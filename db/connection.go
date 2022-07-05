@@ -7,7 +7,8 @@ import (
 
 const uris_table string = `
   CREATE TABLE IF NOT EXISTS uris (
-  uri TEXT PRIMARY KEY NOT NULL
+  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  name TEXT NOT NULL UNIQUE
   );`
 
 const endpoints_table string = `
@@ -17,17 +18,20 @@ const endpoints_table string = `
   body TEXT,
   headers TEXT,
   method TEXT NOT NULL,
-  uri INTEGER NOT NULL,
-  FOREIGN KEY (uri)
-       REFERENCES uris (uri)
+  uri TEXT NULL,
+  FOREIGN KEY(uri) REFERENCES uris(name)
   );`
 
 func Conn() (*sql.DB, error) {
-	db, err := sql.Open("sqlite3", "./database.db")
+	db, err := sql.Open("sqlite3", "./database.db?_foreign_keys=on")
 
 	if err != nil {
 		return nil, err
 	}
+
+	stmt, err := db.Prepare("PRAGMA foreign_keys = ON;")
+	defer stmt.Close()
+	stmt.Exec()
 
 	if err := createTable(db, uris_table); err != nil {
 		return nil, err

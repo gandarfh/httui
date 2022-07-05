@@ -8,22 +8,6 @@ import (
 	"github.com/jroimartin/gocui"
 )
 
-func layouts(g *gocui.Gui) error {
-	if err := v.Endpoints(g); err != nil {
-		return err
-	}
-
-	if err := v.Uri(g); err != nil {
-		return err
-	}
-
-	if err := v.Content(g); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func main() {
 
 	g, err := gocui.NewGui(gocui.OutputNormal)
@@ -34,8 +18,9 @@ func main() {
 
 	g.Highlight = true
 	g.SelFgColor = gocui.ColorGreen
+	g.InputEsc = true
 
-	g.SetManagerFunc(layouts)
+	g.SetManagerFunc(v.Layouts)
 
 	if err := cmd.Bindings(g); err != nil {
 		log.Panicln(err)

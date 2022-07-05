@@ -2,8 +2,10 @@ package cmd
 
 import "github.com/jroimartin/gocui"
 
-func Bindings(g *gocui.Gui) error {
+var views = []string{"uri", "endpoints", "content"}
+var active = 0
 
+func Bindings(g *gocui.Gui) error {
 	// global key bindings
 	if err := g.SetKeybinding("", 'q', gocui.ModNone, quit); err != nil {
 		return err
@@ -13,11 +15,11 @@ func Bindings(g *gocui.Gui) error {
 		return err
 	}
 
-	if err := g.SetKeybinding("", 'l', gocui.ModNone, Navigate("next")); err != nil {
+	if err := g.SetKeybinding("", 'l', gocui.ModNone, Navigate("next", views, &active)); err != nil {
 		return err
 	}
 
-	if err := g.SetKeybinding("", 'h', gocui.ModNone, Navigate("prev")); err != nil {
+	if err := g.SetKeybinding("", 'h', gocui.ModNone, Navigate("prev", views, &active)); err != nil {
 		return err
 	}
 
