@@ -10,7 +10,7 @@ import (
 	c "github.com/logrusorgru/aurora/v3"
 )
 
-func Endpoints(g *gocui.Gui) error {
+func Endpoints(g *gocui.Gui, config *cmd.Config) error {
 	_, maxY := g.Size()
 
 	if v, err := g.SetView("endpoints", 4, 5, 30, maxY-4); err != nil {
@@ -25,7 +25,7 @@ func Endpoints(g *gocui.Gui) error {
 		v.Autoscroll = true
 		g.Cursor = true
 
-		Bus.Subscribe("endpoints:get", listEndpoints)
+		cmd.Bus.Subscribe("endpoints:get", listEndpoints(config))
 
 		v.Title = " Endpoints "
 	}
@@ -33,16 +33,8 @@ func Endpoints(g *gocui.Gui) error {
 	return nil
 }
 
-func listByBus() {
-
-}
-
-func listEndpoints(g *gocui.Gui, v *gocui.View, uri string) error {
-	list, err := model.GetEndpoints(uri)
-
-	if err != nil {
-		return err
-	}
+func listEndpoints(config *cmd.Config) func(g *gocui.Gui, v *gocui.View, uri string) error {
+	list := config.GetUri()
 
 	fmt.Fprintln(v, list)
 

@@ -4,16 +4,11 @@ import (
 	"fmt"
 
 	"github.com/gandarfh/httui/cmd"
-	"github.com/gandarfh/httui/cmd/model"
 	"github.com/jroimartin/gocui"
 	c "github.com/logrusorgru/aurora/v3"
 )
 
-func getCurrentUri(v *gocui.View, name string) {
-	fmt.Fprintln(v, c.Bold(c.Yellow(name)))
-}
-
-func Uri(g *gocui.Gui) error {
+func Uri(g *gocui.Gui, config *cmd.Config) error {
 	maxX, _ := g.Size()
 
 	if v, err := g.SetView("uri", 4, 2, maxX-4, 4); err != nil {
@@ -25,19 +20,22 @@ func Uri(g *gocui.Gui) error {
 			return err
 		}
 
-		if err := uBindings(g); err != nil {
+		if err := uBindings(g, config); err != nil {
 			return err
 		}
 
-		Bus.Subscribe("uri:current-uri", getCurrentUri)
-		v.Title = " Uri "
+		uDefault := config.GetDefaultUri()
 
+		fmt.Fprintln(v, c.Bold(c.Yellow(uDefault.Alias)))
+
+		cmd.Bus.Subscribe("uri:current-uri", getCurrentUri)
+		v.Title = " Uri "
 	}
 
 	return nil
 }
 
-func NewUri(g *gocui.Gui, v *gocui.View) error {
+func newUri(g *gocui.Gui, v *gocui.View) error {
 	g.DeleteKeybindings("")
 
 	maxX, maxY := g.Size()
@@ -55,36 +53,39 @@ func NewUri(g *gocui.Gui, v *gocui.View) error {
 	return nil
 }
 
-func ListUris(g *gocui.Gui, v *gocui.View) error {
-	g.DeleteKeybindings("")
-	maxX, maxY := g.Size()
+func listUris(config *cmd.Config) func(g *gocui.Gui, v *gocui.View) error {
 
-	if v, err := g.SetView("select-uri", maxX/5, (maxY / 3), (maxX - (maxX / 5)), (maxY/2)+2); err != nil {
-		if err != gocui.ErrUnknownView {
-			return err
-		}
+	return func(g *gocui.Gui, v *gocui.View) error {
 
-		if list, err := model.GetUris(); err != nil {
-			return err
-		} else {
-			for _, name := range list {
-				fmt.Fprintln(v, "", c.Bold(c.White(name)))
+		g.DeleteKeybindings("")
+		maxX, maxY := g.Size()
+
+		if v, err := g.SetView("select-uri", maxX/5, (maxY / 3), (maxX - (maxX / 5)), (maxY/2)+2); err != nil {
+			if err != gocui.ErrUnknownView {
+				return err
 			}
+
+			list := config.Uris
+
+			for _, item := range list {
+				fmt.Fprintln(v, "", c.Bold(c.White(item.Alias)))
+			}
+
+			v.Title = " Select uri "
+			cmd.SetActive(g, "select-uri")
 		}
 
-		v.Title = " Select uri "
-		cmd.SetActive(g, "select-uri")
-	}
+		return nil
 
-	return nil
+	}
 }
 
-func uBindings(g *gocui.Gui) error {
-	if err := g.SetKeybinding("uri", 'c', gocui.ModNone, NewUri); err != nil {
+func uBindings(g *gocui.Gui, config *cmd.Config) error {
+	if err := g.SetKeybinding("uri", 'c', gocui.ModNone, newUri); err != nil {
 		return err
 	}
 
-	if err := g.SetKeybinding("uri", 's', gocui.ModNone, ListUris); err != nil {
+	if err := g.SetKeybinding("uri", 's', gocui.ModNone, listUris(config)); err != nil {
 		return err
 	}
 
@@ -114,6 +115,10 @@ func uBindings(g *gocui.Gui) error {
 	return nil
 }
 
+func getCurrentUri(v *gocui.View, name string) {
+	fmt.Fprintln(v, c.Bold(c.Yellow(name)))
+}
+
 func selectUri(g *gocui.Gui, v *gocui.View) error {
 	defer cmd.Close("select-uri", "uri")(g, v)
 
@@ -135,20 +140,21 @@ func selectUri(g *gocui.Gui, v *gocui.View) error {
 	}
 	eView.Clear()
 	uView.Clear()
-	Bus.Publish("uri:current-uri", uView, line)
-	Bus.Publish("endpoints:get", g, eView, line)
+
+	cmd.Bus.Publish("uri:current-uri", uView, line)
+	cmd.Bus.Publish("endpoints:get", g, eView, line)
 	return nil
 }
 
 func saveNewUri(g *gocui.Gui, v *gocui.View) error {
 	defer cmd.Close("create-uri", "uri")(g, v)
-	name, err := v.Line(0)
+	// name, err := v.Line(0)
 
-	if err != nil {
-		return err
-	}
+	// if err != nil {
+	// 	return err
+	// }
 
-	model.CreateUri(name)
+	// model.CreateUri(name)
 
 	return nil
 }

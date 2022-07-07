@@ -1,0 +1,13 @@
+dataSource:
+  - alias: "http:localhost:3000"
+    endpoints:
+      - path: api/users
+        method: get
+        headers:
+        body:
+      - path: api/users
+        method: post
+        headers:
+        body:
+
+default: "http:localhost:3000"
