@@ -2,11 +2,11 @@ dataSource:
   - alias: "http:localhost:3000"
     endpoints:
       - path: api/users
-        method: get
+        method: GET
         headers:
         body:
       - path: api/users
-        method: post
+        method: POST 
         headers:
         body:
 

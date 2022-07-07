@@ -5,7 +5,6 @@ import (
 
 	"github.com/gandarfh/httui/cmd"
 	"github.com/gandarfh/httui/cmd/elements"
-	"github.com/gandarfh/httui/cmd/model"
 	"github.com/jroimartin/gocui"
 	c "github.com/logrusorgru/aurora/v3"
 )
@@ -25,6 +24,7 @@ func Endpoints(g *gocui.Gui, config *cmd.Config) error {
 		v.Autoscroll = true
 		g.Cursor = true
 
+		listEndpoints(config)(g, v, &config.Default)
 		cmd.Bus.Subscribe("endpoints:get", listEndpoints(config))
 
 		v.Title = " Endpoints "
@@ -33,20 +33,22 @@ func Endpoints(g *gocui.Gui, config *cmd.Config) error {
 	return nil
 }
 
-func listEndpoints(config *cmd.Config) func(g *gocui.Gui, v *gocui.View, uri string) error {
-	list := config.GetUri()
+func listEndpoints(config *cmd.Config) func(g *gocui.Gui, v *gocui.View, uri *string) error {
+	return func(g *gocui.Gui, v *gocui.View, uri *string) error {
 
-	fmt.Fprintln(v, list)
+		list := config.GetUri(uri)
 
-	// if len(list) == 0 {
-	// 	fmt.Fprintln(v, c.Red("not found uri"))
-	// }
+		if len(*list.ListEndpoints()) == 0 {
+			fmt.Fprintln(v, c.Red("not found uri"))
+		}
 
-	for _, item := range list {
-		fmt.Fprintln(v, "", c.Bold(getMethod(item["method"])), c.Gray(1, item["path"]))
+		for _, item := range *&list.Endpoints {
+			fmt.Fprintln(v, "", c.Bold(getMethod(item.Method)), c.Gray(1, item.Path))
+		}
+
+		return nil
+
 	}
-
-	return nil
 }
 
 var views = []string{"create-endpoint", "method", "path"}
@@ -109,7 +111,6 @@ func createEndpoint(g *gocui.Gui, v *gocui.View) error {
 	}
 
 	for _, name := range test {
-
 		key, err := g.View(name)
 		if err != nil {
 			return err
@@ -119,9 +120,9 @@ func createEndpoint(g *gocui.Gui, v *gocui.View) error {
 		values[name] = value
 	}
 
-	if err := model.CreateEndpoint(values); err != nil {
-		return err
-	}
+	// if err := model.CreateEndpoint(values); err != nil {
+	// 	return err
+	// }
 
 	if err := cmd.CloseList(views, "endpoints")(g, v); err != nil {
 		return err

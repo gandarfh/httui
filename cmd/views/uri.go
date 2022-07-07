@@ -142,7 +142,7 @@ func selectUri(g *gocui.Gui, v *gocui.View) error {
 	uView.Clear()
 
 	cmd.Bus.Publish("uri:current-uri", uView, line)
-	cmd.Bus.Publish("endpoints:get", g, eView, line)
+	cmd.Bus.Publish("endpoints:get", g, eView, &line)
 	return nil
 }
 

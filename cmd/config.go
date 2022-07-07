@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -41,9 +42,10 @@ func (config *Config) SetDefaultUri() {}
 func (config *Config) CreateUri() {}
 
 func Connect() (*Config, error) {
-	file, err := os.ReadFile("../config.yml")
+	file, err := os.ReadFile("config.yml")
 
 	if err != nil {
+		fmt.Println(err)
 		log.Fatal("Error when try read config.yml file:\n")
 		return &Config{}, err
 	}
@@ -53,7 +55,7 @@ func Connect() (*Config, error) {
 	err = yaml.Unmarshal(file, &config)
 
 	if err != nil {
-
+		fmt.Println(err)
 		log.Fatal("Bad syntax in config.yml. \n", "Syntax must be like: `Config struct`")
 		return &Config{}, err
 	}
