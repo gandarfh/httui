@@ -1,13 +1,46 @@
+default: api.onhousi.com/v3
 dataSource:
-  - alias: "http:localhost:3000"
-    endpoints:
-      - path: api/users
-        method: GET
-        headers:
-        body:
-      - path: api/users
-        method: POST 
-        headers:
-        body:
-
-default: "http:localhost:3000"
+    - alias: http:localhost:3000
+      endpoints:
+        - path: api/users
+          method: GET
+          headers: ""
+          body: ""
+        - path: api/users
+          method: POST
+          headers: ""
+          body: ""
+    - alias: http:localhost:4000
+      endpoints:
+        - path: api/products
+          method: GET
+          headers: ""
+          body: ""
+        - path: api/products
+          method: POST
+          headers: ""
+          body: ""
+    - alias: http:localhost:2020
+      endpoints:
+        - path: api/tests
+          method: GET
+          headers: ""
+          body: ""
+        - path: api/tests
+          method: POST
+          headers: ""
+          body: ""
+    - alias: api.onhousi.com/v3
+      endpoints:
+        - path: geosearch
+          method: POST
+          headers: api.onhousi.com/v3
+          body: ""
+        - path: /geosearch
+          method: GET
+          headers: api.onhousi.com/v3
+          body: ""
+        - path: /properties/detail/[id]
+          method: GET
+          headers: api.onhousi.com/v3
+          body: ""

@@ -13,14 +13,14 @@ import (
 var Bus = EventBus.New()
 
 type Config struct {
-	Default string      `yaml:"default"`
-	Uris    []model.Uri `yaml:"dataSource"`
+	Default string       `yaml:"default"`
+	Uris    *[]model.Uri `yaml:"dataSource"`
 }
 
 func (config *Config) GetUri(alias *string) *model.Uri {
 	uri := model.Uri{}
 
-	for _, item := range config.Uris {
+	for _, item := range *config.Uris {
 		if item.Alias == *alias {
 
 			uri = item
@@ -37,9 +37,47 @@ func (config *Config) GetDefaultUri() *model.Uri {
 	return &uri
 }
 
-func (config *Config) SetDefaultUri() {}
+func (config *Config) SetDefaultUri(uri *string) {
+	newConfig := Config{
+		Uris:    config.Uris,
+		Default: *uri,
+	}
 
-func (config *Config) CreateUri() {}
+	err := updateConfig(&newConfig)
+
+	if err != nil {
+		log.Panicln(err)
+	}
+}
+
+func (config *Config) CreateUri(uri *model.Uri) error {
+	*config.Uris = append(*config.Uris, *uri)
+
+	if err := updateConfig(config); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (config *Config) CreateEndpoint(uri *model.Uri, in *model.Endpoint) error {
+
+	for _, item := range *config.Uris {
+		if item.Alias == uri.Alias {
+
+			*item.Endpoints = append(*item.Endpoints, *in)
+			break
+		}
+	}
+
+	fmt.Print(config.GetUri(&uri.Alias))
+
+	if err := updateConfig(config); err != nil {
+		return err
+	}
+
+	return nil
+}
 
 func Connect() (*Config, error) {
 	file, err := os.ReadFile("config.yml")
@@ -61,4 +99,22 @@ func Connect() (*Config, error) {
 	}
 
 	return &config, nil
+}
+
+func updateConfig(in *Config) error {
+	out, err := yaml.Marshal(&in)
+
+	if err != nil {
+
+		return err
+	}
+
+	err = os.WriteFile("config.yml", out, 0666)
+
+	if err != nil {
+
+		return err
+	}
+
+	return nil
 }

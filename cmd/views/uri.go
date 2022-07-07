@@ -2,8 +2,10 @@ package views
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/gandarfh/httui/cmd"
+	"github.com/gandarfh/httui/cmd/model"
 	"github.com/jroimartin/gocui"
 	c "github.com/logrusorgru/aurora/v3"
 )
@@ -40,7 +42,10 @@ func newUri(g *gocui.Gui, v *gocui.View) error {
 
 	maxX, maxY := g.Size()
 
-	if v, err := g.SetView("create-uri", maxX/5, (maxY / 2), (maxX - (maxX / 5)), (maxY/2)+2); err != nil {
+	y, y1 := (maxY / 3), (maxY/3)+2
+	x, x1 := maxX/3, (maxX - (maxX / 3))
+
+	if v, err := g.SetView("create-uri", x, y, x1, y1); err != nil {
 		if err != gocui.ErrUnknownView {
 			return err
 		}
@@ -60,14 +65,17 @@ func listUris(config *cmd.Config) func(g *gocui.Gui, v *gocui.View) error {
 		g.DeleteKeybindings("")
 		maxX, maxY := g.Size()
 
-		if v, err := g.SetView("select-uri", maxX/5, (maxY / 3), (maxX - (maxX / 5)), (maxY/2)+2); err != nil {
+		y, y1 := (maxY / 3), (maxY / 2)
+		x, x1 := maxX/3, (maxX - (maxX / 3))
+
+		if v, err := g.SetView("select-uri", x, y, x1, y1); err != nil {
 			if err != gocui.ErrUnknownView {
 				return err
 			}
 
 			list := config.Uris
 
-			for _, item := range list {
+			for _, item := range *list {
 				fmt.Fprintln(v, "", c.Bold(c.White(item.Alias)))
 			}
 
@@ -89,7 +97,7 @@ func uBindings(g *gocui.Gui, config *cmd.Config) error {
 		return err
 	}
 
-	if err := g.SetKeybinding("create-uri", gocui.KeyEnter, gocui.ModNone, saveNewUri); err != nil {
+	if err := g.SetKeybinding("create-uri", gocui.KeyEnter, gocui.ModNone, saveNewUri(config)); err != nil {
 		return err
 	}
 
@@ -141,20 +149,32 @@ func selectUri(g *gocui.Gui, v *gocui.View) error {
 	eView.Clear()
 	uView.Clear()
 
-	cmd.Bus.Publish("uri:current-uri", uView, line)
-	cmd.Bus.Publish("endpoints:get", g, eView, &line)
+	uri := strings.TrimLeft(line, " ")
+
+	cmd.Bus.Publish("uri:current-uri", uView, uri)
+	cmd.Bus.Publish("endpoints:get", g, eView, &uri)
+
 	return nil
 }
 
-func saveNewUri(g *gocui.Gui, v *gocui.View) error {
-	defer cmd.Close("create-uri", "uri")(g, v)
-	// name, err := v.Line(0)
+func saveNewUri(config *cmd.Config) func(g *gocui.Gui, v *gocui.View) error {
+	return func(g *gocui.Gui, v *gocui.View) error {
 
-	// if err != nil {
-	// 	return err
-	// }
+		defer cmd.Close("create-uri", "uri")(g, v)
 
-	// model.CreateUri(name)
+		name, err := v.Line(0)
 
-	return nil
+		if err != nil {
+			return err
+		}
+
+		uri := model.Uri{Alias: name, Endpoints: &[]model.Endpoint{}}
+
+		if err := config.CreateUri(&uri); err != nil {
+			return err
+		}
+
+		return nil
+
+	}
 }
