@@ -1,4 +1,4 @@
-default: api.onhousi.com/v3
+default: http:localhost:3000
 dataSource:
     - alias: http:localhost:3000
       endpoints:
@@ -10,6 +10,14 @@ dataSource:
           method: POST
           headers: ""
           body: ""
+        - path: api/products
+          method: GET
+          headers: http:localhost:3000
+          body: ""
+        - path: api/products
+          method: POST
+          headers: http:localhost:3000
+          body: ""
     - alias: http:localhost:4000
       endpoints:
         - path: api/products
@@ -19,6 +27,10 @@ dataSource:
         - path: api/products
           method: POST
           headers: ""
+          body: ""
+        - path: api/users
+          method: GET
+          headers: http:localhost:4000
           body: ""
     - alias: http:localhost:2020
       endpoints:
@@ -42,5 +54,9 @@ dataSource:
           body: ""
         - path: /properties/detail/[id]
           method: GET
+          headers: api.onhousi.com/v3
+          body: ""
+        - path: api/users
+          method: PATCH
           headers: api.onhousi.com/v3
           body: ""

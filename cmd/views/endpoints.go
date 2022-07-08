@@ -136,13 +136,14 @@ func createEndpoint(config *cmd.Config) func(g *gocui.Gui, v *gocui.View) error 
 			return err
 		}
 
-		eView, err := g.View("view")
+		eView, err := g.View("endpoints")
 
 		if err != nil {
 			return err
 		}
 
-		cmd.Bus.Publish("endpoints:get", g, eView, &uri)
+		eView.Clear()
+		cmd.Bus.Publish("endpoints:get", g, eView, &uri.Alias)
 
 		if err := cmd.CloseList(views, "endpoints")(g, v); err != nil {
 			return err
