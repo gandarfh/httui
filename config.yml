@@ -1,4 +1,4 @@
-default: http:localhost:3000
+default: http:localhost:2020
 dataSource:
     - alias: http:localhost:3000
       endpoints:
@@ -16,6 +16,10 @@ dataSource:
           body: ""
         - path: api/products
           method: POST
+          headers: http:localhost:3000
+          body: ""
+        - path: api/services
+          method: DELETE
           headers: http:localhost:3000
           body: ""
     - alias: http:localhost:4000

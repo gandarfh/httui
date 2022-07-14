@@ -13,7 +13,7 @@ import (
 func Uri(g *gocui.Gui, config *cmd.Config) error {
 	maxX, _ := g.Size()
 
-	if v, err := g.SetView("uri", 4, 2, maxX-4, 4); err != nil {
+	if v, err := g.SetView("uri", 4, 2, maxX/3, 4); err != nil {
 		if err != gocui.ErrUnknownView {
 			return err
 		}

@@ -70,8 +70,6 @@ func (config *Config) CreateEndpoint(uri *model.Uri, in *model.Endpoint) error {
 		}
 	}
 
-	fmt.Print(config.GetUri(&uri.Alias))
-
 	if err := updateConfig(config); err != nil {
 		return err
 	}

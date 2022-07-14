@@ -14,7 +14,7 @@ import (
 func Endpoints(g *gocui.Gui, config *cmd.Config) error {
 	_, maxY := g.Size()
 
-	if v, err := g.SetView("endpoints", 4, 5, 30, maxY-4); err != nil {
+	if v, err := g.SetView("endpoints", 4, 5, 34, maxY-4); err != nil {
 		if err != gocui.ErrUnknownView {
 			return err
 		}
@@ -64,7 +64,7 @@ func createView(g *gocui.Gui, v *gocui.View) error {
 	maxX, maxY := g.Size()
 
 	x, x1 := maxX/3, maxX-(maxX/3)
-	y, y1 := maxY/3, (maxY/2)-4
+	y, y1 := maxY/3, (maxY/3)+7
 
 	if v, err := g.SetView("create-endpoint", x, y, x1, y1); err != nil {
 		if err != gocui.ErrUnknownView {
@@ -128,7 +128,7 @@ func createEndpoint(config *cmd.Config) func(g *gocui.Gui, v *gocui.View) error 
 
 		uri := config.GetUri(&address)
 
-		endpoint := model.Endpoint{Path: values["path"], Method: values["method"], Headers: values["uri"]}
+		endpoint := model.Endpoint{Path: values["path"], Method: strings.ToUpper(values["method"]), Headers: values["uri"]}
 
 		err := config.CreateEndpoint(uri, &endpoint)
 
@@ -211,7 +211,7 @@ func getMethod(method string) c.Value {
 	case "PUT":
 		selected = c.Brown(method)
 	case "DELETE":
-		selected = c.Brown(method)
+		selected = c.Red(method)
 	default:
 		selected = c.Green(method)
 	}
@@ -220,13 +220,14 @@ func getMethod(method string) c.Value {
 }
 
 func getLine(g *gocui.Gui, v *gocui.View) error {
-	// var l string
-	// var err error
+	line, _ := cmd.GetLine(v)
+	// vContent, _ := g.View("content")
 
-	// _, cy := v.Cursor()
-	// if l, err = v.Line(cy); err != nil {
-	// 	l = ""
-	// }
+	value := strings.Split(strings.TrimLeft(line, " "), " ")
+
+	cmd.Bus.Publish("test", value[1])
+
+	// vContent.Title = fmt.Sprintf(" %v ", value[1])
 
 	return nil
 }

@@ -2,7 +2,7 @@ package cmd
 
 import "github.com/jroimartin/gocui"
 
-var views = []string{"uri", "endpoints", "content"}
+var views = []string{"uri", "preview", "endpoints", "body", "header", "response"}
 var active = 0
 
 func Bindings(g *gocui.Gui) error {
