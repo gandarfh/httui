@@ -8,8 +8,8 @@ import (
 func Body(g *gocui.Gui, config *cmd.Config) error {
 	maxX, maxY := g.Size()
 
-	x, x1 := 36, (maxX/3)+8
-	y, y1 := 5, maxY-4
+	x, x1 := 38, (maxX/2)+10
+	y, y1 := 9, maxY/2
 
 	if v, err := g.SetView("body", x, y, x1, y1); err != nil {
 		if err != gocui.ErrUnknownView {

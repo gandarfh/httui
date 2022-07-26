@@ -8,7 +8,7 @@ import (
 func Response(g *gocui.Gui, config *cmd.Config) error {
 	maxX, maxY := g.Size()
 
-	x, x1 := (maxX/2)+20, maxX-6
+	x, x1 := (maxX/2)+12, maxX-6
 	y, y1 := 5, maxY-4
 
 	if v, err := g.SetView("response", x, y, x1, y1); err != nil {

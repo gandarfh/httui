@@ -1,4 +1,4 @@
-default: http:localhost:2020
+default: api.onhousi.com/v3
 dataSource:
     - alias: http:localhost:3000
       endpoints:

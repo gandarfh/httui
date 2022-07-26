@@ -8,6 +8,12 @@ import (
 )
 
 func Content(g *gocui.Gui, config *cmd.Config) error {
+	if err := Tabs(g, config); err != nil {
+		return err
+	}
+	if err := Params(g, config); err != nil {
+		return err
+	}
 	if err := Body(g, config); err != nil {
 		return err
 	}

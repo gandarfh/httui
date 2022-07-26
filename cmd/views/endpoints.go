@@ -14,7 +14,10 @@ import (
 func Endpoints(g *gocui.Gui, config *cmd.Config) error {
 	_, maxY := g.Size()
 
-	if v, err := g.SetView("endpoints", 4, 5, 34, maxY-4); err != nil {
+	x, x1 := 4, 36
+	y, y1 := 5, maxY-4
+
+	if v, err := g.SetView("endpoints", x, y, x1, y1); err != nil {
 		if err != gocui.ErrUnknownView {
 			return err
 		}
