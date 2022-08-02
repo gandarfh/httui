@@ -1,0 +1,30 @@
+default: api.onhousi.com/v3
+dataSource:
+    - alias: http:localhost:3000
+      id: 342f2467-01fa-4f60-a7bd-5103b0040f86
+      endpoints:
+        - path: api/users
+          method: GET
+          headers: ""
+          body: ""
+          id: bcc6ba84-eed8-4b6d-a2a0-43f69037c756
+        - path: api/users
+          method: POST
+          headers: ""
+          body: ""
+          id: fc597574-043d-42b6-a8c4-7b10cca93a01
+        - path: api/products
+          method: GET
+          headers: http:localhost:3000
+          body: ""
+          id: 75dbdaeb-b88d-415d-b772-48bbe57ec309
+        - path: api/products
+          method: POST
+          headers: http:localhost:3000
+          body: ""
+        - path: api/services
+          method: DELETE
+          headers: http:localhost:3000
+          body: ""
+          id: ff45b480-7ef8-4fb3-976a-0d75be1a5e33
+
