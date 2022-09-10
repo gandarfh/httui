@@ -3,7 +3,7 @@ package workspace
 import (
 	"fmt"
 
-	"github.com/gandarfh/httui-repl/cmd/commands"
+	"github.com/gandarfh/httui-repl/pkg/commands"
 )
 
 type Workspaces struct {
@@ -12,7 +12,7 @@ type Workspaces struct {
 	BaseUrl string
 }
 
-func (w *Workspaces) Read(tokens []string) error {
+func (w *Workspaces) Read(tokens ...string) error {
 	w.Name = tokens[0]
 	return nil
 }
