@@ -7,8 +7,9 @@ import (
 	"os"
 	"strings"
 
-	notfound "github.com/gandarfh/httui-repl/cmd/methods/not_found"
-	"github.com/gandarfh/httui-repl/cmd/process"
+	"github.com/gandarfh/httui-repl/internal/methods"
+	"github.com/gandarfh/httui-repl/internal/methods/errors"
+	"github.com/gandarfh/httui-repl/pkg/process"
 )
 
 const (
@@ -16,35 +17,29 @@ const (
 )
 
 func main() {
+	wellcome()
+	console()
+}
+
+func console() {
 	tokens, err := start()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	process, err := process.Start(tokens)
+	err = process.Start(tokens, methods.Commands)
 	if err != nil {
-		process := notfound.Init()
+		command := errors.Init(err)
 
-		process.Read(tokens)
-		process.Eval()
-		process.Print()
-	} else {
-		// TODO: tratar erros para cada processo
-		process.Read(tokens)
-		process.Eval()
-		process.Print()
+		command.Read(tokens...)
+		command.Eval()
+		command.Print()
 	}
-	main()
-}
 
-func wellcome() {
-	fmt.Printf("Wellcome my love >.<  ───  v%s.\n", version)
-	fmt.Println("Want more?")
-	fmt.Print("\n")
+	console()
 }
 
 func start() ([]string, error) {
-	wellcome()
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Print("httui=> ")
 	cmd, err := reader.ReadString('\n')
@@ -56,4 +51,10 @@ func start() ([]string, error) {
 	tokens := strings.Split(strings.TrimSpace(cmd), " ")
 
 	return tokens, nil
+}
+
+func wellcome() {
+	fmt.Printf("Wellcome my love >.<  ───  v%s.\n", version)
+	fmt.Println("Want more?")
+	fmt.Print("\n")
 }
