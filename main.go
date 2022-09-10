@@ -22,16 +22,16 @@ func main() {
 }
 
 func console() {
-	tokens, err := start()
+	args, err := getArgs()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = process.Start(tokens, methods.Commands)
+	err = process.Start(args, methods.Commands)
 	if err != nil {
 		command := errors.Init(err)
 
-		command.Read(tokens...)
+		command.Read(args...)
 		command.Eval()
 		command.Print()
 	}
@@ -39,7 +39,7 @@ func console() {
 	console()
 }
 
-func start() ([]string, error) {
+func getArgs() ([]string, error) {
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Print("httui=> ")
 	cmd, err := reader.ReadString('\n')
