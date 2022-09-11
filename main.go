@@ -1,11 +1,12 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"log"
 	"os"
 	"strings"
+
+	"github.com/peterh/liner"
 
 	"github.com/gandarfh/httui-repl/internal/methods"
 	"github.com/gandarfh/httui-repl/internal/methods/errors"
@@ -13,42 +14,52 @@ import (
 )
 
 const (
-	version = "0.1.0"
+	version    = "0.1.0"
+	history_fn = "./.httui_history"
 )
 
 func main() {
+	line := liner.NewLiner()
+	defer line.Close()
+
+	if f, err := os.Open(history_fn); err == nil {
+		line.ReadHistory(f)
+		f.Close()
+	}
+
 	wellcome()
-	console()
+	console(line)
+
 }
 
-func console() {
-	args, err := getArgs()
-	if err != nil {
-		log.Fatal(err)
+func console(line *liner.State) {
+	if value, err := line.Prompt("httui=> "); err == nil {
+		line.AppendHistory(value)
+		args, _ := getArgs(value)
+
+		err = process.Start(args, methods.Commands)
+		if err != nil {
+			command := errors.Init(err).(*errors.Error)
+			command.Run(args...)
+		}
+
+	} else {
+		log.Print("Error reading line: ", err)
+		os.Exit(0)
 	}
 
-	err = process.Start(args, methods.Commands)
-	if err != nil {
-		command := errors.Init(err)
-
-		command.Read(args...)
-		command.Eval()
-		command.Print()
+	if f, err := os.Create(history_fn); err != nil {
+		log.Print("Error writing history file: ", err)
+	} else {
+		line.WriteHistory(f)
+		f.Close()
 	}
 
-	console()
+	console(line)
 }
 
-func getArgs() ([]string, error) {
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("httui=> ")
-	cmd, err := reader.ReadString('\n')
-
-	if err != nil {
-		return nil, fmt.Errorf("Error when try marshal input data to string!")
-	}
-
-	tokens := strings.Split(strings.TrimSpace(cmd), " ")
+func getArgs(command string) ([]string, error) {
+	tokens := strings.Split(strings.TrimSpace(command), " ")
 
 	return tokens, nil
 }
