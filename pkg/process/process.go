@@ -8,16 +8,16 @@ import (
 // [ command ] [ method ] [ values... ]
 // create      workspace  name=api-prd baseUrl=localhost:5000
 func Start(args []string, commands map[string]repl.Repl) error {
-	command := (args[0])
+	name := (args[0])
 
-	// Try find method, if dont find return a error to print a not found message
-	// Will render `errors` method created into methods folder
-	method, ok := commands[command]
+	// Try find command, if dont find return a error to print a not found message
+	// Will render `errors` command created into methods folder
+	command, ok := commands[name]
 	if !ok {
 		return errors.NotFoundError()
 	}
 
-	err := method.Run(args...)
+	err := command.Run(args...)
 	if err != nil {
 		return errors.NotFoundError()
 	}
