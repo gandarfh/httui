@@ -41,10 +41,6 @@ func (w *Clear) Run(args ...string) error {
 	return nil
 }
 
-func (w *Clear) Help() error {
-	return nil
-}
-
 func Init() repl.Repl {
 	return &Clear{}
 }

@@ -5,5 +5,4 @@ type Repl interface {
 	Eval() error
 	Print() error
 	Run(args ...string) error
-	Help() error
 }

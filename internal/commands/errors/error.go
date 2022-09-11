@@ -47,10 +47,6 @@ func (w *Error) Print() error {
 	return nil
 }
 
-func (w *Error) Help() error {
-	return nil
-}
-
 func (w *Error) Run(args ...string) error {
 	if err := w.Read(args...); err != nil {
 		return err

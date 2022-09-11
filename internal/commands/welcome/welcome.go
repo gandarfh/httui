@@ -37,10 +37,6 @@ func (w *Wellcome) Run(args ...string) error {
 	return nil
 }
 
-func (w *Wellcome) Help() error {
-	return nil
-}
-
 func Init() repl.Repl {
 	return &Wellcome{}
 }

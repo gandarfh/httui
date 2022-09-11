@@ -33,10 +33,6 @@ func (w *Exit) Run(args ...string) error {
 	return nil
 }
 
-func (w *Exit) Help() error {
-	return nil
-}
-
 func Init() repl.Repl {
 	return &Exit{}
 }
