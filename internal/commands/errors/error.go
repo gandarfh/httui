@@ -44,6 +44,7 @@ func (w *Error) Print() error {
 	}
 
 	fmt.Println("For more information type: [help]")
+	fmt.Print("\n")
 
 	return nil
 }

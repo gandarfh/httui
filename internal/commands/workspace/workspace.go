@@ -19,34 +19,35 @@ type Workspaces struct {
 }
 
 func SubCommands() repl.SubCommands {
-	subs := repl.SubCommands{
+	return repl.SubCommands{
 		{Parent: "workspace", Key: "help", Repl: welcome.Init()},
 	}
 
-	return subs
 }
 
 func (w *Workspaces) Read(args ...string) error {
 	mappedArgs, err := utils.ArgsFormat(args[1:])
-
 	if err != nil {
-		return fmt.Errorf("jaum, ta dando merda aqui carai")
+		return errors.BadRequest()
 	}
 
 	err = convert.MapToStruct(mappedArgs, &w.workspace)
-
 	if err != nil {
-		return err
+		return errors.BadRequest()
 	}
 
 	validator := validate.NewValidator()
 
 	if err := validator.Struct(w.workspace); err != nil {
+		errorList := []string{"Unprocessable Entity!\n"}
 
 		// TODO: throw a error
 		for key, value := range validate.ValidatorErrors(err) {
-			fmt.Println(key, value)
+			er := fmt.Sprintf("[%s] - %s", key, value)
+			errorList = append(errorList, er)
 		}
+
+		return errors.UnprocessableEntity(errorList...)
 
 	}
 
@@ -69,15 +70,15 @@ func (w *Workspaces) Print() error {
 
 func (w *Workspaces) Run(args ...string) error {
 	if err := w.Read(args...); err != nil {
-		return errors.ReadError("jaum, ta dando merda aqui carai")
+		return err
 	}
 
 	if err := w.Eval(); err != nil {
-		return fmt.Errorf("jaum, ta dando merda aqui carai")
+		return err
 	}
 
 	if err := w.Print(); err != nil {
-		return fmt.Errorf("jaum, ta dando merda aqui carai")
+		return err
 	}
 
 	return nil

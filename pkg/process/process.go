@@ -20,19 +20,16 @@ func Start(args []string, commands repl.CommandList) error {
 		}
 	}
 
-	fmt.Println(key)
-
 	// Try find command, if dont find return a error to print a not found message
 	// Will render `errors` command created into methods folder
 	command, error := commands.Find(key)
-
 	if error != nil {
 		return errors.NotFoundError()
 	}
 
 	err := command.Repl.Run(args...)
 	if err != nil {
-		return errors.NotFoundError()
+		return err
 	}
 
 	return nil

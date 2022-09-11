@@ -9,6 +9,20 @@ func (r *ProcessErrors) Error() string {
 	return ""
 }
 
+func BadRequest(msg ...string) error {
+	if len(msg) > 0 {
+		return &ProcessErrors{
+			Status:  400,
+			Message: msg,
+		}
+	}
+
+	return &ProcessErrors{
+		Status:  400,
+		Message: []string{"Bad Request!"},
+	}
+}
+
 func NotFoundError(msg ...string) error {
 	if len(msg) > 0 {
 		return &ProcessErrors{
@@ -19,31 +33,20 @@ func NotFoundError(msg ...string) error {
 
 	return &ProcessErrors{
 		Status:  404,
-		Message: []string{"Command not found!"},
+		Message: []string{"Not Found!"},
 	}
 }
 
-func ReadError(msg ...string) error {
-
-	return &ProcessErrors{
-		Status:  404,
-		Message: msg,
+func UnprocessableEntity(msg ...string) error {
+	if len(msg) > 0 {
+		return &ProcessErrors{
+			Status:  422,
+			Message: msg,
+		}
 	}
 
-}
-
-func EvalError(msg ...string) error {
-
 	return &ProcessErrors{
-		Status:  404,
-		Message: msg,
-	}
-}
-
-func PrintError(msg ...string) error {
-
-	return &ProcessErrors{
-		Status:  404,
-		Message: msg,
+		Status:  422,
+		Message: []string{"Unprocessable Entity!"},
 	}
 }
