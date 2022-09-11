@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type WorkspaceModel struct {
+type Workspaces struct {
 	gorm.Model
 	Name string `db:"name" json:"name" validate:"required"`
 	Uri  string `db:"uri" json:"uri" validate:"required"`
@@ -19,7 +19,7 @@ type WorkspaceRepo struct {
 
 func NewWorkspaceRepo() (*WorkspaceRepo, error) {
 	db, err := database.SqliteConnection()
-	db.AutoMigrate(&WorkspaceModel{})
+	db.AutoMigrate(&Workspaces{})
 
 	if err != nil {
 		fmt.Println("Deu ruim database")
@@ -31,7 +31,7 @@ func NewWorkspaceRepo() (*WorkspaceRepo, error) {
 	}, nil
 }
 
-func (repo *WorkspaceRepo) Create(ws *WorkspaceModel) {
+func (repo *WorkspaceRepo) Create(ws *Workspaces) {
 	result := repo.Sql.Create(ws)
 
 	if result.Error != nil {
@@ -39,8 +39,8 @@ func (repo *WorkspaceRepo) Create(ws *WorkspaceModel) {
 	}
 }
 
-func (repo *WorkspaceRepo) List() *[]WorkspaceModel {
-	ws := []WorkspaceModel{}
+func (repo *WorkspaceRepo) List() *[]Workspaces {
+	ws := []Workspaces{}
 	result := repo.Sql.Find(&ws)
 
 	if result.Error != nil {

@@ -12,8 +12,8 @@ import (
 )
 
 type Workspaces struct {
-	workspace repository.WorkspaceModel
-	wks       *[]repository.WorkspaceModel
+	workspace repository.Workspaces
+	wks       *[]repository.Workspaces
 	Repo      *repository.WorkspaceRepo
 }
 
@@ -45,7 +45,6 @@ func (w *Workspaces) Read(tokens ...string) error {
 }
 
 func (w *Workspaces) Eval() error {
-
 	return nil
 }
 
