@@ -11,6 +11,7 @@ import (
 	"github.com/gandarfh/httui-repl/internal/methods"
 	"github.com/gandarfh/httui-repl/internal/methods/errors"
 	"github.com/gandarfh/httui-repl/pkg/process"
+	"github.com/gandarfh/httui-repl/pkg/utils"
 )
 
 const (
@@ -22,7 +23,10 @@ func main() {
 	line := liner.NewLiner()
 	defer line.Close()
 
-	wellcome()
+	fmt.Printf("Wellcome my love >.<  ───  v%s.\n", version)
+	fmt.Println("Want more?")
+	fmt.Print("\n")
+
 	console(line)
 
 }
@@ -33,9 +37,9 @@ func console(line *liner.State) {
 		f.Close()
 	}
 
-	if value, err := line.Prompt("httui=> "); err == nil {
-		line.AppendHistory(value)
-		args, _ := getArgs(value)
+	if output, err := line.Prompt("httui=> "); err == nil {
+		line.AppendHistory(output)
+		args := utils.SplitArgs(strings.TrimSpace(output))
 
 		err = process.Start(args, methods.Commands)
 		if err != nil {
@@ -56,16 +60,4 @@ func console(line *liner.State) {
 	}
 
 	console(line)
-}
-
-func getArgs(command string) ([]string, error) {
-	tokens := strings.Split(strings.TrimSpace(command), " ")
-
-	return tokens, nil
-}
-
-func wellcome() {
-	fmt.Printf("Wellcome my love >.<  ───  v%s.\n", version)
-	fmt.Println("Want more?")
-	fmt.Print("\n")
 }
