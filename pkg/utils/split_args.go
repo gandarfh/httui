@@ -8,6 +8,7 @@ import (
 // Will match: word.word='some value to this'
 // Will match: word="some value to this"
 // Will match: word=42
+// Implementation: https://regexr.com/6to57
 var re = regexp.MustCompile(`(((\w\.?\w?)*?)=(("|')(.*?)("|')|\w*))`)
 
 func SplitArgs(command string) []string {
