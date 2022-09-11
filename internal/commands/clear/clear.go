@@ -1,7 +1,6 @@
 package clear
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
 	"runtime"
@@ -16,14 +15,21 @@ func (w *Clear) Read(args ...string) error {
 }
 
 func (w *Clear) Eval() error {
-	clearTerminal()
+	switch runtime.GOOS {
+	case "darwin":
+		runCmd("clear")
+	case "linux":
+		runCmd("clear")
+	case "windows":
+		runCmd("cmd", "/c", "cls")
+	default:
+		runCmd("clear")
+	}
 
 	return nil
 }
 
 func (w *Clear) Print() error {
-	fmt.Println("By my love <3 >.<")
-
 	return nil
 }
 
@@ -50,14 +56,4 @@ func runCmd(name string, arg ...string) {
 }
 
 func clearTerminal() {
-	switch runtime.GOOS {
-	case "darwin":
-		runCmd("clear")
-	case "linux":
-		runCmd("clear")
-	case "windows":
-		runCmd("cmd", "/c", "cls")
-	default:
-		runCmd("clear")
-	}
 }

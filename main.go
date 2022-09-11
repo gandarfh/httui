@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -10,12 +9,12 @@ import (
 
 	"github.com/gandarfh/httui-repl/internal/commands"
 	"github.com/gandarfh/httui-repl/internal/commands/errors"
+	"github.com/gandarfh/httui-repl/internal/commands/welcome"
 	"github.com/gandarfh/httui-repl/pkg/process"
 	"github.com/gandarfh/httui-repl/pkg/utils"
 )
 
 const (
-	version    = "0.1.0"
 	history_fn = "./.httui_history"
 )
 
@@ -23,9 +22,8 @@ func main() {
 	line := liner.NewLiner()
 	defer line.Close()
 
-	fmt.Printf("Wellcome my love >.<  ───  v%s.\n", version)
-	fmt.Println("Want more?")
-	fmt.Print("\n")
+	welcome := welcome.Init()
+	welcome.Print()
 
 	console(line)
 
