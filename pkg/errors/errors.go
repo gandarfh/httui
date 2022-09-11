@@ -2,7 +2,7 @@ package errors
 
 type ProcessErrors struct {
 	Status  int
-	Message string
+	Message []string
 }
 
 func (r *ProcessErrors) Error() string {
@@ -13,27 +13,37 @@ func NotFoundError(msg ...string) error {
 	if len(msg) > 0 {
 		return &ProcessErrors{
 			Status:  404,
-			Message: msg[0],
+			Message: msg,
 		}
 	}
 
 	return &ProcessErrors{
 		Status:  404,
-		Message: "Command not found!",
+		Message: []string{"Command not found!"},
 	}
 }
 
 func ReadError(msg ...string) error {
 
-	return nil
+	return &ProcessErrors{
+		Status:  404,
+		Message: msg,
+	}
+
 }
 
 func EvalError(msg ...string) error {
 
-	return nil
+	return &ProcessErrors{
+		Status:  404,
+		Message: msg,
+	}
 }
 
 func PrintError(msg ...string) error {
 
-	return nil
+	return &ProcessErrors{
+		Status:  404,
+		Message: msg,
+	}
 }

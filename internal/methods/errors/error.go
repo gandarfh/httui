@@ -10,7 +10,7 @@ import (
 type Error struct {
 	Command string
 	Err     error
-	message *errs.ProcessErrors
+	msgs    *errs.ProcessErrors
 }
 
 func (w *Error) Read(tokens ...string) error {
@@ -21,14 +21,13 @@ func (w *Error) Read(tokens ...string) error {
 
 func (w *Error) Eval() error {
 	if err, ok := w.Err.(*errs.ProcessErrors); ok {
-		w.message = err
-		// w.message.Command = w.Command
+		w.msgs = err
 		return nil
 	}
 
-	w.message = &errs.ProcessErrors{
+	w.msgs = &errs.ProcessErrors{
 		Status:  500,
-		Message: w.Err.Error(),
+		Message: []string{w.Err.Error()},
 	}
 
 	return nil
@@ -36,14 +35,32 @@ func (w *Error) Eval() error {
 
 func (w *Error) Print() error {
 	var msg string
-	msg = fmt.Sprintf("Error when execute [%s] command, pls try again.\n", w.Command)
+	msg = fmt.Sprintf("[%d] | Error when execute [%s] command, pls try again.\n", w.msgs.Status, w.Command)
 	fmt.Println(msg)
 
-	msg = fmt.Sprintf("[%d] | %s", w.message.Status, w.message.Message)
-	fmt.Println(msg)
+	for _, msg := range w.msgs.Message {
+		fmt.Println(msg)
+	}
 
 	fmt.Println("For more information type: [help]")
 
+	return nil
+}
+
+func (w *Error) Help() error {
+	return nil
+}
+
+func (w *Error) Run(args ...string) error {
+	if err := w.Read(args...); err != nil {
+		return err
+	}
+
+	if err := w.Eval(); err != nil {
+		return err
+	}
+
+	w.Print()
 	return nil
 }
 

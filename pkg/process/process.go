@@ -17,7 +17,7 @@ func Start(args []string, commands map[string]commands.Command) error {
 		return errors.NotFoundError()
 	}
 
-	err := Run(method, args)
+	err := method.Run(args...)
 	if err != nil {
 		return errors.NotFoundError()
 	}
