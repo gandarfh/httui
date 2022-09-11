@@ -1,14 +1,11 @@
 package database
 
 import (
-	"fmt"
-
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
 func SqliteConnection() (*gorm.DB, error) {
-	fmt.Println("Connecting to database...")
 	db, err := gorm.Open(sqlite.Open("database.db"), &gorm.Config{})
 
 	if err != nil {
@@ -22,6 +19,5 @@ func SqliteConnection() (*gorm.DB, error) {
 		return nil, err
 	}
 
-	fmt.Println("[Success] | Connected")
 	return db, nil
 }

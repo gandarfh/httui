@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/gandarfh/httui-repl/pkg/commands"
+	"github.com/gandarfh/httui-repl/pkg/repl"
 )
 
 type Exit struct{}
@@ -37,6 +37,6 @@ func (w *Exit) Help() error {
 	return nil
 }
 
-func Init() commands.Command {
+func Init() repl.Repl {
 	return &Exit{}
 }

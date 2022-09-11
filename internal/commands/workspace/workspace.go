@@ -3,10 +3,10 @@ package workspace
 import (
 	"fmt"
 
-	"github.com/gandarfh/httui-repl/internal/methods/workspace/repository"
-	"github.com/gandarfh/httui-repl/pkg/commands"
+	"github.com/gandarfh/httui-repl/internal/commands/workspace/repository"
 	"github.com/gandarfh/httui-repl/pkg/convert"
 	"github.com/gandarfh/httui-repl/pkg/errors"
+	"github.com/gandarfh/httui-repl/pkg/repl"
 	"github.com/gandarfh/httui-repl/pkg/utils"
 	"github.com/gandarfh/httui-repl/pkg/validate"
 )
@@ -78,7 +78,7 @@ func (w *Workspaces) Run(args ...string) error {
 	return nil
 }
 
-func Init() commands.Command {
+func Init() repl.Repl {
 	repo, err := repository.NewWorkspaceRepo()
 
 	if err != nil {

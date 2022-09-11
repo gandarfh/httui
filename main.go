@@ -8,8 +8,8 @@ import (
 
 	"github.com/peterh/liner"
 
-	"github.com/gandarfh/httui-repl/internal/methods"
-	"github.com/gandarfh/httui-repl/internal/methods/errors"
+	"github.com/gandarfh/httui-repl/internal/commands"
+	"github.com/gandarfh/httui-repl/internal/commands/errors"
 	"github.com/gandarfh/httui-repl/pkg/process"
 	"github.com/gandarfh/httui-repl/pkg/utils"
 )
@@ -41,7 +41,7 @@ func console(line *liner.State) {
 		line.AppendHistory(output)
 		args := utils.SplitArgs(strings.TrimSpace(output))
 
-		err = process.Start(args, methods.Commands)
+		err = process.Start(args, commands.Commands)
 		if err != nil {
 			command := errors.Init(err).(*errors.Error)
 			command.Run(args...)

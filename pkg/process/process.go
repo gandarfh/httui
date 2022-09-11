@@ -1,13 +1,13 @@
 package process
 
 import (
-	"github.com/gandarfh/httui-repl/pkg/commands"
 	"github.com/gandarfh/httui-repl/pkg/errors"
+	"github.com/gandarfh/httui-repl/pkg/repl"
 )
 
 // [ command ] [ method ] [ values... ]
 // create      workspace  name=api-prd baseUrl=localhost:5000
-func Start(args []string, commands map[string]commands.Command) error {
+func Start(args []string, commands map[string]repl.Repl) error {
 	command := (args[0])
 
 	// Try find method, if dont find return a error to print a not found message

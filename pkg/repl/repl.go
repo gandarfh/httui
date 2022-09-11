@@ -1,6 +1,6 @@
-package commands
+package repl
 
-type Command interface {
+type Repl interface {
 	Read(args ...string) error
 	Eval() error
 	Print() error

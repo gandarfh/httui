@@ -3,8 +3,8 @@ package errors
 import (
 	"fmt"
 
-	"github.com/gandarfh/httui-repl/pkg/commands"
 	errs "github.com/gandarfh/httui-repl/pkg/errors"
+	"github.com/gandarfh/httui-repl/pkg/repl"
 )
 
 type Error struct {
@@ -64,7 +64,7 @@ func (w *Error) Run(args ...string) error {
 	return nil
 }
 
-func Init(err error) commands.Command {
+func Init(err error) repl.Repl {
 	return &Error{
 		Err: err,
 	}
