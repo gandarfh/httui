@@ -25,6 +25,15 @@ func main() {
 	welcome := welcome.Init()
 	welcome.Print()
 
+	line.SetCompleter(func(l string) (c []string) {
+		for _, i := range commands.Cmds() {
+			if strings.HasPrefix(i.Key, strings.ToLower(l)) {
+				c = append(c, i.Key)
+			}
+		}
+		return
+	})
+
 	console(line)
 
 }
@@ -39,7 +48,7 @@ func console(line *liner.State) {
 		line.AppendHistory(output)
 		args := utils.SplitArgs(strings.TrimSpace(output))
 
-		err = process.Start(args, commands.Commands)
+		err = process.Start(args, commands.Cmds())
 		if err != nil {
 			command := errors.Init(err).(*errors.Error)
 			command.Run(args...)

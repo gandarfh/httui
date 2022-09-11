@@ -3,6 +3,7 @@ package workspace
 import (
 	"fmt"
 
+	"github.com/gandarfh/httui-repl/internal/commands/welcome"
 	"github.com/gandarfh/httui-repl/internal/commands/workspace/repository"
 	"github.com/gandarfh/httui-repl/pkg/convert"
 	"github.com/gandarfh/httui-repl/pkg/errors"
@@ -17,9 +18,16 @@ type Workspaces struct {
 	Repo      *repository.WorkspaceRepo
 }
 
-func (w *Workspaces) Read(tokens ...string) error {
+func SubCommands() repl.SubCommands {
+	subs := repl.SubCommands{
+		{Parent: "workspace", Key: "help", Repl: welcome.Init()},
+	}
 
-	mappedArgs, err := utils.ArgsFormat(tokens[1:])
+	return subs
+}
+
+func (w *Workspaces) Read(args ...string) error {
+	mappedArgs, err := utils.ArgsFormat(args[1:])
 
 	if err != nil {
 		return fmt.Errorf("jaum, ta dando merda aqui carai")
@@ -35,6 +43,7 @@ func (w *Workspaces) Read(tokens ...string) error {
 
 	if err := validator.Struct(w.workspace); err != nil {
 
+		// TODO: throw a error
 		for key, value := range validate.ValidatorErrors(err) {
 			fmt.Println(key, value)
 		}
@@ -58,10 +67,6 @@ func (w *Workspaces) Print() error {
 	return nil
 }
 
-func (w *Workspaces) Help() error {
-	return nil
-}
-
 func (w *Workspaces) Run(args ...string) error {
 	if err := w.Read(args...); err != nil {
 		return errors.ReadError("jaum, ta dando merda aqui carai")
@@ -80,7 +85,6 @@ func (w *Workspaces) Run(args ...string) error {
 
 func Init() repl.Repl {
 	repo, err := repository.NewWorkspaceRepo()
-
 	if err != nil {
 		fmt.Println("erro init repo")
 	}

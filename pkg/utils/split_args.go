@@ -14,7 +14,7 @@ var re = regexp.MustCompile(`(((\w\.?\w?)*?)=(("|')(.*?)("|')|\w*))`)
 func SplitArgs(command string) []string {
 	commands := strings.Split(command, " ")
 
-	if hasQuotes(command) {
+	if IsKeyValue(command) {
 		removedQuotes := []string{}
 
 		for _, item := range re.FindAllString(command, -1) {
@@ -27,13 +27,12 @@ func SplitArgs(command string) []string {
 
 		commands = append(commands[:1], removedQuotes...)
 		return commands
-
 	}
 
 	return commands
 }
 
-func hasQuotes(command string) bool {
+func IsKeyValue(command string) bool {
 	has := re.MatchString(command)
 
 	return has
