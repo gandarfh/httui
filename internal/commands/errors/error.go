@@ -2,6 +2,7 @@ package errors
 
 import (
 	"fmt"
+	"strings"
 
 	errs "github.com/gandarfh/httui-repl/pkg/errors"
 	"github.com/gandarfh/httui-repl/pkg/repl"
@@ -14,7 +15,7 @@ type Error struct {
 }
 
 func (w *Error) Read(tokens ...string) error {
-	w.Command = tokens[0]
+	w.Command = strings.Join(tokens, " ")
 
 	return nil
 }

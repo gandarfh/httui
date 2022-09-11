@@ -50,7 +50,7 @@ func console(line *liner.State) {
 
 		err = process.Start(args, commands.Cmds())
 		if err != nil {
-			command := errors.Init(err).(*errors.Error)
+			command := errors.Init(err)
 			command.Run(args...)
 		}
 

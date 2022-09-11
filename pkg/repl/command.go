@@ -30,6 +30,7 @@ func (clist *CommandList) Find(key string) (Command, error) {
 			finded = &sub
 			break
 		}
+		finded = nil
 	}
 
 	if finded == nil {
