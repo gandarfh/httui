@@ -22,17 +22,17 @@ func main() {
 	line := liner.NewLiner()
 	defer line.Close()
 
-	if f, err := os.Open(history_fn); err == nil {
-		line.ReadHistory(f)
-		f.Close()
-	}
-
 	wellcome()
 	console(line)
 
 }
 
 func console(line *liner.State) {
+	if f, err := os.Open(history_fn); err == nil {
+		line.ReadHistory(f)
+		f.Close()
+	}
+
 	if value, err := line.Prompt("httui=> "); err == nil {
 		line.AppendHistory(value)
 		args, _ := getArgs(value)
