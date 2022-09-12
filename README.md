@@ -1,9 +1,11 @@
 <div align="center">
-  <img src="assets/logo.png" alt="logo" width="350" height="350" style="object-fit: cover; object-position: top;" />
-  <h1>Maid-san</h1>
-  <p>
-    My CLI with all my necessary tooling for work.
-  </p>
+  <img
+    src="assets/logo.png"
+    alt="logo"
+    style="width: 360px; height: 100%"
+  />
+  <h1 style="margin-top: 16px;">Maid-san</h1>
+  <p>My CLI with all my necessary tools for work.</p>
 </div>
 
 ## About the Project
