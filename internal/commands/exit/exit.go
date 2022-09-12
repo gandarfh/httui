@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/gandarfh/httui-repl/pkg/repl"
+	"github.com/gandarfh/maid-san/pkg/repl"
 )
 
 type Exit struct{}

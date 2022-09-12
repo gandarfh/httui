@@ -1,12 +1,12 @@
-module github.com/gandarfh/httui-repl
+module github.com/gandarfh/maid-san
 
 go 1.19
 
 require (
-	gorm.io/driver/sqlite v1.3.6
-	gorm.io/gorm v1.23.8
 	github.com/go-playground/validator/v10 v10.11.0
 	github.com/peterh/liner v1.2.2
+	gorm.io/driver/sqlite v1.3.6
+	gorm.io/gorm v1.23.8
 )
 
 require (

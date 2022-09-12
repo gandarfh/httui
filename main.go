@@ -7,15 +7,15 @@ import (
 
 	"github.com/peterh/liner"
 
-	"github.com/gandarfh/httui-repl/internal/commands"
-	"github.com/gandarfh/httui-repl/internal/commands/errors"
-	"github.com/gandarfh/httui-repl/internal/commands/welcome"
-	"github.com/gandarfh/httui-repl/pkg/process"
-	"github.com/gandarfh/httui-repl/pkg/utils"
+	"github.com/gandarfh/maid-san/internal/commands"
+	"github.com/gandarfh/maid-san/internal/commands/errors"
+	"github.com/gandarfh/maid-san/internal/commands/welcome"
+	"github.com/gandarfh/maid-san/pkg/process"
+	"github.com/gandarfh/maid-san/pkg/utils"
 )
 
 const (
-	history_fn = "./.httui_history"
+	history_fn = "./.maid-san_history"
 )
 
 func main() {
@@ -44,7 +44,7 @@ func console(line *liner.State) {
 		f.Close()
 	}
 
-	if output, err := line.Prompt("httui=> "); err == nil {
+	if output, err := line.Prompt("[maid-san] > "); err == nil {
 		line.AppendHistory(output)
 		args := utils.SplitArgs(strings.TrimSpace(output))
 

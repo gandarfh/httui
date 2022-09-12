@@ -3,14 +3,18 @@ package commands
 import (
 	"fmt"
 
-	"github.com/gandarfh/httui-repl/internal/commands/clear"
-	"github.com/gandarfh/httui-repl/internal/commands/exit"
-	"github.com/gandarfh/httui-repl/internal/commands/welcome"
-	"github.com/gandarfh/httui-repl/internal/commands/workspace"
-	"github.com/gandarfh/httui-repl/pkg/repl"
+	"github.com/gandarfh/maid-san/internal/commands/clear"
+	"github.com/gandarfh/maid-san/internal/commands/exit"
+	"github.com/gandarfh/maid-san/internal/commands/welcome"
+	"github.com/gandarfh/maid-san/internal/commands/workspace"
+	"github.com/gandarfh/maid-san/pkg/repl"
 )
 
 func Cmds() []repl.Command {
+	var (
+		subs repl.SubCommands
+	)
+
 	commands := []repl.Command{
 		{Key: "workspace", Repl: workspace.Init(), SubCommands: workspace.SubCommands()},
 		{Key: "exit", Repl: exit.Init()},
@@ -18,16 +22,16 @@ func Cmds() []repl.Command {
 		{Key: "welcome", Repl: welcome.Init()},
 	}
 
-	subs := workspace.SubCommands()
-	commands = appendSubs(commands, subs)
+	subs = workspace.SubCommands()
+	commands = appendSubs(commands, subs, "workspace")
 
 	return commands
 }
 
-func appendSubs(commands []repl.Command, subs repl.SubCommands) []repl.Command {
+func appendSubs(commands []repl.Command, subs repl.SubCommands, parrent string) []repl.Command {
 	for _, key := range subs {
 		commands = append(commands, repl.Command{
-			Key:    fmt.Sprintf("%s %s", key.Parent, key.Key),
+			Key:    fmt.Sprintf("%s %s", parrent, key.Key),
 			Parent: key.Parent,
 			Repl:   key.Repl,
 		})

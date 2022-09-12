@@ -3,7 +3,7 @@ package repository
 import (
 	"fmt"
 
-	"github.com/gandarfh/httui-repl/external/database"
+	"github.com/gandarfh/maid-san/external/database"
 	"gorm.io/gorm"
 )
 

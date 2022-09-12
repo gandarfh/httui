@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	errs "github.com/gandarfh/httui-repl/pkg/errors"
-	"github.com/gandarfh/httui-repl/pkg/repl"
+	errs "github.com/gandarfh/maid-san/pkg/errors"
+	"github.com/gandarfh/maid-san/pkg/repl"
 )
 
 type Error struct {

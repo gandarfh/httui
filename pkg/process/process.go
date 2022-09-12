@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/gandarfh/httui-repl/pkg/errors"
-	"github.com/gandarfh/httui-repl/pkg/repl"
-	"github.com/gandarfh/httui-repl/pkg/utils"
+	"github.com/gandarfh/maid-san/pkg/errors"
+	"github.com/gandarfh/maid-san/pkg/repl"
+	"github.com/gandarfh/maid-san/pkg/utils"
 )
 
 // [ command ] [ sub-command ] [ values... ]

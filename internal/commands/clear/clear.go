@@ -5,7 +5,7 @@ import (
 	"os/exec"
 	"runtime"
 
-	"github.com/gandarfh/httui-repl/pkg/repl"
+	"github.com/gandarfh/maid-san/pkg/repl"
 )
 
 type Clear struct{}

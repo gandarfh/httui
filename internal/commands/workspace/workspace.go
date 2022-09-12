@@ -3,13 +3,13 @@ package workspace
 import (
 	"fmt"
 
-	"github.com/gandarfh/httui-repl/internal/commands/welcome"
-	"github.com/gandarfh/httui-repl/internal/commands/workspace/repository"
-	"github.com/gandarfh/httui-repl/pkg/convert"
-	"github.com/gandarfh/httui-repl/pkg/errors"
-	"github.com/gandarfh/httui-repl/pkg/repl"
-	"github.com/gandarfh/httui-repl/pkg/utils"
-	"github.com/gandarfh/httui-repl/pkg/validate"
+	"github.com/gandarfh/maid-san/internal/commands/welcome"
+	"github.com/gandarfh/maid-san/internal/commands/workspace/repository"
+	"github.com/gandarfh/maid-san/pkg/convert"
+	"github.com/gandarfh/maid-san/pkg/errors"
+	"github.com/gandarfh/maid-san/pkg/repl"
+	"github.com/gandarfh/maid-san/pkg/utils"
+	"github.com/gandarfh/maid-san/pkg/validate"
 )
 
 type Workspaces struct {
@@ -20,7 +20,7 @@ type Workspaces struct {
 
 func SubCommands() repl.SubCommands {
 	return repl.SubCommands{
-		{Parent: "workspace", Key: "help", Repl: welcome.Init()},
+		{Key: "run", Parent: "workspace", Repl: welcome.Init()},
 	}
 
 }
