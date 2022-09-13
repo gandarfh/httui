@@ -8,7 +8,7 @@ import (
 	"github.com/gandarfh/maid-san/pkg/utils"
 )
 
-func ValidateInputErrors(args []string, decode any) error {
+func InputErrors(args []string, decode any) error {
 	mappedArgs, err := utils.ArgsFormat(args[1:])
 	if err != nil {
 		return errors.BadRequest()

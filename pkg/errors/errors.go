@@ -50,3 +50,17 @@ func UnprocessableEntity(msg ...string) error {
 		Message: []string{"Unprocessable Entity!"},
 	}
 }
+
+func InternalServer(msg ...string) error {
+	if len(msg) > 0 {
+		return &ProcessErrors{
+			Status:  500,
+			Message: msg,
+		}
+	}
+
+	return &ProcessErrors{
+		Status:  500,
+		Message: []string{"Internal Server Error!"},
+	}
+}

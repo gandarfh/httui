@@ -11,24 +11,23 @@ import (
 // Implementation: https://regexr.com/6to57
 var re = regexp.MustCompile(`(((\w\.?\w?)*?)=(("|')(.*?)("|')|\w*))`)
 
-func SplitArgs(command string) []string {
-	commands := strings.Split(command, " ")
+func SplitArgs(args string) []string {
+	command := strings.Trim(re.ReplaceAllString(args, ""), " ")
 
-	if IsKeyValue(command) {
-		removedQuotes := []string{}
+	commands := []string{command}
+	keysAndValues := []string{}
 
-		for _, item := range re.FindAllString(command, -1) {
+	if IsKeyValue(args) {
+		for _, item := range re.FindAllString(args, -1) {
 			newValue := strings.Replace(item, "'", "", -1)
 			newValue = strings.Replace(newValue, `"`, "", -1)
 
-			removedQuotes = append(removedQuotes, newValue)
-
+			keysAndValues = append(keysAndValues, newValue)
 		}
 
-		commands = append(commands[:1], removedQuotes...)
-		return commands
 	}
 
+	commands = append(commands, keysAndValues...)
 	return commands
 }
 
