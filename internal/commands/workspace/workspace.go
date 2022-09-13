@@ -1,8 +1,6 @@
 package workspace
 
 import (
-	"fmt"
-
 	"github.com/gandarfh/maid-san/internal/commands/welcome"
 	"github.com/gandarfh/maid-san/internal/commands/workspace/repository"
 	"github.com/gandarfh/maid-san/pkg/repl"
@@ -12,7 +10,6 @@ import (
 type Workspaces struct {
 	workspace repository.Workspaces
 	wks       *[]repository.Workspaces
-	Repo      *repository.WorkspaceRepo
 }
 
 func SubCommands() repl.SubCommands {
@@ -61,12 +58,5 @@ func (w *Workspaces) Run(args ...string) error {
 }
 
 func Init() repl.Repl {
-	repo, err := repository.NewWorkspaceRepo()
-	if err != nil {
-		fmt.Println("erro init repo")
-	}
-
-	return &Workspaces{
-		Repo: repo,
-	}
+	return &Workspaces{}
 }

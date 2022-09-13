@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gandarfh/maid-san/internal/commands/clear"
+	"github.com/gandarfh/maid-san/internal/commands/envs"
 	"github.com/gandarfh/maid-san/internal/commands/exit"
 	"github.com/gandarfh/maid-san/internal/commands/welcome"
 	"github.com/gandarfh/maid-san/internal/commands/workspace"
@@ -17,6 +18,7 @@ func Cmds() []repl.Command {
 
 	commands := []repl.Command{
 		{Key: "workspace", Repl: workspace.Init(), SubCommands: workspace.SubCommands()},
+		{Key: "envs", Repl: envs.Init(), SubCommands: envs.SubCommands()},
 		{Key: "exit", Repl: exit.Init()},
 		{Key: "clear", Repl: clear.Init()},
 		{Key: "welcome", Repl: welcome.Init()},
@@ -25,15 +27,17 @@ func Cmds() []repl.Command {
 	subs = workspace.SubCommands()
 	commands = appendSubs(commands, subs, "workspace")
 
+	subs = envs.SubCommands()
+	commands = appendSubs(commands, subs, "envs")
+
 	return commands
 }
 
 func appendSubs(commands []repl.Command, subs repl.SubCommands, parrent string) []repl.Command {
 	for _, key := range subs {
 		commands = append(commands, repl.Command{
-			Key:    fmt.Sprintf("%s %s", parrent, key.Key),
-			Parent: key.Parent,
-			Repl:   key.Repl,
+			Key:  fmt.Sprintf("%s %s", parrent, key.Key),
+			Repl: key.Repl,
 		})
 	}
 
