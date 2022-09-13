@@ -4,10 +4,11 @@ import (
 	"fmt"
 
 	"github.com/gandarfh/maid-san/pkg/repl"
+	"github.com/logrusorgru/aurora/v3"
 )
 
 const (
-	version = "0.1.0"
+	version = "v0.1.0"
 )
 
 type Wellcome struct{}
@@ -22,8 +23,9 @@ func (w *Wellcome) Eval() error {
 }
 
 func (w *Wellcome) Print() error {
-	fmt.Printf("Welcome my love >.<  ───  v%s.\n", version)
-	fmt.Println("Want more?")
+	fmt.Println(aurora.Yellow(art))
+	fmt.Print("\n")
+	fmt.Printf("Okaerinasaimase, Goshujin-sama >.<  ───  %s.\n", aurora.Green(version))
 	fmt.Print("\n")
 
 	return nil
@@ -40,3 +42,9 @@ func (w *Wellcome) Run(args ...string) error {
 func Init() repl.Repl {
 	return &Wellcome{}
 }
+
+var art = `
+ _____     _   _
+|     |___|_|_| |    ___ ___ ___
+| | | | .'| | . | _ |_ -| .'|   |
+|_|_|_|__,|_|___|   |___|__,|_|_|`

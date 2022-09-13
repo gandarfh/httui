@@ -44,7 +44,7 @@ func console(line *liner.State) {
 		f.Close()
 	}
 
-	if output, err := line.Prompt("[maid-san] > "); err == nil {
+	if output, err := line.Prompt("💕[maid-san]: "); err == nil {
 		line.AppendHistory(output)
 		args := utils.SplitArgs(strings.TrimSpace(output))
 

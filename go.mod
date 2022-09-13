@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/go-playground/validator/v10 v10.11.0
+	github.com/logrusorgru/aurora/v3 v3.0.0
 	github.com/peterh/liner v1.2.2
 	gorm.io/driver/sqlite v1.3.6
 	gorm.io/gorm v1.23.8
