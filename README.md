@@ -39,3 +39,41 @@ Twitter - [@gandarfh](https://twitter.com/gandarfh)
 - [Validator](github.com/go-playground/validator/v10)
 - [Liner](github.com/peterh/liner)
 - [Gorm](gorm.io/gorm)
+
+## Guide
+
+When create a new command, follow this simple structure:
+
+```go
+package commandname
+
+import (
+	"github.com/gandarfh/maid-san/pkg/repl"
+)
+
+type CommandName struct{}
+
+func (w *CommandName) Read(args ...string) error {
+	return nil
+}
+
+func (w *CommandName) Eval() error {
+	return nil
+}
+
+func (w *CommandName) Print() error {
+	return nil
+}
+
+func (w *CommandName) Run(args ...string) error {
+	w.Read(args...)
+	w.Eval()
+	w.Print()
+
+	return nil
+}
+
+func Init() repl.Repl {
+	return &CommandName{}
+}
+```
