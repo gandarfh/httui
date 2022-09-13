@@ -4,7 +4,6 @@ import "fmt"
 
 type Command struct {
 	Key         string
-	Parent      string
 	SubCommands SubCommands
 	Repl        Repl
 }

@@ -5,10 +5,7 @@ import (
 
 	"github.com/gandarfh/maid-san/internal/commands/welcome"
 	"github.com/gandarfh/maid-san/internal/commands/workspace/repository"
-	"github.com/gandarfh/maid-san/pkg/convert"
-	"github.com/gandarfh/maid-san/pkg/errors"
 	"github.com/gandarfh/maid-san/pkg/repl"
-	"github.com/gandarfh/maid-san/pkg/utils"
 	"github.com/gandarfh/maid-san/pkg/validate"
 )
 
@@ -20,35 +17,14 @@ type Workspaces struct {
 
 func SubCommands() repl.SubCommands {
 	return repl.SubCommands{
-		{Key: "run", Parent: "workspace", Repl: welcome.Init()},
+		{Key: "run", Repl: welcome.Init()},
 	}
 
 }
 
 func (w *Workspaces) Read(args ...string) error {
-	mappedArgs, err := utils.ArgsFormat(args[1:])
-	if err != nil {
-		return errors.BadRequest()
-	}
-
-	err = convert.MapToStruct(mappedArgs, &w.workspace)
-	if err != nil {
-		return errors.BadRequest()
-	}
-
-	validator := validate.NewValidator()
-
-	if err := validator.Struct(w.workspace); err != nil {
-		errorList := []string{"Unprocessable Entity!\n"}
-
-		// TODO: throw a error
-		for key, value := range validate.ValidatorErrors(err) {
-			er := fmt.Sprintf("[%s] - %s", key, value)
-			errorList = append(errorList, er)
-		}
-
-		return errors.UnprocessableEntity(errorList...)
-
+	if err := validate.InputErrors(args, &w.workspace); err != nil {
+		return err
 	}
 
 	return nil

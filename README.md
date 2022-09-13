@@ -66,9 +66,17 @@ func (w *CommandName) Print() error {
 }
 
 func (w *CommandName) Run(args ...string) error {
-	w.Read(args...)
-	w.Eval()
-	w.Print()
+  if err := w.Read(args...); err != nil {
+		return err
+	}
+
+	if err := w.Eval(); err != nil {
+		return err
+	}
+
+	if err := w.Print(); err != nil {
+		return err
+	}
 
 	return nil
 }
