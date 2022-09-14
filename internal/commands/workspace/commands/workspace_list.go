@@ -3,14 +3,14 @@ package commands
 import (
 	"strconv"
 
-	"github.com/gandarfh/maid-san/internal/commands/envs/repository"
+	"github.com/gandarfh/maid-san/internal/commands/workspace/repository"
 	"github.com/gandarfh/maid-san/pkg/errors"
 	"github.com/gandarfh/maid-san/pkg/repl"
 	"github.com/gandarfh/maid-san/pkg/table"
 )
 
 type List struct {
-	envs *[]repository.Envs
+	wks *[]repository.Workspaces
 }
 
 func (c *List) Read(args ...string) error {
@@ -18,25 +18,26 @@ func (c *List) Read(args ...string) error {
 }
 
 func (c *List) Eval() error {
-	repo, err := repository.NewEnvsRepo()
+	repo, err := repository.NewWorkspaceRepo()
 	if err != nil {
 		return errors.InternalServer("Error when connect to database!")
 	}
 
-	c.envs = repo.List()
+	c.wks = repo.List()
 
 	return nil
 }
 
 func (c *List) Print() error {
-	tbl := table.NewTable([]string{"id", "key", "value"})
+	tbl := table.NewTable([]string{"id", "name", "uri", "created at"})
 	rows := []table.Row{}
 
-	for _, item := range *c.envs {
+	for _, item := range *c.wks {
 		row := table.Row{
 			strconv.FormatUint(uint64(item.ID), 10),
-			item.Key,
-			item.Value,
+			item.Name,
+			item.Uri,
+			item.CreatedAt.Format("2006/01/02"),
 		}
 		rows = append(rows, row)
 	}

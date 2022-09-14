@@ -9,8 +9,8 @@ import (
 
 type Workspaces struct {
 	gorm.Model
-	Name string `db:"name" json:"name" validate:"required"`
-	Uri  string `db:"uri" json:"uri" validate:"required"`
+	Name string `db:"name" validate:"required"`
+	Uri  string `db:"uri" validate:"required"`
 }
 
 type WorkspaceRepo struct {

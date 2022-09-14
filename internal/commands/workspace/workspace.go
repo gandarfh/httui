@@ -1,10 +1,9 @@
 package workspace
 
 import (
-	"github.com/gandarfh/maid-san/internal/commands/welcome"
+	"github.com/gandarfh/maid-san/internal/commands/workspace/commands"
 	"github.com/gandarfh/maid-san/internal/commands/workspace/repository"
 	"github.com/gandarfh/maid-san/pkg/repl"
-	"github.com/gandarfh/maid-san/pkg/validate"
 )
 
 type Workspaces struct {
@@ -12,18 +11,7 @@ type Workspaces struct {
 	wks       *[]repository.Workspaces
 }
 
-func SubCommands() repl.SubCommands {
-	return repl.SubCommands{
-		{Key: "run", Repl: welcome.Init()},
-	}
-
-}
-
 func (w *Workspaces) Read(args ...string) error {
-	if err := validate.InputErrors(args, &w.workspace); err != nil {
-		return err
-	}
-
 	return nil
 }
 
@@ -32,12 +20,6 @@ func (w *Workspaces) Eval() error {
 }
 
 func (w *Workspaces) Print() error {
-	// fmt.Println()
-
-	// for _, item := range *w.wks {
-	// 	fmt.Println(item)
-	// }
-
 	return nil
 }
 
@@ -59,4 +41,11 @@ func (w *Workspaces) Run(args ...string) error {
 
 func Init() repl.Repl {
 	return &Workspaces{}
+}
+
+func SubCommands() repl.SubCommands {
+	return repl.SubCommands{
+		{Key: "create", Repl: commands.CreateInit()},
+		{Key: "list", Repl: commands.ListInit()},
+	}
 }
