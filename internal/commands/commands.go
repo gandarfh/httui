@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gandarfh/maid-san/internal/commands/clear"
+	"github.com/gandarfh/maid-san/internal/commands/command"
 	"github.com/gandarfh/maid-san/internal/commands/envs"
 	"github.com/gandarfh/maid-san/internal/commands/exit"
 	"github.com/gandarfh/maid-san/internal/commands/welcome"
@@ -17,12 +18,16 @@ func Cmds() []repl.Command {
 	)
 
 	commands := []repl.Command{
+		{Key: "command", Repl: command.Init(), SubCommands: command.SubCommands()},
 		{Key: "workspace", Repl: workspace.Init(), SubCommands: workspace.SubCommands()},
 		{Key: "envs", Repl: envs.Init(), SubCommands: envs.SubCommands()},
 		{Key: "exit", Repl: exit.Init()},
 		{Key: "clear", Repl: clear.Init()},
 		{Key: "welcome", Repl: welcome.Init()},
 	}
+
+	subs = command.SubCommands()
+	commands = appendSubs(commands, subs, "command")
 
 	subs = workspace.SubCommands()
 	commands = appendSubs(commands, subs, "workspace")

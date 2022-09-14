@@ -1,0 +1,3 @@
+package dtos
+
+type InputCreate struct {}

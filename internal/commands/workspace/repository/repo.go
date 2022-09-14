@@ -32,20 +32,12 @@ func NewWorkspaceRepo() (*WorkspaceRepo, error) {
 }
 
 func (repo *WorkspaceRepo) Create(ws *Workspaces) {
-	result := repo.Sql.Create(ws)
-
-	if result.Error != nil {
-		fmt.Println("Deu ruim criar dado")
-	}
+	repo.Sql.Create(ws)
 }
 
 func (repo *WorkspaceRepo) List() *[]Workspaces {
 	ws := []Workspaces{}
-	result := repo.Sql.Find(&ws)
-
-	if result.Error != nil {
-		fmt.Println("Deu ruim criar dado")
-	}
+	repo.Sql.Find(&ws)
 
 	return &ws
 }
