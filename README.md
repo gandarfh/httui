@@ -10,7 +10,7 @@
 
 ## About the Project
 
-This project will center all my needed tools like: http client, db view, healthcheck micro-services, etc.
+This project will center all my tooling like: http client, db view, healthcheck micro-services, etc.
 
 ### Tech Stack
 
