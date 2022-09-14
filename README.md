@@ -12,6 +12,10 @@
 
 This project will center all my tooling like: http client, db view, healthcheck micro-services, etc.
 
+## Exemple of usage
+
+<img src="assets/exemple.svg" alt="logo" style="width: 100%;" />
+
 ### Tech Stack
 
 - [Golang](https://go.dev/)
