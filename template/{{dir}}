@@ -1,7 +1,7 @@
-package {{commandName}}
+package {{dir}}
 
 import (
-	"github.com/gandarfh/maid-san/internal/commands/{{dir}}/subs"
+	"github.com/gandarfh/maid-san/internal/commands/{{dir}}/commands"
 	"github.com/gandarfh/maid-san/pkg/repl"
 )
 
@@ -41,7 +41,7 @@ func Init() repl.Repl {
 
 func SubCommands() repl.CommandList {
 	return repl.CommandList{
-		{Key: "create", Repl: subs.CreateInit()},
-		{Key: "list", Repl: subs.ListInit()},
+		{Key: "create", Repl: commands.CreateInit()},
+		{Key: "list", Repl: commands.ListInit()},
 	}
 }
