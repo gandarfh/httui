@@ -7,6 +7,7 @@ import (
 	"github.com/gandarfh/maid-san/internal/commands/envs"
 	"github.com/gandarfh/maid-san/internal/commands/exit"
 	"github.com/gandarfh/maid-san/internal/commands/generator"
+	"github.com/gandarfh/maid-san/internal/commands/resources"
 	"github.com/gandarfh/maid-san/internal/commands/welcome"
 	"github.com/gandarfh/maid-san/internal/commands/workspace"
 	"github.com/gandarfh/maid-san/pkg/repl"
@@ -18,6 +19,7 @@ func Cmds() []repl.Command {
 	)
 
 	commands := []repl.Command{
+		{Key: "resource", Repl: resources.Init()},
 		{Key: "generate", Repl: generator.Init()},
 		{Key: "workspace", Repl: workspace.Init()},
 		{Key: "envs", Repl: envs.Init()},
@@ -25,6 +27,9 @@ func Cmds() []repl.Command {
 		{Key: "clear", Repl: clear.Init()},
 		{Key: "welcome", Repl: welcome.Init()},
 	}
+
+	subs = resources.SubCommands()
+	commands = appendSubs(commands, subs, "resource")
 
 	subs = generator.SubCommands()
 	commands = appendSubs(commands, subs, "generate")

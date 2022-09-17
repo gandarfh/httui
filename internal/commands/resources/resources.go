@@ -1,0 +1,47 @@
+package resources
+
+import (
+	"github.com/gandarfh/maid-san/internal/commands/resources/commands"
+	"github.com/gandarfh/maid-san/pkg/repl"
+)
+
+type Resources struct{}
+
+func (w *Resources) Read(args ...string) error {
+	return nil
+}
+
+func (w *Resources) Eval() error {
+	return nil
+}
+
+func (w *Resources) Print() error {
+	return nil
+}
+
+func (w *Resources) Run(args ...string) error {
+	if err := w.Read(args...); err != nil {
+		return err
+	}
+
+	if err := w.Eval(); err != nil {
+		return err
+	}
+
+	if err := w.Print(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func Init() repl.Repl {
+	return &Resources{}
+}
+
+func SubCommands() repl.CommandList {
+	return repl.CommandList{
+		{Key: "create", Repl: commands.CreateInit()},
+		{Key: "list", Repl: commands.ListInit()},
+	}
+}
