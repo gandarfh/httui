@@ -1,0 +1,38 @@
+package repository
+
+import (
+	"github.com/gandarfh/maid-san/external/database"
+	"gorm.io/gorm"
+)
+
+type {{commandName}}s struct {
+	gorm.Model
+}
+
+type {{commandName}}Repo struct {
+	Sql *gorm.DB
+}
+
+func New{{commandName}}sRepo() (*{{commandName}}Repo, error) {
+	db, err := database.SqliteConnection()
+	db.AutoMigrate(&{{commandName}}s{})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &{{commandName}}Repo{
+		Sql: db,
+	}, nil
+}
+
+func (repo *{{commandName}}Repo) Create(value *{{commandName}}s) {
+	repo.Sql.Create(value)
+}
+
+func (repo *{{commandName}}Repo) List() *[]{{commandName}}s {
+	list := []{{commandName}}s{}
+	repo.Sql.Find(&list)
+
+	return &list
+}

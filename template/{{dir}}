@@ -1,0 +1,47 @@
+package {{commandName}}
+
+import (
+	"github.com/gandarfh/maid-san/internal/commands/{{dir}}/subs"
+	"github.com/gandarfh/maid-san/pkg/repl"
+)
+
+type {{commandName}}s struct {}
+
+func (w *{{commandName}}s) Read(args ...string) error {
+	return nil
+}
+
+func (w *{{commandName}}s) Eval() error {
+	return nil
+}
+
+func (w *{{commandName}}s) Print() error {
+	return nil
+}
+
+func (w *{{commandName}}s) Run(args ...string) error {
+	if err := w.Read(args...); err != nil {
+		return err
+	}
+
+	if err := w.Eval(); err != nil {
+		return err
+	}
+
+	if err := w.Print(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func Init() repl.Repl {
+	return &{{commandName}}s{}
+}
+
+func SubCommands() repl.CommandList {
+	return repl.CommandList{
+		{Key: "create", Repl: subs.CreateInit()},
+		{Key: "list", Repl: subs.ListInit()},
+	}
+}
