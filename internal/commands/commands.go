@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	"github.com/gandarfh/maid-san/internal/commands/clear"
-	"github.com/gandarfh/maid-san/internal/commands/command"
 	"github.com/gandarfh/maid-san/internal/commands/envs"
 	"github.com/gandarfh/maid-san/internal/commands/exit"
+	"github.com/gandarfh/maid-san/internal/commands/generator"
 	"github.com/gandarfh/maid-san/internal/commands/welcome"
 	"github.com/gandarfh/maid-san/internal/commands/workspace"
 	"github.com/gandarfh/maid-san/pkg/repl"
@@ -14,19 +14,19 @@ import (
 
 func Cmds() []repl.Command {
 	var (
-		subs repl.SubCommands
+		subs repl.CommandList
 	)
 
 	commands := []repl.Command{
-		{Key: "command", Repl: command.Init(), SubCommands: command.SubCommands()},
-		{Key: "workspace", Repl: workspace.Init(), SubCommands: workspace.SubCommands()},
-		{Key: "envs", Repl: envs.Init(), SubCommands: envs.SubCommands()},
+		{Key: "command", Repl: generator.Init()},
+		{Key: "workspace", Repl: workspace.Init()},
+		{Key: "envs", Repl: envs.Init()},
 		{Key: "exit", Repl: exit.Init()},
 		{Key: "clear", Repl: clear.Init()},
 		{Key: "welcome", Repl: welcome.Init()},
 	}
 
-	subs = command.SubCommands()
+	subs = generator.SubCommands()
 	commands = appendSubs(commands, subs, "command")
 
 	subs = workspace.SubCommands()
@@ -38,7 +38,7 @@ func Cmds() []repl.Command {
 	return commands
 }
 
-func appendSubs(commands []repl.Command, subs repl.SubCommands, parrent string) []repl.Command {
+func appendSubs(commands repl.CommandList, subs repl.CommandList, parrent string) []repl.Command {
 	for _, key := range subs {
 		commands = append(commands, repl.Command{
 			Key:  fmt.Sprintf("%s %s", parrent, key.Key),

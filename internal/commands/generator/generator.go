@@ -1,15 +1,11 @@
-package command
+package generator
 
 import (
-	"github.com/gandarfh/maid-san/internal/commands/command/commands"
-	"github.com/gandarfh/maid-san/internal/commands/command/repository"
+	"github.com/gandarfh/maid-san/internal/commands/generator/commands"
 	"github.com/gandarfh/maid-san/pkg/repl"
 )
 
-type Commands struct {
-	cmd  repository.Commands
-	cmds *[]repository.Commands
-}
+type Commands struct{}
 
 func (w *Commands) Read(args ...string) error {
 	return nil
@@ -43,9 +39,8 @@ func Init() repl.Repl {
 	return &Commands{}
 }
 
-func SubCommands() repl.SubCommands {
-	return repl.SubCommands{
+func SubCommands() repl.CommandList {
+	return repl.CommandList{
 		{Key: "create", Repl: commands.CreateInit()},
-		{Key: "list", Repl: commands.ListInit()},
 	}
 }

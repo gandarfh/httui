@@ -34,8 +34,8 @@ func Init() repl.Repl {
 	return &Envs{}
 }
 
-func SubCommands() repl.SubCommands {
-	return repl.SubCommands{
+func SubCommands() repl.CommandList {
+	return repl.CommandList{
 		{Key: "create", Repl: commands.CreateInit()},
 		{Key: "list", Repl: commands.ListInit()},
 	}

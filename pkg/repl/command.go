@@ -3,23 +3,11 @@ package repl
 import "fmt"
 
 type Command struct {
-	Key         string
-	SubCommands SubCommands
-	Repl        Repl
+	Key  string
+	Repl Repl
 }
 
-type SubCommands []Command
 type CommandList []Command
-
-func (c *SubCommands) Keys() []string {
-	keys := []string{}
-
-	for _, item := range *c {
-		keys = append(keys, item.Key)
-	}
-
-	return keys
-}
 
 func (clist *CommandList) Find(key string) (Command, error) {
 	finded := &Command{}
