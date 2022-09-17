@@ -18,7 +18,7 @@ func Cmds() []repl.Command {
 	)
 
 	commands := []repl.Command{
-		{Key: "command", Repl: generator.Init()},
+		{Key: "generate", Repl: generator.Init()},
 		{Key: "workspace", Repl: workspace.Init()},
 		{Key: "envs", Repl: envs.Init()},
 		{Key: "exit", Repl: exit.Init()},
@@ -27,7 +27,7 @@ func Cmds() []repl.Command {
 	}
 
 	subs = generator.SubCommands()
-	commands = appendSubs(commands, subs, "command")
+	commands = appendSubs(commands, subs, "generate")
 
 	subs = workspace.SubCommands()
 	commands = appendSubs(commands, subs, "workspace")
