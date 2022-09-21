@@ -11,11 +11,19 @@ import (
 func InputErrors(args []string, decode any) error {
 	mappedArgs, err := utils.ArgsFormat(args[1:])
 	if err != nil {
+		fmt.Println("\nArgs Format:")
+		fmt.Println(err.Error())
+		fmt.Println()
 		return errors.BadRequest()
 	}
 
+	fmt.Printf("%T\n", mappedArgs["parent_id"])
+
 	err = convert.MapToStruct(mappedArgs, decode)
 	if err != nil {
+		fmt.Println("\nMap to struct:")
+		fmt.Println(err.Error())
+		fmt.Println()
 		return errors.BadRequest()
 	}
 
