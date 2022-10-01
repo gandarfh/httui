@@ -15,15 +15,20 @@ func ArgsFormat(args []string) (map[string]any, error) {
 
 		if len(item) == 2 {
 			key, value := item[0], item[1]
-			if IsInt(value) {
-				// convert string to int
-				newValue, _ := strconv.Atoi(value)
+			fmt.Println(IsInt(value))
+
+			// convert string to int
+			newValue, err := strconv.Atoi(value)
+
+			if err == nil {
+				// convert to int value
 				mapArgs[key] = newValue
 				continue
 			}
 
 			mapArgs[key] = value
 			continue
+
 		}
 
 		return nil, fmt.Errorf("Key and value not expected. You provide: %s.\nTry something like: key=value", arg)

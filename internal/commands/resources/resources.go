@@ -1,25 +1,25 @@
-package {{dir}}
+package resources
 
 import (
-	"github.com/gandarfh/maid-san/internal/commands/{{dir}}/commands"
+	"github.com/gandarfh/maid-san/internal/commands/resources/commands"
 	"github.com/gandarfh/maid-san/pkg/repl"
 )
 
-type {{commandName}}s struct {}
+type Resources struct{}
 
-func (w *{{commandName}}s) Read(args ...string) error {
+func (w *Resources) Read(args ...string) error {
 	return nil
 }
 
-func (w *{{commandName}}s) Eval() error {
+func (w *Resources) Eval() error {
 	return nil
 }
 
-func (w *{{commandName}}s) Print() error {
+func (w *Resources) Print() error {
 	return nil
 }
 
-func (w *{{commandName}}s) Run(args ...string) error {
+func (w *Resources) Run(args ...string) error {
 	if err := w.Read(args...); err != nil {
 		return err
 	}
@@ -36,7 +36,7 @@ func (w *{{commandName}}s) Run(args ...string) error {
 }
 
 func Init() repl.Repl {
-	return &{{commandName}}s{}
+	return &Resources{}
 }
 
 func SubCommands() repl.CommandList {
