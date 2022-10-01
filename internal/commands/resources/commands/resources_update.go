@@ -112,7 +112,7 @@ func (c *Update) create_tmp_file(resource *repository.Resources) error {
 }
 
 func (c *Update) Print() error {
-	msg := fmt.Sprintf("[%s] Resource success created!\n", c.inpt.Name)
+	msg := fmt.Sprintf("[%s] Resource success updated!\n", c.inpt.Name)
 
 	fmt.Println(msg)
 
