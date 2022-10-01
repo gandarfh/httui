@@ -39,6 +39,13 @@ type Resources struct {
 	Body         json.RawMessage `db:"body" json:"body"`
 }
 
+func (re *Resources) AfterUpdate(tx *gorm.DB) error {
+	tx.Model(&Params{}).Where("resources_id IS ?", nil).Unscoped().Delete(&Params{})
+	tx.Model(&Headers{}).Where("resources_id IS ?", nil).Unscoped().Delete(&Headers{})
+
+	return nil
+}
+
 func (re *Resources) Parent() *workspace {
 	wk := workspace{}
 	repo, err := NewResourcesRepo()
@@ -83,7 +90,7 @@ func (repo *ResourceRepo) Update(resource *Resources, value *dtos.InputUpdate) {
 		headers = append(headers, Headers{ResourcesId: resource.ID, Value: item.Value, Key: item.Key})
 	}
 
-	decoded := Resources{
+	data := Resources{
 		Name:     value.Name,
 		Endpoint: value.Endpoint,
 		Method:   value.Method,
@@ -97,7 +104,7 @@ func (repo *ResourceRepo) Update(resource *Resources, value *dtos.InputUpdate) {
 	db.Association("Headers").Replace(headers)
 	db.Association("Params").Replace(params)
 
-	db.Updates(decoded)
+	db.Updates(data)
 }
 
 func (repo *ResourceRepo) Create(value *dtos.InputCreate) {
