@@ -4,13 +4,16 @@ import (
 	"fmt"
 
 	"github.com/gandarfh/maid-san/external/database"
+	resourcerepo "github.com/gandarfh/maid-san/internal/commands/resources/repository"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type Workspaces struct {
 	gorm.Model
-	Name string `db:"name" validate:"required"`
-	Uri  string `db:"uri" validate:"required"`
+	Name      string `db:"name" validate:"required"`
+	Uri       string `db:"uri" validate:"required"`
+	Resources []resourcerepo.Resources
 }
 
 type WorkspaceRepo struct {
@@ -32,7 +35,7 @@ func NewWorkspaceRepo() (*WorkspaceRepo, error) {
 }
 
 func (repo *WorkspaceRepo) Create(ws *Workspaces) {
-	repo.Sql.Create(ws)
+	repo.Sql.Omit(clause.Associations).Create(ws)
 }
 
 func (repo *WorkspaceRepo) List() *[]Workspaces {

@@ -15,7 +15,6 @@ func ArgsFormat(args []string) (map[string]any, error) {
 
 		if len(item) == 2 {
 			key, value := item[0], item[1]
-			fmt.Println(IsInt(value))
 
 			// convert string to int
 			newValue, err := strconv.Atoi(value)

@@ -28,9 +28,7 @@ func (c *Create) Eval() error {
 		return errors.InternalServer("Error when connect to database!")
 	}
 
-	value := repository.Resources{}
-
-	repo.Create(&value)
+	repo.Create(&c.inpt)
 
 	return nil
 }

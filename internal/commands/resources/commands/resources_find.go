@@ -29,12 +29,18 @@ func (c *List) Eval() error {
 }
 
 func (c *List) Print() error {
-	tbl := table.NewTable([]string{"id"})
+	tbl := table.NewTable([]string{"parent", "id", "name", "endpoint", "method"})
 	rows := []table.Row{}
 
 	for _, item := range *c.envs {
+		parent := item.Parent()
+
 		row := table.Row{
+			parent.Name,
 			strconv.FormatUint(uint64(item.ID), 10),
+			item.Name,
+			item.Endpoint,
+			item.Method,
 		}
 		rows = append(rows, row)
 	}

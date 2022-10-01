@@ -8,6 +8,7 @@ require (
 	github.com/peterh/liner v1.2.2
 	gorm.io/driver/sqlite v1.3.6
 	gorm.io/gorm v1.23.8
+	github.com/google/uuid v1.3.0
 )
 
 require (
@@ -18,7 +19,7 @@ require (
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/mattn/go-runewidth v0.0.3 // indirect
 	github.com/mattn/go-sqlite3 v1.14.15 // indirect
-	golang.org/x/crypto v0.0.0-20211215153901-e495a2d5b3d3 // indirect
+	golang.org/x/crypto v0.0.0-20220214200702-86341886e292 // indirect
 	golang.org/x/sys v0.0.0-20211117180635-dee7805ff2e1 // indirect
 	golang.org/x/text v0.3.7 // indirect
 )
