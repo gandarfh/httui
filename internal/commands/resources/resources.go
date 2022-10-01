@@ -49,5 +49,9 @@ func SubCommands() repl.CommandList {
 	// [resource] [update] [resourceId]
 	subs = append(subs, commands.UpdateSubs()...)
 
+	// sub commands to execute resource
+	// [resource] [exec] [resourceId]
+	subs = append(subs, commands.ExecSubs()...)
+
 	return subs
 }
