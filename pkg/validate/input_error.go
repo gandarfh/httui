@@ -17,8 +17,6 @@ func InputErrors(args []string, decode any) error {
 		return errors.BadRequest()
 	}
 
-	fmt.Printf("%T\n", mappedArgs["parent_id"])
-
 	err = convert.MapToStruct(mappedArgs, decode)
 	if err != nil {
 		fmt.Println("\nMap to struct:")
