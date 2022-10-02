@@ -51,6 +51,7 @@ func SubCommands() repl.CommandList {
 
 	// sub commands to execute resource
 	// [resource] [exec] [resourceId]
+	// [resource] [exec] [vim] [resourceId]
 	subs = append(subs, commands.ExecSubs()...)
 
 	return subs

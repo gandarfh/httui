@@ -1,10 +1,14 @@
 package commands
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
+	"os/exec"
 	"strconv"
 	"strings"
 
+	"github.com/gandarfh/maid-san/internal/commands/resources/dtos"
 	"github.com/gandarfh/maid-san/internal/commands/resources/repository"
 	"github.com/gandarfh/maid-san/pkg/client"
 	"github.com/gandarfh/maid-san/pkg/errors"
@@ -17,11 +21,24 @@ type Exec struct {
 	ResourceId uint
 	resource   *repository.Resources
 	data       map[string]any
+	withVim    bool
 }
 
 func (c *Exec) Read(args ...string) error {
+	var (
+		resourceId = 0
+		err        error
+	)
+
+	fmt.Println(args)
+	c.withVim = strings.Contains(args[0], "vim")
 	args = strings.Split(args[0], " ")
-	resourceId, err := strconv.Atoi(args[2])
+
+	if c.withVim {
+		resourceId, err = strconv.Atoi(args[3])
+	} else {
+		resourceId, err = strconv.Atoi(args[2])
+	}
 
 	if err != nil {
 		return errors.UnprocessableEntity("Id provided isn't uint")
@@ -31,8 +48,6 @@ func (c *Exec) Read(args ...string) error {
 
 	return nil
 }
-
-type teste struct{}
 
 func (c *Exec) Eval() error {
 	repo, err := repository.NewResourcesRepo()
@@ -62,6 +77,21 @@ func (c *Exec) Eval() error {
 	}
 
 	fmt.Printf("%s - %s - %s \n", aurora.Yellow(c.resource.Method).Bold(), aurora.Bold(url), aurora.Green(data.Status).Bold())
+
+	if c.withVim {
+		if err := c.create_tmp_file(c.resource, url, data.Status); err != nil {
+			return err
+		}
+
+		cmd := exec.Command("lvim", tmp_file)
+		cmd.Stdin = os.Stdin
+		cmd.Stdout = os.Stdout
+		cmd.Run()
+
+		if err := os.Remove(tmp_file); err != nil {
+			return errors.BadRequest("Error when try delete the tmp file.\n", err.Error())
+		}
+	}
 
 	return nil
 }
@@ -96,6 +126,41 @@ func (w *Exec) Run(args ...string) error {
 	return nil
 }
 
+func (c *Exec) create_tmp_file(resource *repository.Resources, url string, status string) error {
+	file, err := os.Create(tmp_file)
+	if err != nil {
+		return errors.BadRequest("Error when try create the file.\n", err.Error())
+	}
+
+	headers := []dtos.KeyValue{}
+	for _, header := range resource.Headers {
+		headers = append(headers, dtos.KeyValue{Key: header.Key, Value: header.Value})
+	}
+
+	data := struct {
+		Url     string          `json:"url"`
+		Method  string          `json:"method"`
+		Status  string          `json:"status"`
+		Headers []dtos.KeyValue `json:"headers"`
+		Body    any             `json:"body"`
+	}{
+		Url:     url,
+		Method:  resource.Method,
+		Status:  status,
+		Headers: headers,
+		Body:    c.data,
+	}
+
+	text, err := json.MarshalIndent(data, "", "\t")
+	if err != nil {
+		return errors.BadRequest("Error when try marshal resource data to json file.\n", err.Error())
+	}
+
+	file.Write([]byte(text))
+
+	return nil
+}
+
 func ExecSubs() repl.CommandList {
 	repo, _ := repository.NewResourcesRepo()
 	list := repo.List()
@@ -108,6 +173,10 @@ func ExecSubs() repl.CommandList {
 			Repl: ExecInit(),
 		})
 
+		commands = append(commands, repl.Command{
+			Key:  fmt.Sprintf("%s %d", "vim exec", item.ID),
+			Repl: ExecInit(),
+		})
 	}
 
 	return commands
