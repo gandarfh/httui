@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gandarfh/maid-san/external/database"
+	"github.com/gandarfh/maid-san/internal/commands/envs/dtos"
 	"gorm.io/gorm"
 )
 
@@ -37,6 +38,24 @@ func (repo *EnvsRepo) Create(env *Envs) {
 	if result.Error != nil {
 		fmt.Println("Deu ruim criar dado")
 	}
+}
+
+func (repo *EnvsRepo) Update(resource *Envs, value *dtos.InputUpdate) {
+	data := Envs{
+		Key:   value.Key,
+		Value: value.Value,
+	}
+
+	db := repo.Sql.Model(resource).Session(&gorm.Session{FullSaveAssociations: true})
+	db.Updates(data)
+}
+
+func (repo *EnvsRepo) Find(id uint) *Envs {
+	value := Envs{}
+	db := repo.Sql.Model(&Envs{})
+	db.First(&value, id)
+
+	return &value
 }
 
 func (repo *EnvsRepo) List() *[]Envs {

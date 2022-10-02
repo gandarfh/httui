@@ -35,8 +35,14 @@ func Init() repl.Repl {
 }
 
 func SubCommands() repl.CommandList {
-	return repl.CommandList{
+	subs := repl.CommandList{
 		{Key: "create", Repl: commands.CreateInit()},
 		{Key: "list", Repl: commands.ListInit()},
 	}
+
+	// sub commands top update
+	// [envs] [update] [envId]
+	subs = append(subs, commands.UpdateSubs()...)
+
+	return subs
 }
