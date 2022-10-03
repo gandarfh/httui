@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"strconv"
 	"strings"
 
 	"github.com/gandarfh/maid-san/internal/commands/resources/dtos"
@@ -14,37 +13,24 @@ import (
 	"github.com/gandarfh/maid-san/pkg/errors"
 	"github.com/gandarfh/maid-san/pkg/repl"
 	"github.com/gandarfh/maid-san/pkg/utils"
+	"github.com/gandarfh/maid-san/pkg/validate"
 	"github.com/hokaccha/go-prettyjson"
 	"github.com/logrusorgru/aurora/v3"
 )
 
 type Exec struct {
-	ResourceId uint
-	resource   *repository.Resources
-	data       map[string]any
-	withVim    bool
+	inpt     dtos.InputExec
+	resource *repository.Resources
+	data     map[string]any
+	withVim  bool
 }
 
 func (c *Exec) Read(args ...string) error {
-	var (
-		resourceId = 0
-		err        error
-	)
+	if err := validate.InputErrors(args, &c.inpt); err != nil {
+		return err
+	}
 
 	c.withVim = strings.Contains(args[0], "vim")
-	args = strings.Split(args[0], " ")
-
-	if c.withVim {
-		resourceId, err = strconv.Atoi(args[3])
-	} else {
-		resourceId, err = strconv.Atoi(args[2])
-	}
-
-	if err != nil {
-		return errors.UnprocessableEntity("Id provided isn't uint")
-	}
-
-	c.ResourceId = uint(resourceId)
 
 	return nil
 }
@@ -56,7 +42,7 @@ func (c *Exec) Eval() error {
 		return errors.InternalServer("Error when connect to database!")
 	}
 
-	c.resource = repo.Find(c.ResourceId)
+	c.resource = repo.FindByName(c.inpt.Name)
 	workspace := c.resource.Parent()
 
 	url := utils.ReplaceByEnv(workspace.Uri) + utils.ReplaceByEnv(c.resource.Endpoint)
@@ -178,14 +164,34 @@ func ExecSubs() repl.CommandList {
 
 	commands := repl.CommandList{}
 
+	commands = append(commands, repl.Command{
+		Key:  "vim exec",
+		Repl: ExecInit(),
+	})
+
+	commands = append(commands, repl.Command{
+		Key:  "exec",
+		Repl: ExecInit(),
+	})
+
 	for _, item := range *list {
 		commands = append(commands, repl.Command{
-			Key:  fmt.Sprintf("%s %d", "exec", item.ID),
+			Key:  fmt.Sprintf(`%s %s`, "exec", item.Parent().Name),
 			Repl: ExecInit(),
 		})
 
 		commands = append(commands, repl.Command{
-			Key:  fmt.Sprintf("%s %d", "vim exec", item.ID),
+			Key:  fmt.Sprintf(`%s %s`, "vim exec", item.Parent().Name),
+			Repl: ExecInit(),
+		})
+
+		commands = append(commands, repl.Command{
+			Key:  fmt.Sprintf(`%s %s name="%s"`, "exec", item.Parent().Name, item.Name),
+			Repl: ExecInit(),
+		})
+
+		commands = append(commands, repl.Command{
+			Key:  fmt.Sprintf(`%s %s name="%s"`, "vim exec", item.Parent().Name, item.Name),
 			Repl: ExecInit(),
 		})
 	}

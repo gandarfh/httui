@@ -6,13 +6,12 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strconv"
-	"strings"
 
 	"github.com/gandarfh/maid-san/internal/commands/resources/dtos"
 	"github.com/gandarfh/maid-san/internal/commands/resources/repository"
 	"github.com/gandarfh/maid-san/pkg/errors"
 	"github.com/gandarfh/maid-san/pkg/repl"
+	"github.com/gandarfh/maid-san/pkg/validate"
 	"github.com/google/uuid"
 )
 
@@ -21,20 +20,13 @@ var (
 )
 
 type Update struct {
-	inpt       dtos.InputUpdate
-	ResourceId uint
+	inpt dtos.InputUpdate
 }
 
 func (c *Update) Read(args ...string) error {
-	args = strings.Split(args[0], " ")
-	resourceId, err := strconv.Atoi(args[2])
-
-	if err != nil {
-		return errors.UnprocessableEntity("Id provided isn't uint")
-
+	if err := validate.InputErrors(args, &c.inpt); err != nil {
+		return err
 	}
-
-	c.ResourceId = uint(resourceId)
 
 	return nil
 }
@@ -45,7 +37,7 @@ func (c *Update) Eval() error {
 		return errors.InternalServer("Error when connect to database!")
 	}
 
-	resource := repo.Find(c.ResourceId)
+	resource := repo.FindByName(c.inpt.Name)
 
 	if err := c.create_tmp_file(resource); err != nil {
 		return err
@@ -142,12 +134,21 @@ func UpdateSubs() repl.CommandList {
 
 	commands := repl.CommandList{}
 
+	commands = append(commands, repl.Command{
+		Key:  "update",
+		Repl: UpdateInit(),
+	})
+
 	for _, item := range *list {
 		commands = append(commands, repl.Command{
-			Key:  fmt.Sprintf("%s %d", "update", item.ID),
+			Key:  fmt.Sprintf("%s %s", "update", item.Parent().Name),
 			Repl: UpdateInit(),
 		})
 
+		commands = append(commands, repl.Command{
+			Key:  fmt.Sprintf(`%s %s name="%s"`, "update", item.Parent().Name, item.Name),
+			Repl: UpdateInit(),
+		})
 	}
 
 	return commands

@@ -16,10 +16,14 @@ type KeyValue struct {
 
 type InputUpdate struct {
 	WorkspacesId uint            `json:"workspace_id"`
-	Name         string          `json:"name"`
+	Name         string          `json:"name" validate:"required"`
 	Endpoint     string          `json:"endpoint"`
 	Method       string          `json:"method"`
 	Params       []KeyValue      `json:"params"`
 	Headers      []KeyValue      `json:"headers"`
 	Body         json.RawMessage `json:"body"`
+}
+
+type InputExec struct {
+	Name string `json:"name" validate:"required"`
 }

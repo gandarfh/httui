@@ -134,6 +134,21 @@ func (repo *ResourceRepo) Find(id uint) *Resources {
 	return &value
 }
 
+func (repo *ResourceRepo) FindByName(name string) *Resources {
+	value := Resources{}
+
+	db := repo.Sql.Model(&Resources{})
+
+	db.Preload("Headers")
+	db.Preload("Params")
+
+	db.Where("name = ?", name)
+
+	db.First(&value)
+
+	return &value
+}
+
 func (repo *ResourceRepo) List() *[]Resources {
 	list := []Resources{}
 	repo.Sql.Find(&list)
