@@ -1,10 +1,7 @@
 package commands
 
 import (
-	"encoding/json"
 	"fmt"
-	"os"
-	"os/exec"
 	"strings"
 
 	"github.com/gandarfh/maid-san/internal/commands/resources/dtos"
@@ -14,6 +11,7 @@ import (
 	"github.com/gandarfh/maid-san/pkg/repl"
 	"github.com/gandarfh/maid-san/pkg/utils"
 	"github.com/gandarfh/maid-san/pkg/validate"
+	"github.com/gandarfh/maid-san/pkg/vim"
 	"github.com/hokaccha/go-prettyjson"
 	"github.com/logrusorgru/aurora/v3"
 )
@@ -69,17 +67,8 @@ func (c *Exec) Eval() error {
 	fmt.Printf("%s - %s - %s \n", aurora.Yellow(c.resource.Method).Bold(), aurora.Bold(url), aurora.Green(data.Status).Bold())
 
 	if c.withVim {
-		if err := c.create_tmp_file(c.resource, url, data.Status); err != nil {
+		if err := c.preview(c.resource, url, data.Status); err != nil {
 			return err
-		}
-
-		cmd := exec.Command("lvim", tmp_file)
-		cmd.Stdin = os.Stdin
-		cmd.Stdout = os.Stdout
-		cmd.Run()
-
-		if err := os.Remove(tmp_file); err != nil {
-			return errors.BadRequest("Error when try delete the tmp file.\n", err.Error())
 		}
 	}
 
@@ -116,12 +105,7 @@ func (w *Exec) Run(args ...string) error {
 	return nil
 }
 
-func (c *Exec) create_tmp_file(resource *repository.Resources, url string, status string) error {
-	file, err := os.Create(tmp_file)
-	if err != nil {
-		return errors.BadRequest("Error when try create the file.\n", err.Error())
-	}
-
+func (c *Exec) preview(resource *repository.Resources, url string, status string) error {
 	params := []dtos.KeyValue{}
 	for _, param := range resource.Params {
 		params = append(params, dtos.KeyValue{Key: param.Key, Value: utils.ReplaceByEnv(param.Value)})
@@ -148,12 +132,12 @@ func (c *Exec) create_tmp_file(resource *repository.Resources, url string, statu
 		Body:    c.data,
 	}
 
-	text, err := json.MarshalIndent(data, "", "\t")
-	if err != nil {
-		return errors.BadRequest("Error when try marshal resource data to json file.\n", err.Error())
-	}
+	preview := vim.NewPreview(data)
+	defer preview.Close()
 
-	file.Write([]byte(text))
+	if err := preview.Open(); err != nil {
+		return err
+	}
 
 	return nil
 }
