@@ -81,13 +81,13 @@ func NewResourcesRepo() (*ResourceRepo, error) {
 func (repo *ResourceRepo) Update(resource *Resources, value *dtos.InputUpdate) {
 
 	params := []Params{}
-	for _, item := range value.Params {
-		params = append(params, Params{ResourcesId: resource.ID, Value: item.Value, Key: item.Key})
+	for key, value := range value.Params {
+		params = append(params, Params{ResourcesId: resource.ID, Value: value.(string), Key: key})
 	}
 
 	headers := []Headers{}
-	for _, item := range value.Headers {
-		headers = append(headers, Headers{ResourcesId: resource.ID, Value: item.Value, Key: item.Key})
+	for key, value := range value.Headers {
+		headers = append(headers, Headers{ResourcesId: resource.ID, Value: value.(string), Key: key})
 	}
 
 	data := Resources{

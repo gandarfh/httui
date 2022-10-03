@@ -31,7 +31,27 @@ func (c *Update) Eval() error {
 
 	resource := repo.FindByName(c.inpt.Name)
 
-	preview := vim.NewPreview(resource)
+	params := dtos.KeyValue{}
+	for _, item := range resource.Params {
+		params[item.Key] = item.Value
+	}
+
+	headers := dtos.KeyValue{}
+	for _, item := range resource.Headers {
+		headers[item.Key] = item.Value
+	}
+
+	data := dtos.InputUpdate{
+		WorkspacesId: resource.WorkspacesId,
+		Name:         resource.Name,
+		Endpoint:     resource.Endpoint,
+		Method:       resource.Method,
+		Params:       params,
+		Headers:      headers,
+		Body:         resource.Body,
+	}
+
+	preview := vim.NewPreview(data)
 	defer preview.Close()
 
 	if err := preview.Open(); err != nil {

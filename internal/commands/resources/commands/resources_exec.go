@@ -106,23 +106,23 @@ func (w *Exec) Run(args ...string) error {
 }
 
 func (c *Exec) preview(resource *repository.Resources, url string, status string) error {
-	params := []dtos.KeyValue{}
-	for _, param := range resource.Params {
-		params = append(params, dtos.KeyValue{Key: param.Key, Value: utils.ReplaceByEnv(param.Value)})
+	params := dtos.KeyValue{}
+	for _, item := range resource.Params {
+		params[item.Key] = item.Value
 	}
 
-	headers := []dtos.KeyValue{}
-	for _, header := range resource.Headers {
-		headers = append(headers, dtos.KeyValue{Key: header.Key, Value: utils.ReplaceByEnv(header.Value)})
+	headers := dtos.KeyValue{}
+	for _, item := range resource.Headers {
+		headers[item.Key] = item.Value
 	}
 
 	data := struct {
-		Url     string          `json:"url"`
-		Method  string          `json:"method"`
-		Status  string          `json:"status"`
-		Params  []dtos.KeyValue `json:"params"`
-		Headers []dtos.KeyValue `json:"headers"`
-		Body    any             `json:"body"`
+		Url     string        `json:"url"`
+		Method  string        `json:"method"`
+		Status  string        `json:"status"`
+		Params  dtos.KeyValue `json:"params"`
+		Headers dtos.KeyValue `json:"headers"`
+		Body    any           `json:"body"`
 	}{
 		Url:     url,
 		Method:  resource.Method,

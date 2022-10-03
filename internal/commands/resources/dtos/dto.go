@@ -9,18 +9,15 @@ type InputCreate struct {
 	Method   string `json:"method" validate:"required"`
 }
 
-type KeyValue struct {
-	Key   string `json:"key"`
-	Value string `json:"value"`
-}
+type KeyValue map[string]interface{}
 
 type InputUpdate struct {
 	WorkspacesId uint            `json:"workspace_id"`
 	Name         string          `json:"name" validate:"required"`
 	Endpoint     string          `json:"endpoint"`
 	Method       string          `json:"method"`
-	Params       []KeyValue      `json:"params"`
-	Headers      []KeyValue      `json:"headers"`
+	Params       KeyValue        `json:"params"`
+	Headers      KeyValue        `json:"headers"`
 	Body         json.RawMessage `json:"body"`
 }
 
