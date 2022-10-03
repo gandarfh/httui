@@ -38,7 +38,7 @@ func HaveEnv(raw string) bool {
 	return re_env.Match([]byte(raw))
 }
 
-func ReplaceByEnv(raw string) (string, error) {
+func ReplaceByEnv(raw string) string {
 	listOfEnvs := re_env.FindAllString(raw, -1)
 
 	for _, item := range listOfEnvs {
@@ -54,5 +54,5 @@ func ReplaceByEnv(raw string) (string, error) {
 		}
 	}
 
-	return raw, nil
+	return raw
 }

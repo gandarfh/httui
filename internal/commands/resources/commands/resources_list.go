@@ -7,6 +7,7 @@ import (
 	"github.com/gandarfh/maid-san/pkg/errors"
 	"github.com/gandarfh/maid-san/pkg/repl"
 	"github.com/gandarfh/maid-san/pkg/table"
+	"github.com/gandarfh/maid-san/pkg/utils"
 )
 
 type List struct {
@@ -29,18 +30,18 @@ func (c *List) Eval() error {
 }
 
 func (c *List) Print() error {
-	tbl := table.NewTable([]string{"parent", "id", "name", "endpoint", "method"})
+	tbl := table.NewTable([]string{"id", "parent", "name", "endpoint", "method"})
 	rows := []table.Row{}
 
 	for _, item := range *c.envs {
 		parent := item.Parent()
 
 		row := table.Row{
-			parent.Name,
 			strconv.FormatUint(uint64(item.ID), 10),
-			item.Name,
-			item.Endpoint,
-			item.Method,
+			utils.ReplaceByEnv(parent.Name),
+			utils.ReplaceByEnv(item.Name),
+			utils.ReplaceByEnv(item.Endpoint),
+			utils.ReplaceByEnv(item.Method),
 		}
 		rows = append(rows, row)
 	}

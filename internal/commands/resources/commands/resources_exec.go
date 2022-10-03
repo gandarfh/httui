@@ -13,6 +13,7 @@ import (
 	"github.com/gandarfh/maid-san/pkg/client"
 	"github.com/gandarfh/maid-san/pkg/errors"
 	"github.com/gandarfh/maid-san/pkg/repl"
+	"github.com/gandarfh/maid-san/pkg/utils"
 	"github.com/hokaccha/go-prettyjson"
 	"github.com/logrusorgru/aurora/v3"
 )
@@ -58,15 +59,19 @@ func (c *Exec) Eval() error {
 	c.resource = repo.Find(c.ResourceId)
 	workspace := c.resource.Parent()
 
-	url := workspace.Uri + c.resource.Endpoint
-	res := client.Request(url, c.resource.Method).Body(c.resource.Body)
+	url := utils.ReplaceByEnv(workspace.Uri) + utils.ReplaceByEnv(c.resource.Endpoint)
+
+	rawbody, _ := c.resource.Body.MarshalJSON()
+	body := utils.ReplaceByEnv(string(rawbody))
+
+	res := client.Request(url, utils.ReplaceByEnv(c.resource.Method)).Body(body)
 
 	for _, item := range c.resource.Headers {
-		res.Header(item.Key, item.Value)
+		res.Header(item.Key, utils.ReplaceByEnv(item.Value))
 	}
 
 	for _, item := range c.resource.Params {
-		res.Params(item.Key, item.Value)
+		res.Params(item.Key, utils.ReplaceByEnv(item.Value))
 	}
 
 	data, err := res.Decode(&c.data)
@@ -97,7 +102,7 @@ func (c *Exec) Eval() error {
 
 func (c *Exec) Print() error {
 	for _, item := range c.resource.Headers {
-		fmt.Println(aurora.Cyan(item.Key).String()+":", item.Value)
+		fmt.Println(aurora.Cyan(item.Key).String()+":", utils.ReplaceByEnv(item.Value))
 	}
 	fmt.Print("\n")
 
@@ -131,21 +136,28 @@ func (c *Exec) create_tmp_file(resource *repository.Resources, url string, statu
 		return errors.BadRequest("Error when try create the file.\n", err.Error())
 	}
 
+	params := []dtos.KeyValue{}
+	for _, param := range resource.Params {
+		params = append(params, dtos.KeyValue{Key: param.Key, Value: utils.ReplaceByEnv(param.Value)})
+	}
+
 	headers := []dtos.KeyValue{}
 	for _, header := range resource.Headers {
-		headers = append(headers, dtos.KeyValue{Key: header.Key, Value: header.Value})
+		headers = append(headers, dtos.KeyValue{Key: header.Key, Value: utils.ReplaceByEnv(header.Value)})
 	}
 
 	data := struct {
 		Url     string          `json:"url"`
 		Method  string          `json:"method"`
 		Status  string          `json:"status"`
+		Params  []dtos.KeyValue `json:"params"`
 		Headers []dtos.KeyValue `json:"headers"`
 		Body    any             `json:"body"`
 	}{
 		Url:     url,
 		Method:  resource.Method,
 		Status:  status,
+		Params:  params,
 		Headers: headers,
 		Body:    c.data,
 	}

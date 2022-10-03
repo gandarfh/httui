@@ -7,6 +7,7 @@ import (
 	"github.com/gandarfh/maid-san/pkg/errors"
 	"github.com/gandarfh/maid-san/pkg/repl"
 	"github.com/gandarfh/maid-san/pkg/table"
+	"github.com/gandarfh/maid-san/pkg/utils"
 )
 
 type List struct {
@@ -35,8 +36,8 @@ func (c *List) Print() error {
 	for _, item := range *c.wks {
 		row := table.Row{
 			strconv.FormatUint(uint64(item.ID), 10),
-			item.Name,
-			item.Uri,
+			utils.ReplaceByEnv(item.Name),
+			utils.ReplaceByEnv(item.Uri),
 			item.CreatedAt.Format("2006/01/02"),
 		}
 		rows = append(rows, row)
