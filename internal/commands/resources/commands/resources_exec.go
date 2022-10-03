@@ -30,7 +30,6 @@ func (c *Exec) Read(args ...string) error {
 		err        error
 	)
 
-	fmt.Println(args)
 	c.withVim = strings.Contains(args[0], "vim")
 	args = strings.Split(args[0], " ")
 
