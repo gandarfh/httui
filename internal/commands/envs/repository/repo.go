@@ -5,6 +5,7 @@ import (
 
 	"github.com/gandarfh/maid-san/external/database"
 	"github.com/gandarfh/maid-san/internal/commands/envs/dtos"
+	"github.com/gandarfh/maid-san/pkg/errors"
 	"gorm.io/gorm"
 )
 
@@ -56,6 +57,18 @@ func (repo *EnvsRepo) Find(id uint) *Envs {
 	db.First(&value, id)
 
 	return &value
+}
+
+func (repo *EnvsRepo) FindByKey(key string) (*Envs, error) {
+	value := Envs{}
+	db := repo.Sql.Model(&Envs{})
+	result := db.Where("key = ?", key).First(&value)
+
+	if result.Error != nil {
+		return nil, errors.NotFoundError()
+	}
+
+	return &value, nil
 }
 
 func (repo *EnvsRepo) List() *[]Envs {
