@@ -24,6 +24,7 @@ func Cmds() []repl.Command {
 		{Key: "workspace", Repl: workspace.Init()},
 		{Key: "envs", Repl: envs.Init()},
 		{Key: "exit", Repl: exit.Init()},
+		{Key: "ex", Repl: exit.Init()},
 		{Key: "clear", Repl: clear.Init()},
 		{Key: "welcome", Repl: welcome.Init()},
 	}
