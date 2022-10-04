@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/peterh/liner"
@@ -15,7 +16,7 @@ import (
 )
 
 const (
-	history_fn = "./.maid-san_history"
+	history_fn = ".maid-san_history"
 )
 
 func main() {
@@ -39,7 +40,8 @@ func main() {
 }
 
 func console(line *liner.State) {
-	if f, err := os.Open(history_fn); err == nil {
+	home, _ := os.UserHomeDir()
+	if f, err := os.Open(filepath.Join(home, history_fn)); err == nil {
 		line.ReadHistory(f)
 		f.Close()
 	}
@@ -59,7 +61,7 @@ func console(line *liner.State) {
 		os.Exit(0)
 	}
 
-	if f, err := os.Create(history_fn); err != nil {
+	if f, err := os.Create(filepath.Join(home, history_fn)); err != nil {
 		log.Print("Error writing history file: ", err)
 	} else {
 		line.WriteHistory(f)

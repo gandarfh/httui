@@ -36,7 +36,7 @@ func (c *List) Print() error {
 		row := table.Row{
 			strconv.FormatUint(uint64(item.ID), 10),
 			item.Key,
-			item.Value,
+			item.Value[:14],
 		}
 		rows = append(rows, row)
 	}

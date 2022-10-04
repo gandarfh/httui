@@ -3,6 +3,7 @@ package database
 import (
 	"log"
 	"os"
+	"path/filepath"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -15,7 +16,8 @@ var newLogger = logger.New(
 )
 
 func SqliteConnection() (*gorm.DB, error) {
-	db, err := gorm.Open(sqlite.Open("database.db"), &gorm.Config{
+	home, _ := os.UserHomeDir()
+	db, err := gorm.Open(sqlite.Open(filepath.Join(home, "maidsan.db")), &gorm.Config{
 		Logger: newLogger,
 	})
 
