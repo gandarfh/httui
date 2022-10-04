@@ -8,15 +8,17 @@ import (
 	"github.com/gandarfh/maid-san/pkg/errors"
 	"github.com/gandarfh/maid-san/pkg/repl"
 	"github.com/gandarfh/maid-san/pkg/validate"
+	"github.com/gandarfh/maid-san/pkg/vim"
 )
 
 type Create struct {
-	inpt dtos.InputCreate
+	inpt    dtos.InputCreate
+	withvim bool
 }
 
 func (c *Create) Read(args ...string) error {
 	if err := validate.InputErrors(args, &c.inpt); err != nil {
-		return err
+		c.withvim = true
 	}
 
 	return nil
@@ -26,6 +28,19 @@ func (c *Create) Eval() error {
 	repo, err := repository.NewResourcesRepo()
 	if err != nil {
 		return errors.InternalServer("Error when connect to database!")
+	}
+
+	if c.withvim {
+		preview := vim.NewPreview(c.inpt)
+		defer preview.Close()
+
+		if err := preview.Open(); err != nil {
+			return err
+		}
+
+		if err := preview.Execute(&c.inpt); err != nil {
+			return err
+		}
 	}
 
 	repo.Create(&c.inpt)
