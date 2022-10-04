@@ -45,6 +45,7 @@ func Init() repl.Repl {
 
 func SubCommands() repl.CommandList {
 	subs := repl.CommandList{
+		{Key: "delete", Repl: commands.DeleteInit()},
 		{Key: "update", Repl: commands.UpdateInit()},
 		{Key: "create", Repl: commands.CreateInit()},
 		{Key: "list", Repl: commands.ListInit()},
@@ -53,6 +54,10 @@ func SubCommands() repl.CommandList {
 	// sub commands from update command
 	// [workspace] [update] [resourceId]
 	subs = append(subs, commands.UpdateSubs()...)
+
+	// sub commands from update command
+	// [workspace] [update] [resourceId]
+	subs = append(subs, commands.DeleteSubs()...)
 
 	return subs
 }

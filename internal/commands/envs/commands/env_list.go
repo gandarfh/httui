@@ -7,6 +7,7 @@ import (
 	"github.com/gandarfh/maid-san/pkg/errors"
 	"github.com/gandarfh/maid-san/pkg/repl"
 	"github.com/gandarfh/maid-san/pkg/table"
+	"github.com/gandarfh/maid-san/pkg/truncate"
 )
 
 type List struct {
@@ -36,7 +37,7 @@ func (c *List) Print() error {
 		row := table.Row{
 			strconv.FormatUint(uint64(item.ID), 10),
 			item.Key,
-			item.Value[:14],
+			truncate.Dots(item.Value, 24),
 		}
 		rows = append(rows, row)
 	}

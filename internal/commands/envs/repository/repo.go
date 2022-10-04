@@ -51,6 +51,11 @@ func (repo *EnvsRepo) Update(resource *Envs, value *dtos.InputUpdate) {
 	db.Updates(data)
 }
 
+func (repo *EnvsRepo) Delete(id uint) {
+	db := repo.Sql.Model(&Envs{})
+	db.Where("id IS ?", id).Unscoped().Delete(&Envs{})
+}
+
 func (repo *EnvsRepo) Find(id uint) *Envs {
 	value := Envs{}
 	db := repo.Sql.Model(&Envs{})

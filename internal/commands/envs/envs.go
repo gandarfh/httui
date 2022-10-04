@@ -38,11 +38,16 @@ func SubCommands() repl.CommandList {
 	subs := repl.CommandList{
 		{Key: "create", Repl: commands.CreateInit()},
 		{Key: "list", Repl: commands.ListInit()},
+		{Key: "delete", Repl: commands.DeleteInit()},
 	}
 
-	// sub commands top update
+	// sub commands to update
 	// [envs] [update] [envId]
 	subs = append(subs, commands.UpdateSubs()...)
+
+	// sub commands to delete
+	// [envs] [delete] [envId]
+	subs = append(subs, commands.DeleteSubs()...)
 
 	return subs
 }
