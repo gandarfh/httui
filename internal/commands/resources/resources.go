@@ -43,11 +43,16 @@ func SubCommands() repl.CommandList {
 	subs := repl.CommandList{
 		{Key: "create", Repl: commands.CreateInit()},
 		{Key: "list", Repl: commands.ListInit()},
+		{Key: "delete", Repl: commands.DeleteInit()},
 	}
 
 	// sub commands from update command
 	// [resource] [update] [resourceId]
 	subs = append(subs, commands.UpdateSubs()...)
+
+	// sub commands to delete resource
+	// [resource] [delete] [resourceId]
+	subs = append(subs, commands.DeleteSubs()...)
 
 	// sub commands to execute resource
 	// [resource] [exec] [resourceId]

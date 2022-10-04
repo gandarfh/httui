@@ -134,6 +134,14 @@ func (repo *ResourceRepo) Find(id uint) *Resources {
 	return &value
 }
 
+func (repo *ResourceRepo) Delete(id uint) {
+	repo.Sql.Model(&Params{}).Where("resources_id IS ?", nil).Unscoped().Delete(&Params{})
+	repo.Sql.Model(&Headers{}).Where("resources_id IS ?", nil).Unscoped().Delete(&Headers{})
+
+	db := repo.Sql.Model(&Resources{})
+	db.Where("id IS ?", id).Unscoped().Delete(&Resources{})
+}
+
 func (repo *ResourceRepo) FindByName(name string) *Resources {
 	value := Resources{}
 
