@@ -2,6 +2,7 @@ package repository
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/gandarfh/maid-san/external/database"
 	"github.com/gandarfh/maid-san/internal/commands/resources/dtos"
@@ -83,13 +84,23 @@ func (repo *ResourceRepo) Update(resource *Resources, value *dtos.InputUpdate) {
 	params := []Params{}
 	for _, param := range value.Params {
 		for key, value := range param {
-			params = append(params, Params{Value: value.(string), Key: key})
+			if v, ok := value.(string); ok {
+				params = append(params, Params{Value: v, Key: key})
+				continue
+			}
+
+			params = append(params, Params{Value: fmt.Sprintf("%d", int(value.(int))), Key: key})
+
 		}
 	}
 
 	headers := []Headers{}
 	for key, value := range value.Headers {
-		headers = append(headers, Headers{Value: value.(string), Key: key})
+		if v, ok := value.(string); ok {
+			headers = append(headers, Headers{Value: v, Key: key})
+			continue
+		}
+		headers = append(headers, Headers{Value: fmt.Sprintf("%d", int(value.(int))), Key: key})
 	}
 
 	data := Resources{

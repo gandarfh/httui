@@ -44,6 +44,8 @@ func SubCommands() repl.CommandList {
 		{Key: "create", Repl: commands.CreateInit()},
 		{Key: "list", Repl: commands.ListInit()},
 		{Key: "delete", Repl: commands.DeleteInit()},
+		{Key: "exec", Repl: commands.ExecInit()},
+		{Key: "vim exec", Repl: commands.ExecInit()},
 	}
 
 	// sub commands from update command

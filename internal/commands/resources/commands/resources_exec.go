@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/gandarfh/maid-san/pkg/client"
 	"github.com/gandarfh/maid-san/pkg/errors"
 	"github.com/gandarfh/maid-san/pkg/repl"
+	"github.com/gandarfh/maid-san/pkg/truncate"
 	"github.com/gandarfh/maid-san/pkg/utils"
 	"github.com/gandarfh/maid-san/pkg/validate"
 	"github.com/gandarfh/maid-san/pkg/vim"
@@ -45,10 +47,23 @@ func (c *Exec) Eval() error {
 
 	url := utils.ReplaceByEnv(workspace.Uri) + utils.ReplaceByEnv(c.resource.Endpoint)
 
-	rawbody, _ := c.resource.Body.MarshalJSON()
-	body := utils.ReplaceByEnv(string(rawbody))
+	fmt.Println()
 
-	res := client.Request(url, utils.ReplaceByEnv(c.resource.Method)).Body(body)
+	res := client.Request(url, c.resource.Method)
+
+	rawbody, _ := c.resource.Body.MarshalJSON()
+	bodystring := utils.ReplaceByEnv(string(rawbody))
+
+	body := map[string]interface{}{}
+	if err := json.Unmarshal([]byte(bodystring), &body); err != nil {
+		panic(err)
+	}
+
+	if len(body) == 0 {
+		res.Body(nil)
+	} else {
+		res.Body([]byte(bodystring))
+	}
 
 	for _, item := range c.resource.Headers {
 		res.Header(item.Key, utils.ReplaceByEnv(item.Value))
@@ -77,7 +92,7 @@ func (c *Exec) Eval() error {
 
 func (c *Exec) Print() error {
 	for _, item := range c.resource.Headers {
-		fmt.Println(aurora.Cyan(item.Key).String()+":", utils.ReplaceByEnv(item.Value))
+		fmt.Println(aurora.Cyan(item.Key).String()+":", truncate.Dots(utils.ReplaceByEnv(item.Value), 20))
 	}
 	fmt.Print("\n")
 
@@ -149,12 +164,12 @@ func ExecSubs() repl.CommandList {
 	commands := repl.CommandList{}
 
 	commands = append(commands, repl.Command{
-		Key:  "vim exec",
+		Key:  "exec",
 		Repl: ExecInit(),
 	})
 
 	commands = append(commands, repl.Command{
-		Key:  "exec",
+		Key:  "vim exec",
 		Repl: ExecInit(),
 	})
 
