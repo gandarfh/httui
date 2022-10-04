@@ -8,15 +8,17 @@ import (
 	"github.com/gandarfh/maid-san/pkg/errors"
 	"github.com/gandarfh/maid-san/pkg/repl"
 	"github.com/gandarfh/maid-san/pkg/validate"
+	"github.com/gandarfh/maid-san/pkg/vim"
 )
 
 type Create struct {
-	ws dtos.InputCreate
+	inpt    dtos.InputCreate
+	withvim bool
 }
 
 func (c *Create) Read(args ...string) error {
-	if err := validate.InputErrors(args, &c.ws); err != nil {
-		return err
+	if err := validate.InputErrors(args, &c.inpt); err != nil {
+		c.withvim = true
 	}
 
 	return nil
@@ -28,18 +30,26 @@ func (c *Create) Eval() error {
 		return errors.InternalServer("Error when connect to database!")
 	}
 
-	ws := repository.Workspaces{
-		Uri:  c.ws.Uri,
-		Name: c.ws.Name,
+	if c.withvim {
+		preview := vim.NewPreview(c.inpt)
+		defer preview.Close()
+
+		if err := preview.Open(); err != nil {
+			return err
+		}
+
+		if err := preview.Execute(&c.inpt); err != nil {
+			return err
+		}
 	}
 
-	repo.Create(&ws)
+	repo.Create(&c.inpt)
 
 	return nil
 }
 
 func (c *Create) Print() error {
-	msg := fmt.Sprintf("[%s] workspace created with success!\n", c.ws.Name)
+	msg := fmt.Sprintf("[%s] workspace created with success!\n", c.inpt.Name)
 
 	fmt.Println(msg)
 
