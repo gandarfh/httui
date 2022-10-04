@@ -82,8 +82,10 @@ func (repo *WorkspaceRepo) Update(workspace *Workspaces, value *dtos.InputUpdate
 	resources := []resourcerepo.Resources{}
 	for _, item := range value.Resources {
 		params := []resourcerepo.Params{}
-		for key, value := range item.Params {
-			params = append(params, resourcerepo.Params{Key: key, Value: value.(string)})
+		for _, param := range item.Params {
+			for key, value := range param {
+				params = append(params, resourcerepo.Params{Key: key, Value: value.(string)})
+			}
 		}
 
 		headers := []resourcerepo.Headers{}

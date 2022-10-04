@@ -35,9 +35,11 @@ func (c *Update) Eval() error {
 	resources := []resourcesdtos.InputUpdate{}
 	for _, item := range workspace.Resources {
 
-		params := resourcesdtos.KeyValue{}
+		params := []resourcesdtos.KeyValue{}
 		for _, item := range item.Params {
-			params[item.Key] = item.Value
+			key := resourcesdtos.KeyValue{}
+			key[item.Key] = item.Value
+			params = append(params, key)
 		}
 
 		headers := resourcesdtos.KeyValue{}

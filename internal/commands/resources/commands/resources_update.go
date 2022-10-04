@@ -31,9 +31,11 @@ func (c *Update) Eval() error {
 
 	resource := repo.FindByName(c.inpt.Name)
 
-	params := dtos.KeyValue{}
+	params := []dtos.KeyValue{}
 	for _, item := range resource.Params {
-		params[item.Key] = item.Value
+		key := dtos.KeyValue{}
+		key[item.Key] = item.Value
+		params = append(params, key)
 	}
 
 	headers := dtos.KeyValue{}
