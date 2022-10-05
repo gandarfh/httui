@@ -107,7 +107,9 @@ func (repo *WorkspaceRepo) Update(workspace *Workspaces, value *dtos.InputUpdate
 	}
 
 	data := Workspaces{
-		Name: value.Name,
+		Name:      value.Name,
+		Uri:       value.Uri,
+		Resources: resources,
 	}
 
 	db := repo.Sql.Model(workspace).Session(&gorm.Session{FullSaveAssociations: true})
