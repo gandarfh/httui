@@ -41,6 +41,7 @@ func Init() repl.Repl {
 
 func SubCommands() repl.CommandList {
 	return repl.CommandList{
+		{Key: "swagger", Repl: commands.SwaggerInit()},
 		{Key: "create", Repl: commands.CreateInit()},
 	}
 }
