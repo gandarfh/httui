@@ -42,12 +42,11 @@ func (c *Exec) Eval() error {
 		return errors.InternalServer("Error when connect to database!")
 	}
 
-	c.resource = repo.FindByName(c.inpt.Name)
+	c.resource = repo.FindByName(c.inpt.Name, c.inpt.Parent)
+
 	workspace := c.resource.Parent()
 
 	url := utils.ReplaceByEnv(workspace.Uri) + utils.ReplaceByEnv(c.resource.Endpoint)
-
-	fmt.Println()
 
 	res := client.Request(url, c.resource.Method)
 
@@ -175,22 +174,22 @@ func ExecSubs() repl.CommandList {
 
 	for _, item := range *list {
 		commands = append(commands, repl.Command{
-			Key:  fmt.Sprintf(`%s %s`, "exec", item.Parent().Name),
+			Key:  fmt.Sprintf(`%s parent="%s"`, "exec", item.Parent().Name),
 			Repl: ExecInit(),
 		})
 
 		commands = append(commands, repl.Command{
-			Key:  fmt.Sprintf(`%s %s`, "vim exec", item.Parent().Name),
+			Key:  fmt.Sprintf(`%s parent="%s"`, "vim exec", item.Parent().Name),
 			Repl: ExecInit(),
 		})
 
 		commands = append(commands, repl.Command{
-			Key:  fmt.Sprintf(`%s %s name="%s"`, "exec", item.Parent().Name, item.Name),
+			Key:  fmt.Sprintf(`%s parent="%s" name="%s"`, "exec", item.Parent().Name, item.Name),
 			Repl: ExecInit(),
 		})
 
 		commands = append(commands, repl.Command{
-			Key:  fmt.Sprintf(`%s %s name="%s"`, "vim exec", item.Parent().Name, item.Name),
+			Key:  fmt.Sprintf(`%s parent="%s" name="%s"`, "vim exec", item.Parent().Name, item.Name),
 			Repl: ExecInit(),
 		})
 	}

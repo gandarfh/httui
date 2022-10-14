@@ -12,13 +12,13 @@
 
 This project will center all my tooling like: http client, db view, healthcheck micro-services, etc.
 
-## Exemple of usage
+## Example of usage
 
 <img src="assets/exemple.svg" alt="logo" style="width: 100%;" />
 
 ### Tech Stack
 
-- [Golang](https://go.dev/)
+- [Go Lang](https://go.dev/)
 - [Sqlite](https://www.sqlite.org/index.html)
 
 ### Features

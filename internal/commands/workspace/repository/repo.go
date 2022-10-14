@@ -57,7 +57,9 @@ func (repo *WorkspaceRepo) Delete(id uint) {
 
 func (repo *WorkspaceRepo) List() *[]Workspaces {
 	ws := []Workspaces{}
-	repo.Sql.Find(&ws)
+	db := repo.Sql.Model(&Workspaces{})
+	db.Preload("Resources")
+	db.Find(&ws)
 
 	return &ws
 }

@@ -13,6 +13,7 @@ type KeyValue map[string]interface{}
 
 type InputUpdate struct {
 	WorkspacesId uint            `json:"workspace_id"`
+	Parent       string          `json:"parent" validate:"required"`
 	Name         string          `json:"name" validate:"required"`
 	Endpoint     string          `json:"endpoint"`
 	Method       string          `json:"method"`
@@ -22,5 +23,6 @@ type InputUpdate struct {
 }
 
 type InputExec struct {
-	Name string `json:"name" validate:"required"`
+	Name   string `json:"name" validate:"required"`
+	Parent string `json:"parent" validate:"required"`
 }

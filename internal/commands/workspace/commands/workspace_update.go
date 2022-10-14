@@ -49,6 +49,7 @@ func (c *Update) Eval() error {
 
 		resources = append(resources, resourcesdtos.InputUpdate{
 			WorkspacesId: item.WorkspacesId,
+			Parent:       item.Parent().Name,
 			Name:         item.Name,
 			Endpoint:     item.Endpoint,
 			Method:       item.Method,

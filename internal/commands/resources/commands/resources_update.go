@@ -29,7 +29,7 @@ func (c *Update) Eval() error {
 		return errors.InternalServer("Error when connect to database!")
 	}
 
-	resource := repo.FindByName(c.inpt.Name)
+	resource := repo.FindByName(c.inpt.Name, c.inpt.Parent)
 
 	params := []dtos.KeyValue{}
 	for _, item := range resource.Params {
@@ -45,6 +45,7 @@ func (c *Update) Eval() error {
 
 	data := dtos.InputUpdate{
 		WorkspacesId: resource.WorkspacesId,
+		Parent:       resource.Parent().Name,
 		Name:         resource.Name,
 		Endpoint:     resource.Endpoint,
 		Method:       resource.Method,
@@ -107,12 +108,12 @@ func UpdateSubs() repl.CommandList {
 
 	for _, item := range *list {
 		commands = append(commands, repl.Command{
-			Key:  fmt.Sprintf("%s %s", "update", item.Parent().Name),
+			Key:  fmt.Sprintf(`%s parent="%s"`, "update", item.Parent().Name),
 			Repl: UpdateInit(),
 		})
 
 		commands = append(commands, repl.Command{
-			Key:  fmt.Sprintf(`%s %s name="%s"`, "update", item.Parent().Name, item.Name),
+			Key:  fmt.Sprintf(`%s parent="%s" name="%s"`, "update", item.Parent().Name, item.Name),
 			Repl: UpdateInit(),
 		})
 	}

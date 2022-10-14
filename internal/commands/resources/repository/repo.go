@@ -31,7 +31,7 @@ type workspace struct {
 
 type Resources struct {
 	gorm.Model
-	WorkspacesId uint            `db:"name" json:"workspace_id"`
+	WorkspacesId uint            `db:"workspaces_id" json:"workspaces_id"`
 	Name         string          `db:"name" json:"name"`
 	Endpoint     string          `db:"endpoint" json:"endpoint"`
 	Method       string          `db:"method" json:"method"`
@@ -155,15 +155,19 @@ func (repo *ResourceRepo) Delete(id uint) {
 	db.Where("id IS ?", id).Unscoped().Delete(&Resources{})
 }
 
-func (repo *ResourceRepo) FindByName(name string) *Resources {
+func (repo *ResourceRepo) FindByName(name string, parent string) *Resources {
+	workdb := repo.Sql.Model(&workspace{}).Where("name = ?", parent)
+
+	work := workspace{}
+	workdb.First(&work)
+
 	value := Resources{}
 
 	db := repo.Sql.Model(&Resources{})
+	db.Where("name = ? AND workspaces_id = ?", name, work.ID)
 
 	db.Preload("Headers")
 	db.Preload("Params")
-
-	db.Where("name = ?", name)
 
 	db.First(&value)
 
