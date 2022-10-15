@@ -65,9 +65,9 @@ func (repo *EnvsRepo) Find(id uint) *Envs {
 }
 
 func (repo *EnvsRepo) FindByKey(key string) (*Envs, error) {
-	value := Envs{}
+	value := Envs{Key: key}
 	db := repo.Sql.Model(&Envs{})
-	result := db.Where("key = ?", key).First(&value)
+	result := db.Where("key = ?", key).FirstOrCreate(&value)
 
 	if result.Error != nil {
 		return nil, errors.NotFoundError()

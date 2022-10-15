@@ -1,0 +1,1863 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "HealthController_getHealth",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/prices": {
+      "post": {
+        "operationId": "PricesController_create",
+        "parameters": [
+          {
+            "name": "partnerId",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePriceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Prices"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "PricesController_findAll",
+        "parameters": [
+          {
+            "name": "partnerId",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 100,
+              "type": "number"
+            }
+          },
+          {
+            "name": "aliasId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "name",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "ALPHABETICAL",
+                "CREATION"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "ASC",
+                "DESC"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Prices"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ]
+      }
+    },
+    "/prices/{id}": {
+      "get": {
+        "operationId": "PricesController_findOne",
+        "parameters": [
+          {
+            "name": "partnerId",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Prices"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "PricesController_update",
+        "parameters": [
+          {
+            "name": "partnerId",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePriceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "404": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Prices"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "PricesController_destroy",
+        "parameters": [
+          {
+            "name": "partnerId",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Price has properties associated"
+          },
+          "404": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Prices"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ]
+      }
+    },
+    "/prices/properties/{propertyId}": {
+      "put": {
+        "operationId": "PricesController_propertyUpdate",
+        "parameters": [
+          {
+            "name": "partnerId",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "propertyId",
+            "required": true,
+            "in": "path",
+            "schema": {}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PropertyUpsertDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "404": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Prices"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ]
+      }
+    },
+    "/pricing": {
+      "post": {
+        "operationId": "PricingController_show",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FindOneDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Pricing"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ]
+      }
+    },
+    "/pricing/bulk": {
+      "post": {
+        "operationId": "PricingController_bulk",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkPricingDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Pricing"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ]
+      }
+    },
+    "/short-stays": {
+      "get": {
+        "operationId": "ShortStaysController_findAll",
+        "parameters": [
+          {
+            "name": "partnerId",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "partnerId",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "aliasId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "name",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "ALPHABETICAL",
+                "CREATION"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "ASC",
+                "DESC"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "ShortStay"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "ShortStaysController_create",
+        "parameters": [
+          {
+            "name": "partnerId",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "partnerId",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateShortStayPriceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "ShortStay"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ]
+      }
+    },
+    "/short-stays/{id}": {
+      "get": {
+        "operationId": "ShortStaysController_findOne",
+        "parameters": [
+          {
+            "name": "partnerId",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "partnerId",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "ShortStay"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "ShortStaysController_update",
+        "parameters": [
+          {
+            "name": "partnerId",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "partnerId",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateShortStayPriceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "404": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "ShortStay"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "ShortStaysController_destroy",
+        "parameters": [
+          {
+            "name": "partnerId",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "partnerId",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Short stay has properties associated"
+          },
+          "404": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "ShortStay"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ]
+      }
+    },
+    "/short-stays/{id}/projections": {
+      "get": {
+        "operationId": "ShortStaysController_projection",
+        "parameters": [
+          {
+            "name": "partnerId",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "partnerId",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "ShortStay"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ]
+      }
+    },
+    "/short-stays/projections": {
+      "post": {
+        "operationId": "ShortStaysController_createProjection",
+        "parameters": [
+          {
+            "name": "partnerId",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProjectionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "ShortStay"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ]
+      }
+    },
+    "/short-stays/{shortStayId}/custom-dates": {
+      "get": {
+        "operationId": "CustomDatesController_findAll",
+        "parameters": [
+          {
+            "name": "shortStayId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "name",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "ALPHABETICAL",
+                "CREATION"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "ASC",
+                "DESC"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "CustomDates"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "CustomDatesController_create",
+        "parameters": [
+          {
+            "name": "shortStayId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCustomDateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "404": {
+            "description": ""
+          },
+          "409": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "CustomDates"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ]
+      }
+    },
+    "/short-stays/{shortStayId}/custom-dates/bulk": {
+      "post": {
+        "operationId": "CustomDatesController_bulkCreate",
+        "parameters": [
+          {
+            "name": "shortStayId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CreateCustomDateDto"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "404": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "CustomDates"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ]
+      }
+    },
+    "/short-stays/{shortStayId}/custom-dates/{id}": {
+      "get": {
+        "operationId": "CustomDatesController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "shortStayId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "CustomDates"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "CustomDatesController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "shortStayId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCustomDateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "404": {
+            "description": ""
+          },
+          "409": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "CustomDates"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "CustomDatesController_destroy",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "shortStayId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Custom date has properties associated"
+          },
+          "404": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "CustomDates"
+        ],
+        "security": [
+          {
+            "token": []
+          }
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Tio Patinhas API",
+    "description": "Prices management",
+    "version": "0.0.1",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "token": {
+        "type": "apiKey",
+        "name": "token",
+        "in": "header"
+      }
+    },
+    "schemas": {
+      "CreateAmountDto": {
+        "type": "object",
+        "properties": {
+          "currency": {
+            "type": "string",
+            "default": "BRL",
+            "enum": [
+              "BRL",
+              "USD"
+            ]
+          },
+          "amount": {
+            "type": "number"
+          },
+          "precision": {
+            "type": "object",
+            "default": 2
+          }
+        },
+        "required": [
+          "currency",
+          "amount",
+          "precision"
+        ]
+      },
+      "CreateRulesDto": {
+        "type": "object",
+        "properties": {
+          "period": {
+            "type": "string",
+            "default": "DAYS",
+            "enum": [
+              "DAYS",
+              "MONTHS"
+            ]
+          },
+          "number": {
+            "type": "object",
+            "default": 3
+          },
+          "amount": {
+            "$ref": "#/components/schemas/CreateAmountDto"
+          },
+          "discount": {
+            "type": "object",
+            "default": 0
+          }
+        },
+        "required": [
+          "period",
+          "number",
+          "amount",
+          "discount"
+        ]
+      },
+      "CreateLangDto": {
+        "type": "object",
+        "properties": {
+          "pt_BR": {
+            "type": "string"
+          },
+          "en_US": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "pt_BR",
+          "en_US"
+        ]
+      },
+      "CreateFeeAmountDto": {
+        "type": "object",
+        "properties": {
+          "currency": {
+            "type": "string",
+            "default": "BRL",
+            "enum": [
+              "BRL",
+              "USD"
+            ]
+          },
+          "amount": {
+            "type": "number"
+          },
+          "precision": {
+            "type": "object",
+            "default": 2
+          }
+        },
+        "required": [
+          "currency",
+          "amount",
+          "precision"
+        ]
+      },
+      "CreateFeeDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "$ref": "#/components/schemas/CreateLangDto"
+          },
+          "description": {
+            "$ref": "#/components/schemas/CreateLangDto"
+          },
+          "amount": {
+            "$ref": "#/components/schemas/CreateFeeAmountDto"
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "amount"
+        ]
+      },
+      "CreatePriceDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "salesType": {
+            "type": "string",
+            "default": "SUBSCRIPTION",
+            "enum": [
+              "SHORT_STAY",
+              "SUBSCRIPTION"
+            ]
+          },
+          "feeType": {
+            "type": "string",
+            "default": "NET",
+            "enum": [
+              "NET",
+              "GROSS",
+              "COMISSION"
+            ]
+          },
+          "category": {
+            "type": "string",
+            "default": "BASE",
+            "enum": [
+              "BASE"
+            ]
+          },
+          "currency": {
+            "type": "string",
+            "default": "BRL",
+            "enum": [
+              "BRL",
+              "USD"
+            ]
+          },
+          "ruleType": {
+            "type": "string",
+            "default": "PER_NIGHT",
+            "enum": [
+              "PER_NIGHT",
+              "PER_PERSON"
+            ]
+          },
+          "rules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateRulesDto"
+            }
+          },
+          "fees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateFeeDto"
+            }
+          },
+          "startDate": {
+            "type": "object",
+            "default": "2021-01-01"
+          },
+          "endDate": {
+            "type": "object",
+            "default": "2021-12-31"
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "salesType",
+          "feeType",
+          "category",
+          "currency",
+          "ruleType",
+          "rules",
+          "fees",
+          "startDate",
+          "endDate"
+        ]
+      },
+      "UpdateAmountDto": {
+        "type": "object",
+        "properties": {
+          "currency": {
+            "type": "string",
+            "default": "BRL",
+            "enum": [
+              "BRL",
+              "USD"
+            ]
+          },
+          "amount": {
+            "type": "number"
+          },
+          "precision": {
+            "type": "object",
+            "default": 2
+          }
+        },
+        "required": [
+          "currency",
+          "amount",
+          "precision"
+        ]
+      },
+      "UpdateRulesDto": {
+        "type": "object",
+        "properties": {
+          "period": {
+            "type": "string",
+            "default": "DAYS",
+            "enum": [
+              "DAYS",
+              "MONTHS"
+            ]
+          },
+          "number": {
+            "type": "object",
+            "default": 3
+          },
+          "amount": {
+            "$ref": "#/components/schemas/UpdateAmountDto"
+          },
+          "discount": {
+            "type": "object",
+            "default": 0
+          }
+        },
+        "required": [
+          "period",
+          "number",
+          "amount",
+          "discount"
+        ]
+      },
+      "UpdateLangDto": {
+        "type": "object",
+        "properties": {
+          "pt_BR": {
+            "type": "string"
+          },
+          "en_US": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "pt_BR",
+          "en_US"
+        ]
+      },
+      "UpdateFeeAmountDto": {
+        "type": "object",
+        "properties": {
+          "currency": {
+            "type": "string",
+            "default": "BRL",
+            "enum": [
+              "BRL",
+              "USD"
+            ]
+          },
+          "amount": {
+            "type": "number"
+          },
+          "precision": {
+            "type": "object",
+            "default": 2
+          }
+        },
+        "required": [
+          "currency",
+          "amount",
+          "precision"
+        ]
+      },
+      "UpdateFeeDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "$ref": "#/components/schemas/UpdateLangDto"
+          },
+          "description": {
+            "$ref": "#/components/schemas/UpdateLangDto"
+          },
+          "amount": {
+            "$ref": "#/components/schemas/UpdateFeeAmountDto"
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "amount"
+        ]
+      },
+      "UpdatePriceDto": {
+        "type": "object",
+        "properties": {
+          "properties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "exclude": {
+            "type": "object",
+            "default": false
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "salesType": {
+            "type": "string",
+            "default": "SUBSCRIPTION",
+            "enum": [
+              "SHORT_STAY",
+              "SUBSCRIPTION"
+            ]
+          },
+          "feeType": {
+            "type": "string",
+            "default": "NET",
+            "enum": [
+              "NET",
+              "GROSS",
+              "COMISSION"
+            ]
+          },
+          "category": {
+            "type": "string",
+            "default": "BASE",
+            "enum": [
+              "BASE"
+            ]
+          },
+          "currency": {
+            "type": "string",
+            "default": "BRL",
+            "enum": [
+              "BRL",
+              "USD"
+            ]
+          },
+          "ruleType": {
+            "type": "string",
+            "default": "PER_NIGHT",
+            "enum": [
+              "PER_NIGHT",
+              "PER_PERSON"
+            ]
+          },
+          "rules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UpdateRulesDto"
+            }
+          },
+          "fees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UpdateFeeDto"
+            }
+          },
+          "startDate": {
+            "type": "object",
+            "default": "2021-01-01"
+          },
+          "endDate": {
+            "type": "object",
+            "default": "2021-12-31"
+          }
+        },
+        "required": [
+          "properties",
+          "exclude",
+          "name",
+          "description",
+          "salesType",
+          "feeType",
+          "category",
+          "currency",
+          "ruleType",
+          "rules",
+          "fees",
+          "startDate",
+          "endDate"
+        ]
+      },
+      "PropertyUpsertDto": {
+        "type": "object",
+        "properties": {
+          "priceIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "priceIds"
+        ]
+      },
+      "PropertyDto": {
+        "type": "object",
+        "properties": {
+          "externalId": {
+            "type": "string",
+            "description": "campo necessario quando chamar uma propriedade da omnibees ou stays"
+          },
+          "partnerId": {
+            "type": "string"
+          },
+          "referenceCode": {
+            "type": "string"
+          },
+          "aliasId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "partnerId",
+          "referenceCode",
+          "aliasId"
+        ]
+      },
+      "FindOneDto": {
+        "type": "object",
+        "properties": {
+          "startDate": {
+            "type": "string"
+          },
+          "endDate": {
+            "type": "string"
+          },
+          "adultGuests": {
+            "type": "number"
+          },
+          "childrenGuests": {
+            "type": "number"
+          },
+          "property": {
+            "$ref": "#/components/schemas/PropertyDto"
+          }
+        },
+        "required": [
+          "startDate",
+          "endDate",
+          "property"
+        ]
+      },
+      "BulkPricingDto": {
+        "type": "object",
+        "properties": {
+          "startDate": {
+            "type": "string"
+          },
+          "endDate": {
+            "type": "string"
+          },
+          "adultGuests": {
+            "type": "number"
+          },
+          "childrenGuests": {
+            "type": "number"
+          },
+          "properties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PropertyDto"
+            }
+          }
+        },
+        "required": [
+          "startDate",
+          "endDate",
+          "properties"
+        ]
+      },
+      "CreateProgressiveDiscountDto": {
+        "type": "object",
+        "properties": {
+          "numberDays": {
+            "type": "number"
+          },
+          "discountAmount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "numberDays",
+          "discountAmount"
+        ]
+      },
+      "CreateWeekDto": {
+        "type": "object",
+        "properties": {
+          "discountType": {
+            "type": "string",
+            "enum": [
+              "PERCENT",
+              "MONEY"
+            ]
+          },
+          "mon": {
+            "type": "object",
+            "default": 0
+          },
+          "tue": {
+            "type": "object",
+            "default": 0
+          },
+          "wed": {
+            "type": "object",
+            "default": 0
+          },
+          "thu": {
+            "type": "object",
+            "default": 0
+          },
+          "fri": {
+            "type": "object",
+            "default": 0
+          },
+          "sat": {
+            "type": "object",
+            "default": 0
+          },
+          "sun": {
+            "type": "object",
+            "default": 0
+          }
+        },
+        "required": [
+          "discountType",
+          "mon",
+          "tue",
+          "wed",
+          "thu",
+          "fri",
+          "sat",
+          "sun"
+        ]
+      },
+      "CreateShortStayRulesDto": {
+        "type": "object",
+        "properties": {
+          "progressiveDiscountType": {
+            "type": "string",
+            "enum": [
+              "PERSON",
+              "NIGHT"
+            ]
+          },
+          "progressiveDiscount": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateProgressiveDiscountDto"
+            }
+          },
+          "week": {
+            "$ref": "#/components/schemas/CreateWeekDto"
+          }
+        },
+        "required": [
+          "progressiveDiscountType",
+          "progressiveDiscount",
+          "week"
+        ]
+      },
+      "CreateShortStayPriceDto": {
+        "type": "object",
+        "properties": {
+          "properties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "validity": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "currency": {
+            "type": "string",
+            "default": "BRL",
+            "enum": [
+              "BRL"
+            ]
+          },
+          "feeType": {
+            "type": "string",
+            "enum": [
+              "NET",
+              "GROSS"
+            ]
+          },
+          "amount": {
+            "type": "number"
+          },
+          "precision": {
+            "type": "object",
+            "default": 2
+          },
+          "additionalPersonAmount": {
+            "type": "number"
+          },
+          "childrenAmount": {
+            "type": "number"
+          },
+          "rule": {
+            "$ref": "#/components/schemas/CreateShortStayRulesDto"
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "validity",
+          "currency",
+          "feeType",
+          "amount",
+          "precision"
+        ]
+      },
+      "UpdateShortStayPriceDto": {
+        "type": "object",
+        "properties": {
+          "properties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "exclude": {
+            "type": "object",
+            "default": false
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "validity": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "currency": {
+            "type": "string",
+            "default": "BRL",
+            "enum": [
+              "BRL"
+            ]
+          },
+          "feeType": {
+            "type": "string",
+            "enum": [
+              "NET",
+              "GROSS"
+            ]
+          },
+          "amount": {
+            "type": "number"
+          },
+          "precision": {
+            "type": "object",
+            "default": 2
+          },
+          "additionalPersonAmount": {
+            "type": "object",
+            "default": 0
+          },
+          "childrenAmount": {
+            "type": "object",
+            "default": 0
+          },
+          "rule": {
+            "$ref": "#/components/schemas/UpdateRulesDto"
+          }
+        },
+        "required": [
+          "properties",
+          "exclude",
+          "name",
+          "description",
+          "validity",
+          "currency",
+          "feeType",
+          "amount",
+          "precision",
+          "additionalPersonAmount",
+          "childrenAmount"
+        ]
+      },
+      "CreateCustomDateDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "startDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "endDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "amount": {
+            "$ref": "#/components/schemas/CreateAmountDto"
+          }
+        },
+        "required": [
+          "name",
+          "startDate",
+          "endDate",
+          "amount"
+        ]
+      },
+      "CreateProjectionDto": {
+        "type": "object",
+        "properties": {
+          "customDates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateCustomDateDto"
+            }
+          },
+          "name": {
+            "type": "string"
+          },
+          "validity": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "currency": {
+            "type": "string",
+            "default": "BRL",
+            "enum": [
+              "BRL"
+            ]
+          },
+          "feeType": {
+            "type": "string",
+            "enum": [
+              "NET",
+              "GROSS"
+            ]
+          },
+          "amount": {
+            "type": "number"
+          },
+          "precision": {
+            "type": "object",
+            "default": 2
+          },
+          "additionalPersonAmount": {
+            "type": "number"
+          },
+          "childrenAmount": {
+            "type": "number"
+          },
+          "rule": {
+            "$ref": "#/components/schemas/CreateShortStayRulesDto"
+          }
+        },
+        "required": [
+          "customDates",
+          "name",
+          "validity",
+          "currency",
+          "feeType",
+          "amount",
+          "precision"
+        ]
+      },
+      "UpdateCustomDateDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "startDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "endDate": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "amount": {
+            "$ref": "#/components/schemas/UpdateAmountDto"
+          }
+        }
+      }
+    }
+  }
+}

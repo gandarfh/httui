@@ -7,6 +7,6 @@ type InputCreate struct {
 }
 
 type InputSwagger struct {
-	Link   string `json:"link" validate:"required"`
+	Path   string `json:"path" validate:"required"`
 	Parent string `json:"Parent" validate:"required"`
 }

@@ -164,10 +164,11 @@ func (repo *ResourceRepo) FindByName(name string, parent string) *Resources {
 	value := Resources{}
 
 	db := repo.Sql.Model(&Resources{})
-	db.Where("name = ? AND workspaces_id = ?", name, work.ID)
 
 	db.Preload("Headers")
 	db.Preload("Params")
+
+	db.Where("name LIKE ? AND workspaces_id = ?", name, work.ID)
 
 	db.First(&value)
 
@@ -176,7 +177,9 @@ func (repo *ResourceRepo) FindByName(name string, parent string) *Resources {
 
 func (repo *ResourceRepo) List() *[]Resources {
 	list := []Resources{}
-	repo.Sql.Find(&list)
+	db := repo.Sql.Model(&Resources{})
+
+	db.Find(&list)
 
 	return &list
 }
