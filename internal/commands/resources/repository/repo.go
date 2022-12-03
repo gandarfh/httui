@@ -3,6 +3,7 @@ package repository
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/gandarfh/maid-san/external/database"
 	"github.com/gandarfh/maid-san/internal/commands/resources/dtos"
@@ -23,15 +24,18 @@ type Headers struct {
 	Value       string `db:"value" json:"value"`
 }
 
-type workspace struct {
-	gorm.Model
-	Name string `db:"name"`
-	Uri  string `db:"uri"`
+type workspaces struct {
+	ID        string `db:"id" gorm:"primaryKey"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt `gorm:"index"`
+	Name      string         `db:"name"`
+	Uri       string         `db:"uri"`
 }
 
 type Resources struct {
 	gorm.Model
-	WorkspacesId uint            `db:"workspaces_id" json:"workspaces_id"`
+	WorkspacesId string          `db:"workspaces_id" json:"workspaces_id"`
 	Name         string          `db:"name" json:"name"`
 	Endpoint     string          `db:"endpoint" json:"endpoint"`
 	Method       string          `db:"method" json:"method"`
@@ -47,8 +51,8 @@ func (re *Resources) AfterUpdate(tx *gorm.DB) error {
 	return nil
 }
 
-func (re *Resources) Parent() *workspace {
-	wk := workspace{}
+func (re *Resources) Parent() *workspaces {
+	wk := workspaces{}
 	repo, err := NewResourcesRepo()
 
 	if err != nil {
@@ -122,7 +126,7 @@ func (repo *ResourceRepo) Update(resource *Resources, value *dtos.InputUpdate) {
 
 func (repo *ResourceRepo) Create(value *dtos.InputCreate) {
 	resource := Resources{
-		WorkspacesId: uint(value.ParentId),
+		WorkspacesId: value.ParentId,
 		Name:         value.Name,
 		Endpoint:     value.Endpoint,
 		Method:       value.Method,
@@ -156,9 +160,9 @@ func (repo *ResourceRepo) Delete(id uint) {
 }
 
 func (repo *ResourceRepo) FindByName(name string, parent string) *Resources {
-	workdb := repo.Sql.Model(&workspace{}).Where("name = ?", parent)
+	workdb := repo.Sql.Model(&workspaces{}).Where("name = ?", parent)
 
-	work := workspace{}
+	work := workspaces{}
 	workdb.First(&work)
 
 	value := Resources{}

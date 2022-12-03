@@ -62,8 +62,8 @@ func (w *Delete) Run(args ...string) error {
 }
 
 func DeleteSubs() repl.CommandList {
-	repo, _ := repository.NewResourcesRepo()
-	list := repo.List()
+	// repo, _ := repository.NewResourcesRepo()
+	// list := repo.List()
 
 	commands := repl.CommandList{}
 	commands = append(commands, repl.Command{
@@ -71,12 +71,12 @@ func DeleteSubs() repl.CommandList {
 		Repl: DeleteInit(),
 	})
 
-	for _, item := range *list {
-		commands = append(commands, repl.Command{
-			Key:  fmt.Sprintf("%s %d", "delete", item.ID),
-			Repl: DeleteInit(),
-		})
-	}
+	// for _, item := range *list {
+	// 	commands = append(commands, repl.Command{
+	// 		Key:  fmt.Sprintf("%s %d", "delete", item.ID),
+	// 		Repl: DeleteInit(),
+	// 	})
+	// }
 
 	return commands
 }

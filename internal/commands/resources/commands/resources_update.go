@@ -96,8 +96,8 @@ func (w *Update) Run(args ...string) error {
 }
 
 func UpdateSubs() repl.CommandList {
-	repo, _ := repository.NewResourcesRepo()
-	list := repo.List()
+	// repo, _ := repository.NewResourcesRepo()
+	// list := repo.List()
 
 	commands := repl.CommandList{}
 
@@ -106,17 +106,17 @@ func UpdateSubs() repl.CommandList {
 		Repl: UpdateInit(),
 	})
 
-	for _, item := range *list {
-		commands = append(commands, repl.Command{
-			Key:  fmt.Sprintf(`%s parent="%s"`, "update", item.Parent().Name),
-			Repl: UpdateInit(),
-		})
+	// for _, item := range *list {
+	// 	commands = append(commands, repl.Command{
+	// 		Key:  fmt.Sprintf(`%s parent="%s"`, "update", item.Parent().Name),
+	// 		Repl: UpdateInit(),
+	// 	})
 
-		commands = append(commands, repl.Command{
-			Key:  fmt.Sprintf(`%s parent="%s" name="%s"`, "update", item.Parent().Name, item.Name),
-			Repl: UpdateInit(),
-		})
-	}
+	// 	commands = append(commands, repl.Command{
+	// 		Key:  fmt.Sprintf(`%s parent="%s" name="%s"`, "update", item.Parent().Name, item.Name),
+	// 		Repl: UpdateInit(),
+	// 	})
+	// }
 
 	return commands
 }

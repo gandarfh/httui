@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/gandarfh/maid-san/external/database"
 	resourcerepo "github.com/gandarfh/maid-san/internal/commands/resources/repository"
@@ -11,9 +12,12 @@ import (
 )
 
 type Workspaces struct {
-	gorm.Model
-	Name      string `db:"name" validate:"required"`
-	Uri       string `db:"uri" validate:"required"`
+	ID        string `db:"id" gorm:"primaryKey"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt `gorm:"index"`
+	Name      string         `db:"name" validate:"required"`
+	Uri       string         `db:"uri" validate:"required"`
 	Resources []resourcerepo.Resources
 }
 

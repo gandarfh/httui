@@ -1,8 +1,6 @@
 package commands
 
 import (
-	"strconv"
-
 	"github.com/gandarfh/maid-san/internal/commands/workspace/repository"
 	"github.com/gandarfh/maid-san/pkg/errors"
 	"github.com/gandarfh/maid-san/pkg/repl"
@@ -35,7 +33,7 @@ func (c *List) Print() error {
 
 	for _, item := range *c.wks {
 		row := table.Row{
-			strconv.FormatUint(uint64(item.ID), 10),
+			item.ID,
 			utils.ReplaceByEnv(item.Name),
 			utils.ReplaceByEnv(item.Uri),
 			item.CreatedAt.Format("2006/01/02"),

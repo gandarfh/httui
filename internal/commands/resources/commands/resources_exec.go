@@ -157,8 +157,8 @@ func (c *Exec) preview(resource *repository.Resources, url string, status string
 }
 
 func ExecSubs() repl.CommandList {
-	repo, _ := repository.NewResourcesRepo()
-	list := repo.List()
+	// repo, _ := repository.NewResourcesRepo()
+	// list := repo.List()
 
 	commands := repl.CommandList{}
 
@@ -172,27 +172,27 @@ func ExecSubs() repl.CommandList {
 		Repl: ExecInit(),
 	})
 
-	for _, item := range *list {
-		commands = append(commands, repl.Command{
-			Key:  fmt.Sprintf(`%s parent="%s"`, "exec", item.Parent().Name),
-			Repl: ExecInit(),
-		})
+	// for _, item := range *list {
+	// 	commands = append(commands, repl.Command{
+	// 		Key:  fmt.Sprintf(`%s parent="%s"`, "exec", item.Parent().Name),
+	// 		Repl: ExecInit(),
+	// 	})
 
-		commands = append(commands, repl.Command{
-			Key:  fmt.Sprintf(`%s parent="%s"`, "vim exec", item.Parent().Name),
-			Repl: ExecInit(),
-		})
+	// 	commands = append(commands, repl.Command{
+	// 		Key:  fmt.Sprintf(`%s parent="%s"`, "vim exec", item.Parent().Name),
+	// 		Repl: ExecInit(),
+	// 	})
 
-		commands = append(commands, repl.Command{
-			Key:  fmt.Sprintf(`%s parent="%s" name="%s"`, "exec", item.Parent().Name, item.Name),
-			Repl: ExecInit(),
-		})
+	// 	commands = append(commands, repl.Command{
+	// 		Key:  fmt.Sprintf(`%s parent="%s" name="%s"`, "exec", item.Parent().Name, item.Name),
+	// 		Repl: ExecInit(),
+	// 	})
 
-		commands = append(commands, repl.Command{
-			Key:  fmt.Sprintf(`%s parent="%s" name="%s"`, "vim exec", item.Parent().Name, item.Name),
-			Repl: ExecInit(),
-		})
-	}
+	// 	commands = append(commands, repl.Command{
+	// 		Key:  fmt.Sprintf(`%s parent="%s" name="%s"`, "vim exec", item.Parent().Name, item.Name),
+	// 		Repl: ExecInit(),
+	// 	})
+	// }
 
 	return commands
 }

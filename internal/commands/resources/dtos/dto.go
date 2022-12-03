@@ -3,7 +3,7 @@ package dtos
 import "encoding/json"
 
 type InputCreate struct {
-	ParentId int    `json:"parent_id" validate:"required"`
+	ParentId string `json:"parent_id" validate:"required"`
 	Name     string `json:"name" validate:"required"`
 	Endpoint string `json:"endpoint" validate:"required"`
 	Method   string `json:"method" validate:"required"`
@@ -12,7 +12,7 @@ type InputCreate struct {
 type KeyValue map[string]interface{}
 
 type InputUpdate struct {
-	WorkspacesId uint            `json:"workspace_id"`
+	WorkspacesId string          `json:"workspace_id"`
 	Parent       string          `json:"parent" validate:"required"`
 	Name         string          `json:"name" validate:"required"`
 	Endpoint     string          `json:"endpoint"`
