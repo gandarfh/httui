@@ -2,6 +2,7 @@ package tabs
 
 import (
 	"github.com/charmbracelet/lipgloss"
+	"github.com/gandarfh/maid-san/pkg/common"
 	"github.com/gandarfh/maid-san/pkg/styles"
 	"golang.org/x/term"
 )
@@ -22,7 +23,7 @@ var (
 
 type Content struct {
 	Tab     string
-	Content string
+	Content common.Component
 }
 
 type Contents []Content
@@ -40,7 +41,7 @@ func New(items Contents, active int, loading string) string {
 		Width(teste).
 		Height(teste2).
 		Render(
-			lipgloss.JoinVertical(0, loading, content),
+			lipgloss.JoinVertical(0, loading, content.View()),
 		)
 
 	tabs := Tabs(items, active, teste)
