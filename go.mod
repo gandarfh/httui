@@ -15,6 +15,7 @@ require (
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/aymanbagabas/go-osc52 v1.0.3 // indirect
 	github.com/containerd/console v1.0.3 // indirect
+	github.com/google/uuid v1.3.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect

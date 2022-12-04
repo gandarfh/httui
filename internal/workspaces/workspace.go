@@ -5,6 +5,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/gandarfh/maid-san/internal/repositories"
 	"github.com/gandarfh/maid-san/pkg/common"
+	"github.com/gandarfh/maid-san/pkg/terminal"
 )
 
 type Model struct {
@@ -45,12 +46,50 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		switch keypress := msg.String(); keypress {
+		case "d":
+			index := m.workspace_list.Index()
+			workspaces, _ := m.workspace_repo.List()
+			common.CurrWorkspace = workspaces[index]
+
+			m.workspace_repo.Delete(common.CurrWorkspace.ID)
+
+		case "c":
+			data := repositories.Workspace{}
+			term := terminal.NewPreview(&data)
+			return m, tea.Batch(term.OpenVim("Create"))
+
+		case "r":
+			index := m.workspace_list.Index()
+			workspaces, _ := m.workspace_repo.List()
+			common.CurrWorkspace = workspaces[index]
+
+			term := terminal.NewPreview(&common.CurrWorkspace)
+			return m, tea.Batch(term.OpenVim("Update"))
+
 		case "enter":
 			index := m.workspace_list.Index()
 			workspaces, _ := m.workspace_repo.List()
 			common.CurrWorkspace = workspaces[index]
 
 			return m, tea.Batch(common.SetPage(common.Page_Resource))
+		}
+
+	case terminal.Finish:
+		switch msg.Category {
+		case "Update":
+			data := repositories.Workspace{}
+			msg.Preview.Execute(&data)
+			m.workspace_repo.Update(&common.CurrWorkspace, &data)
+
+		case "Create":
+			data := repositories.Workspace{}
+			msg.Preview.Execute(&data)
+			m.workspace_repo.Create(&data)
+		}
+
+		defer msg.Preview.Close()
+		if msg.Err != nil {
+			return m, nil
 		}
 	}
 
