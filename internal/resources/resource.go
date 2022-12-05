@@ -253,16 +253,19 @@ func (m Model) Exec() tea.Cmd {
 
 		headers := map[string]string{}
 		json.Unmarshal(resource.Headers, &headers)
-
 		for k, v := range headers {
-			res.Header(k, utils.ReplaceByEnv(v))
+			value := utils.ReplaceByEnv(v)
+			res.Header(k, value)
+			headers[k] = value
 		}
 
 		params := []map[string]string{}
-		json.Unmarshal(resource.Headers, &headers)
+		json.Unmarshal(resource.QueryParams, &params)
 		for _, item := range params {
 			for k, v := range item {
-				res.Params(k, utils.ReplaceByEnv(v))
+				value := utils.ReplaceByEnv(v)
+				res.Params(k, value)
+				params = append(params, map[string]string{k: value})
 			}
 		}
 
