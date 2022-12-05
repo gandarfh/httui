@@ -9,7 +9,7 @@ type container struct {
 }
 
 var Container = func() container {
-	base := lipgloss.NewStyle().MarginTop(2).Padding(0, 3)
+	base := lipgloss.NewStyle().MarginTop(2)
 	loading := lipgloss.NewStyle().Padding(0, 3).PaddingTop(1)
 	resource := lipgloss.NewStyle().Padding(1)
 

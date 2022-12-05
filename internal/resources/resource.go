@@ -120,7 +120,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmds = append(cmds, cmd)
 
 	case tea.WindowSizeMsg:
-		m.height = msg.Height - (msg.Height / 3)
+		m.height = msg.Height - (msg.Height / 3) - 1
 		m.width = msg.Width
 
 		m.tags_list.SetHeight(14)
