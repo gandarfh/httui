@@ -10,7 +10,7 @@ import (
 var (
 	activeFirstTabBorder = lipgloss.Border{
 		Top:         "─",
-		Bottom:      "",
+		Bottom:      " ",
 		Left:        "│",
 		Right:       "│",
 		TopLeft:     "╭",
@@ -20,7 +20,7 @@ var (
 	}
 	activeTabBorder = lipgloss.Border{
 		Top:         "─",
-		Bottom:      "",
+		Bottom:      " ",
 		Left:        "│",
 		Right:       "│",
 		TopLeft:     "╭",
@@ -29,56 +29,54 @@ var (
 		BottomRight: "╰",
 	}
 	firstTabBorder = lipgloss.Border{
-		Top:         "",
+		Top:         " ",
 		Bottom:      "─",
-		Left:        "",
-		Right:       "",
-		TopLeft:     "",
-		TopRight:    "",
+		Left:        " ",
+		Right:       " ",
+		TopLeft:     " ",
+		TopRight:    " ",
 		BottomLeft:  "╭",
 		BottomRight: "─",
 	}
 	tabBorder = lipgloss.Border{
-		Top:         "",
+		Top:         " ",
 		Bottom:      "─",
-		Left:        "",
-		Right:       "",
-		TopLeft:     "",
-		TopRight:    "",
+		Left:        " ",
+		Right:       " ",
+		TopLeft:     " ",
+		TopRight:    " ",
 		BottomLeft:  "─",
 		BottomRight: "─",
 	}
 
 	gapBorder = lipgloss.Border{
-		Top:         "",
+		Top:         " ",
 		Bottom:      "─",
-		Left:        "",
-		Right:       "",
-		TopLeft:     "",
-		TopRight:    "",
+		Left:        " ",
+		Right:       " ",
+		TopLeft:     " ",
+		TopRight:    " ",
 		BottomLeft:  "─",
 		BottomRight: "╮",
 	}
 
 	tabStyle = lipgloss.NewStyle().
 			Border(tabBorder, true).
-			BorderForeground(styles.DefaultTheme.SecondaryBorder).
 			Padding(0, 1)
 
 	firstTabStyle = lipgloss.NewStyle().
 			Border(firstTabBorder, true).
-			BorderForeground(styles.DefaultTheme.SecondaryBorder).
 			Padding(0, 1)
 
 	activeFirstTabStyle = tabStyle.Copy().
 				Border(activeFirstTabBorder, true).
-				Foreground(styles.DefaultTheme.PrimaryBorder).
-				BorderForeground(styles.DefaultTheme.PrimaryBorder)
+				Foreground(styles.DefaultTheme.PrimaryText).
+				BorderForeground(styles.DefaultTheme.PrimaryText)
 
 	activeTabStyle = tabStyle.Copy().
 			Border(activeTabBorder, true).
-			Foreground(styles.DefaultTheme.PrimaryBorder).
-			BorderForeground(styles.DefaultTheme.PrimaryBorder)
+			Foreground(styles.DefaultTheme.PrimaryText).
+			BorderForeground(styles.DefaultTheme.PrimaryText)
 
 	tabGapStyle = tabStyle.Copy().Padding(0, 1).
 			Border(gapBorder, true)

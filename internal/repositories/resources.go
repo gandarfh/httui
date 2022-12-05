@@ -1,36 +1,21 @@
 package repositories
 
 import (
-	"encoding/json"
-
 	"github.com/gandarfh/maid-san/external/database"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 )
-
-type Param struct {
-	gorm.Model
-	ResourceId string
-	Key        string `json:"key"`
-	Value      string `json:"value"`
-}
-type Header struct {
-	gorm.Model
-	ResourceId string
-	Key        string `json:"key"`
-	Value      string `json:"value"`
-}
 
 type Resource struct {
 	gorm.Model
-	WorkspaceId uint            `json:"workspaceId"`
-	TagId       uint            `json:"tagId"`
-	Name        string          `json:"name"`
-	Endpoint    string          `json:"endpoint"`
-	Method      string          `json:"method"`
-	Params      []Param         `json:"params"`
-	Headers     []Header        `json:"headers"`
-	Body        json.RawMessage `json:"body"`
+	Name        string         `json:"name"`
+	Description string         `json:"description"`
+	TagId       uint           `json:"tagId"`
+	Endpoint    string         `json:"endpoint"`
+	Method      string         `json:"method"`
+	QueryParams datatypes.JSON `json:"queryParams"`
+	Headers     datatypes.JSON `json:"headers"`
+	Body        datatypes.JSON `json:"body"`
 }
 
 type ResourcesRepo struct {
@@ -41,8 +26,6 @@ func NewResource() (*ResourcesRepo, error) {
 	db, err := database.SqliteConnection()
 	db.AutoMigrate(&Tag{})
 	db.AutoMigrate(&Resource{})
-	db.AutoMigrate(&Param{})
-	db.AutoMigrate(&Header{})
 
 	return &ResourcesRepo{db}, err
 }
@@ -52,13 +35,8 @@ func (repo *ResourcesRepo) Create(value *Resource) error {
 	return db.Error
 }
 
-func (repo *ResourcesRepo) Update(workspace *Resource, value *Resource) error {
-	db := repo.Sql.Model(workspace).
-		Session(&gorm.Session{FullSaveAssociations: true})
-
-	db.Association("Params").Replace(value.Params)
-	db.Association("Headers").Replace(value.Headers)
-
+func (repo *ResourcesRepo) Update(resource *Resource, value *Resource) error {
+	db := repo.Sql.Model(resource)
 	db.Updates(value)
 
 	return db.Error
@@ -71,12 +49,11 @@ func (repo *ResourcesRepo) FindOne(id uint) (*Resource, error) {
 	return &workspace, db.Error
 }
 
-func (repo *ResourcesRepo) ListByTagAndWorkspace(workspace uint) ([]Resource, error) {
+func (repo *ResourcesRepo) List(tagId uint) ([]Resource, error) {
 	resources := []Resource{}
 
-	db := repo.Sql.Model(&Resource{}).
-		Preload(clause.Associations).
-		Where("workspace_id = ?", workspace).
+	db := repo.Sql.Model(&resources).
+		Where("tag_id IS ?", tagId).
 		Find(&resources)
 
 	return resources, db.Error

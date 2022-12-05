@@ -7,9 +7,9 @@ import (
 
 type Workspace struct {
 	gorm.Model
-	Name      string     `json:"name"`
-	Uri       string     `json:"uri"`
-	Resources []Resource `json:"resources"`
+	Name string `gorm:"unique" json:"name"`
+	Host string `json:"host"`
+	Tags []Tag  `json:"tags"`
 }
 
 type WorkspacesRepo struct {

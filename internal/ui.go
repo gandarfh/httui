@@ -2,6 +2,8 @@ package internal
 
 import (
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
+	"github.com/gandarfh/maid-san/internal/envs"
 	"github.com/gandarfh/maid-san/internal/resources"
 	"github.com/gandarfh/maid-san/internal/workspaces"
 	"github.com/gandarfh/maid-san/pkg/common"
@@ -18,18 +20,17 @@ const (
 )
 
 type Model struct {
-	pages tabs.Contents
-	width int
-	hight int
-	state state
+	pages  tabs.Contents
+	width  int
+	height int
+	state  state
 }
 
 func New() Model {
-
 	pages := tabs.Contents{
 		{Tab: "Workspaces"},
 		{Tab: "Resouces"},
-		{Tab: "Envs"},
+		{Tab: "Environments"},
 	}
 
 	return Model{pages: pages, state: start_state}
@@ -42,7 +43,7 @@ func (m Model) Init() tea.Cmd {
 
 	m.pages[common.Page_Workspace].Content = workspaces.New()
 	m.pages[common.Page_Resource].Content = resources.New()
-	m.pages[common.Page_Env].Content = workspaces.New()
+	m.pages[common.Page_Env].Content = envs.New()
 
 	for _, p := range m.pages {
 		cmds = append(cmds, p.Content.Init())
@@ -61,7 +62,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		m.hight = msg.Height
+		m.height = msg.Height
 		m.width = msg.Width
 
 		m.state = loaded_state
@@ -79,10 +80,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch keypress := msg.String(); keypress {
 		case "ctrl+c", "q":
 			return m, tea.Quit
-		case "right", "l", "tab":
+		case "right", "l":
 			common.CurrPage = min(common.CurrPage+1, len(m.pages)-1)
 			return m, nil
-		case "left", "h", "shift+tab":
+		case "left", "h":
 			common.CurrPage = max(common.CurrPage-1, 0)
 			return m, nil
 		}
@@ -99,12 +100,17 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m Model) View() string {
 	content := ""
 
+	w := m.width - (m.width / 12)
+	h := m.height - (m.height / 3)
+
 	switch m.state {
 	case loaded_state:
-		content = tabs.New(m.pages, common.CurrPage, "carregando")
+		content = tabs.New(m.pages, common.CurrPage, w, h)
+	default:
+		content = tabs.New(m.pages, common.CurrPage, w, h)
 	}
 
-	return styles.Container.Base.Render(content)
+	return lipgloss.Place(m.width, m.height, lipgloss.Center, lipgloss.Top, styles.Container.Base.Render(content))
 }
 
 func max(a, b int) int {

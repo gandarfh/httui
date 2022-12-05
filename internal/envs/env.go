@@ -1,4 +1,4 @@
-package workspaces
+package envs
 
 import (
 	"fmt"
@@ -15,27 +15,25 @@ import (
 )
 
 type Model struct {
-	width          int
-	height         int
-	workspace_list list.Model
-	workspace_repo *repositories.WorkspacesRepo
-	tags_repo      *repositories.TagsRepo
+	width    int
+	height   int
+	env_list list.Model
+	env_repo *repositories.EnvsRepo
 }
 
 func New() Model {
-	workspace_repo, _ := repositories.NewWorkspace()
-	tags_repo, _ := repositories.NewTag()
-	common.ListOfWorkspaces, _ = workspace_repo.List()
+	env_repo, _ := repositories.NewEnvs()
 
 	list := list.New(nil, Delegate{}, 0, 0)
-	list.Title = "All workspaces"
+	list.Title = "All Environments"
 	list.SetShowPagination(false)
 	list.SetShowStatusBar(false)
 	list.SetShowHelp(false)
 
 	list.Styles.Title = titleStyle
+	list.Styles.NoItems = noItemsStyle
 
-	return Model{workspace_repo: workspace_repo, tags_repo: tags_repo, workspace_list: list}
+	return Model{env_repo: env_repo, env_list: list}
 }
 
 func (m Model) Init() tea.Cmd {
@@ -52,51 +50,39 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		m.height = msg.Height - (msg.Height / 3)
 		m.width = msg.Width
-		m.workspace_list.SetHeight(14)
+		m.env_list.SetHeight(14)
 
 	case tea.KeyMsg:
 		switch keypress := msg.String(); keypress {
 		case "d":
-			index := m.workspace_list.Index()
-			workspaces, _ := m.workspace_repo.List()
-			common.CurrWorkspace = workspaces[index]
-
-			m.workspace_repo.Delete(common.CurrWorkspace.ID)
+			index := m.env_list.Index()
+			m.env_repo.Delete(common.ListOfEnvs[index].ID)
 
 		case "c":
-			data := repositories.Workspace{}
+			data := repositories.Env{}
 			term := terminal.NewPreview(&data)
 			return m, tea.Batch(term.OpenVim("Create"))
 
 		case "r":
-			index := m.workspace_list.Index()
-			common.CurrWorkspace = common.ListOfWorkspaces[index]
+			index := m.env_list.Index()
+			common.CurrEnv = common.ListOfEnvs[index]
 
-			term := terminal.NewPreview(&common.CurrWorkspace)
+			term := terminal.NewPreview(&common.CurrEnv)
 			return m, tea.Batch(term.OpenVim("Update"))
 
-		case "enter":
-			index := m.workspace_list.Index()
-			common.CurrWorkspace = common.ListOfWorkspaces[index]
-
-			return m, tea.Batch(
-				common.SetPage(common.Page_Resource),
-				common.SetResourceTab(common.Tab_Tags),
-				common.ListTags(common.CurrWorkspace.ID),
-			)
 		}
 
 	case terminal.Finish:
 		switch msg.Category {
 		case "Update":
-			data := repositories.Workspace{}
+			data := repositories.Env{}
 			msg.Preview.Execute(&data)
-			m.workspace_repo.Update(&common.CurrWorkspace, &data)
+			m.env_repo.Update(&common.CurrEnv, &data)
 
 		case "Create":
-			data := repositories.Workspace{}
+			data := repositories.Env{}
 			msg.Preview.Execute(&data)
-			m.workspace_repo.Create(&data)
+			m.env_repo.Create(&data)
 		}
 
 		defer msg.Preview.Close()
@@ -105,15 +91,15 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	}
 
-	m.workspace_list.SetItems(m.ItemsOfList())
-	m.workspace_list, cmd = m.workspace_list.Update(msg)
+	m.env_list.SetItems(m.ItemsOfList())
+	m.env_list, cmd = m.env_list.Update(msg)
 	cmds = append(cmds, cmd)
 
 	return m, nil
 }
 
 func (m Model) View() string {
-	return m.workspace_list.View()
+	return m.env_list.View()
 }
 func NewTagList() list.Model {
 	list := list.New(nil, Delegate{}, 0, 0)
@@ -144,7 +130,7 @@ var (
 
 var (
 	noItemsStyle = lipgloss.NewStyle().MarginLeft(2).
-			Foreground(styles.DefaultTheme.SecondaryText)
+			Foreground(styles.DefaultTheme.SecondaryBorder)
 	titleStyle = lipgloss.NewStyle().Bold(true)
 	itemStyle  = lipgloss.NewStyle().
 			Border(item_border).
@@ -197,12 +183,12 @@ func (d Delegate) Render(w io.Writer, m list.Model, index int, listItem list.Ite
 
 func (m Model) ItemsOfList() []list.Item {
 	list := []list.Item{}
-	common.ListOfTags, _ = m.tags_repo.List(common.CurrWorkspace.ID)
+	common.ListOfEnvs, _ = m.env_repo.List()
 
 	w := m.width - (m.width / 10)
 
-	for _, i := range common.ListOfWorkspaces {
-		list = append(list, Item{i.Name, i.Host, w})
+	for _, i := range common.ListOfEnvs {
+		list = append(list, Item{i.Key, i.Value, w})
 	}
 
 	return list

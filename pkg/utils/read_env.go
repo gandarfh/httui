@@ -9,19 +9,13 @@ import (
 
 var re_env = regexp.MustCompile(`\$+.\S+`)
 
-func ReadEnv(key string) (*repositories.Envs, error) {
-	repo, _ := repositories.NewEnvsRepo()
-
-	env := &repositories.Envs{
-		Key:   key,
-		Value: key,
-	}
+func ReadEnv(key string) (repositories.Env, error) {
+	repo, _ := repositories.NewEnvs()
 
 	key = strings.Replace(key, "$", "", 1)
+	env, err := repo.FindByKey(key)
 
-	env = repo.FindByKey(key)
-
-	return env, nil
+	return env, err
 }
 
 func HaveEnv(raw string) bool {

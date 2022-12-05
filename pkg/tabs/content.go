@@ -3,8 +3,6 @@ package tabs
 import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/gandarfh/maid-san/pkg/common"
-	"github.com/gandarfh/maid-san/pkg/styles"
-	"golang.org/x/term"
 )
 
 var (
@@ -28,23 +26,20 @@ type Content struct {
 
 type Contents []Content
 
-func New(items Contents, active int, loading string) string {
+func New(items Contents, active int, w, h int) string {
 	content := items[active].Content
-	w, h, _ := term.GetSize(0)
-
-	teste := w - styles.Container.Base.GetHorizontalPadding() - 2
-	teste2 := h - styles.Container.Base.GetVerticalPadding() - 8
 
 	table := wrapperStyle.
 		Border(tableBorderStyle, true).
 		BorderTop(false).
-		Width(teste).
-		Height(teste2).
+		PaddingTop(1).
+		Width(w).
+		Height(h).
 		Render(
-			lipgloss.JoinVertical(0, loading, content.View()),
+			lipgloss.JoinVertical(0, content.View()),
 		)
 
-	tabs := Tabs(items, active, teste)
+	tabs := Tabs(items, active, w)
 
 	return lipgloss.JoinVertical(0, tabs, table)
 }
