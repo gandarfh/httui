@@ -148,11 +148,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Batch(common.SetResourceTab(common.Tab_Resources))
 
 		case "e":
-			// m.Loading = true
-			index := m.resources_list.Index()
-			common.CurrResource = common.ListOfResources[index]
+			if common.CurrResoruceTab.Active == common.Tab_Resources {
+				// m.Loading = true
+				index := m.resources_list.Index()
+				common.CurrResource = common.ListOfResources[index]
 
-			return m, tea.Batch(m.Exec())
+				return m, tea.Batch(m.Exec())
+			}
 
 		case "esc", "shift+tab":
 
