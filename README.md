@@ -10,7 +10,7 @@
 
 ## About the Project
 
-This project will center all my tooling like: http client, db view, healthcheck micro-services, etc.
+This project will center all my tooling like: http client, db view, etc.
 
 ## Example of usage
 
@@ -27,8 +27,8 @@ This project will center all my tooling like: http client, db view, healthcheck 
   - Multi workspaces with infinites resources.
   - Variables to use in values.
   - Open response into vim editor.
-- Connect with dbui to connect with sql databases.
-- Connect with mngr to connect with mongo databases.
+- Connect with sql databases.
+- Connect with mongodb databases.
 - Calendar to connect with my google calendar and Alexa
 - Review pull requests from github.
 
@@ -36,56 +36,7 @@ This project will center all my tooling like: http client, db view, healthcheck 
 
 Twitter - [@gandarfh](https://twitter.com/gandarfh)
 
-<!-- Acknowledgments -->
-
 ## Acknowledgements
 
-- [Validator](github.com/go-playground/validator/v10)
-- [Liner](github.com/peterh/liner)
-- [Gorm](gorm.io/gorm)
-
-## Guide
-
-When create a new command, follow this simple structure:
-
-```go
-package commandname
-
-import (
-	"github.com/gandarfh/maid-san/pkg/repl"
-)
-
-type CommandName struct{}
-
-func (w *CommandName) Read(args ...string) error {
-	return nil
-}
-
-func (w *CommandName) Eval() error {
-	return nil
-}
-
-func (w *CommandName) Print() error {
-	return nil
-}
-
-func (w *CommandName) Run(args ...string) error {
-  if err := w.Read(args...); err != nil {
-		return err
-	}
-
-	if err := w.Eval(); err != nil {
-		return err
-	}
-
-	if err := w.Print(); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func Init() repl.Repl {
-	return &CommandName{}
-}
-```
+- [Bubbletea](https://github.com/charmbracelet/bubbletea)
+- [Gorm](https://gorm.io/gorm)
