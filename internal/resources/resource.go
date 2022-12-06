@@ -26,6 +26,7 @@ type Model struct {
 	height         int
 	tags_repo      *repositories.TagsRepo
 	resources_repo *repositories.ResourcesRepo
+	default_repo   *repositories.DefaultsRepo
 	tags_list      list.Model
 	resources_list list.Model
 }
@@ -33,10 +34,12 @@ type Model struct {
 func New() Model {
 	tags_repo, _ := repositories.NewTag()
 	resources_repo, _ := repositories.NewResource()
+	default_repo, _ := repositories.NewDefault()
 
 	return Model{
 		tags_repo:      tags_repo,
 		resources_repo: resources_repo,
+		default_repo:   default_repo,
 		tags_list:      NewTagList(),
 		resources_list: NewResourceList(),
 	}
@@ -145,6 +148,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			m.resources_list.SetItems(m.ResourcesOfList())
 			m.resources_list, cmd = m.resources_list.Update(msg)
+
+			data := repositories.Default{
+				TagId: common.CurrTag.ID,
+			}
+
+			m.default_repo.Update(&data)
+
 			return m, tea.Batch(common.SetResourceTab(common.Tab_Resources))
 
 		case "e":

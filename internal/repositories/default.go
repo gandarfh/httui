@@ -30,7 +30,7 @@ func NewDefault() (*DefaultsRepo, error) {
 }
 
 func (repo *DefaultsRepo) Update(value *Default) error {
-	db := repo.Sql.Model(&Default{}).Updates(value)
+	db := repo.Sql.Model(&Default{}).Where("id IS ?", 1).Updates(value)
 	return db.Error
 }
 

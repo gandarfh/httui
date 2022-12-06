@@ -19,12 +19,14 @@ type Model struct {
 	height         int
 	workspace_list list.Model
 	workspace_repo *repositories.WorkspacesRepo
+	default_repo   *repositories.DefaultsRepo
 	tags_repo      *repositories.TagsRepo
 }
 
 func New() Model {
 	workspace_repo, _ := repositories.NewWorkspace()
 	tags_repo, _ := repositories.NewTag()
+	default_repo, _ := repositories.NewDefault()
 	common.ListOfWorkspaces, _ = workspace_repo.List()
 
 	list := list.New(nil, Delegate{}, 0, 0)
@@ -35,7 +37,12 @@ func New() Model {
 
 	list.Styles.Title = titleStyle
 
-	return Model{workspace_repo: workspace_repo, tags_repo: tags_repo, workspace_list: list}
+	return Model{
+		workspace_repo: workspace_repo,
+		tags_repo:      tags_repo,
+		default_repo:   default_repo,
+		workspace_list: list,
+	}
 }
 
 func (m Model) Init() tea.Cmd {
@@ -78,6 +85,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "enter":
 			index := m.workspace_list.Index()
 			common.CurrWorkspace = common.ListOfWorkspaces[index]
+
+			data := repositories.Default{
+				WorkspaceId: common.CurrWorkspace.ID,
+			}
+
+			m.default_repo.Update(&data)
 
 			return m, tea.Batch(
 				common.SetPage(common.Page_Resource),

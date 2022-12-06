@@ -5,6 +5,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/gandarfh/maid-san/internal/envs"
+	"github.com/gandarfh/maid-san/internal/repositories"
 	"github.com/gandarfh/maid-san/internal/resources"
 	"github.com/gandarfh/maid-san/internal/workspaces"
 	"github.com/gandarfh/maid-san/pkg/common"
@@ -21,15 +22,26 @@ const (
 )
 
 type Model struct {
-	pages   tabs.Contents
-	spinner spinner.Model
-	loading common.Loading
-	width   int
-	height  int
-	state   state
+	default_repo   *repositories.DefaultsRepo
+	workspace_repo *repositories.WorkspacesRepo
+	tag_repo       *repositories.TagsRepo
+	resource_repo  *repositories.ResourcesRepo
+	pages          tabs.Contents
+	spinner        spinner.Model
+	loading        common.Loading
+	width          int
+	height         int
+	state          state
 }
 
 func New() Model {
+	var (
+		default_repo, _   = repositories.NewDefault()
+		workspace_repo, _ = repositories.NewWorkspace()
+		tag_repo, _       = repositories.NewTag()
+		resource_repo, _  = repositories.NewResource()
+	)
+
 	pages := tabs.Contents{
 		{Tab: "Workspaces"},
 		{Tab: "Resouces"},
@@ -40,7 +52,15 @@ func New() Model {
 	s.Spinner = spinner.Dot
 	s.Style = lipgloss.NewStyle().MarginLeft(2).Foreground(styles.DefaultTheme.PrimaryText)
 
-	return Model{pages: pages, state: start_state, spinner: s}
+	return Model{
+		default_repo:   default_repo,
+		workspace_repo: workspace_repo,
+		tag_repo:       tag_repo,
+		resource_repo:  resource_repo,
+		pages:          pages,
+		state:          start_state,
+		spinner:        s,
+	}
 }
 
 func (m Model) Init() tea.Cmd {
@@ -59,6 +79,27 @@ func (m Model) Init() tea.Cmd {
 	}
 
 	m.state = loaded_state
+
+	config, _ := m.default_repo.First()
+
+	if config.WorkspaceId != 0 {
+		cmd := common.SetPage(common.Page_Resource)
+		cmds = append(cmds, cmd)
+
+		common.CurrWorkspace, _ = m.workspace_repo.FindOne(config.WorkspaceId)
+		cmd = common.ListTags(config.WorkspaceId)
+		cmds = append(cmds, cmd)
+
+	}
+
+	if config.TagId != 0 {
+		cmd := common.SetResourceTab(common.Tab_Resources)
+		cmds = append(cmds, cmd)
+
+		common.CurrTag, _ = m.tag_repo.FindOne(config.TagId)
+		cmd = common.ListResources(config.TagId)
+		cmds = append(cmds, cmd)
+	}
 
 	return tea.Batch(cmds...)
 }

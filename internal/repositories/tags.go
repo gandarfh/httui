@@ -24,6 +24,16 @@ func NewTag() (*TagsRepo, error) {
 	return &TagsRepo{db}, err
 }
 
+func (repo *TagsRepo) FindOne(tagId uint) (Tag, error) {
+	tag := Tag{}
+
+	db := repo.Sql.Model(&tag).
+		Where("id IS ?", tagId).
+		First(&tag)
+
+	return tag, db.Error
+}
+
 func (repo *TagsRepo) List(workspaceId uint) ([]Tag, error) {
 	tags := []Tag{}
 
