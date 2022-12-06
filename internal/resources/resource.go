@@ -58,7 +58,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch msg := msg.(type) {
 	case Result:
-		// m.loading = false
 		term := terminal.NewPreview(&msg.Response)
 
 		return m, tea.Batch(common.SetLoading(false), term.OpenVim("Exec"))
@@ -66,7 +65,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case terminal.Finish:
 		switch msg.Category {
 		case "Update":
-			if common.CurrResoruceTab.Active == common.Tab_Tags {
+			if common.CurrTab == common.Tab_Tags {
 				index := m.tags_list.Index()
 				common.CurrTag = common.ListOfTags[index]
 
@@ -75,7 +74,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.tags_repo.Update(&common.CurrTag, &data)
 			}
 
-			if common.CurrResoruceTab.Active == common.Tab_Resources {
+			if common.CurrTab == common.Tab_Resources {
 				index := m.resources_list.Index()
 				common.CurrResource = common.ListOfResources[index]
 
@@ -87,13 +86,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 		case "Create":
-			if common.CurrResoruceTab.Active == common.Tab_Tags {
+			if common.CurrTab == common.Tab_Tags {
 				data := repositories.Tag{}
 				msg.Preview.Execute(&data)
 				m.tags_repo.Create(&data)
 			}
 
-			if common.CurrResoruceTab.Active == common.Tab_Resources {
+			if common.CurrTab == common.Tab_Resources {
 				data := repositories.Resource{}
 				msg.Preview.Execute(&data)
 				m.resources_repo.Create(&data)
@@ -105,11 +104,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		}
 
-	case common.ResourceTab:
-		common.CurrResoruceTab = msg
+	case common.Tab:
+		common.CurrTab = msg
 		common.ListOfResources = []repositories.Resource{}
 		return m, tea.Batch(common.ClearResources())
-		// return m, nil
 
 	case common.List:
 		common.ListOfTags = msg.Tags
@@ -124,7 +122,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmds = append(cmds, cmd)
 
 	case tea.WindowSizeMsg:
-		m.height = msg.Height - 5
+		m.height = msg.Height - 4
 		m.width = msg.Width
 
 		m.tags_list.SetHeight(14)
@@ -133,18 +131,18 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch keypress := msg.String(); keypress {
 		case "d":
-			if common.CurrResoruceTab.Active == common.Tab_Tags {
+			if common.CurrTab == common.Tab_Tags {
 				index := m.tags_list.Index()
 				m.tags_repo.Delete(common.ListOfTags[index].ID)
 			}
-			if common.CurrResoruceTab.Active == common.Tab_Resources {
+			if common.CurrTab == common.Tab_Resources {
 				index := m.resources_list.Index()
 				m.resources_repo.Delete(common.ListOfResources[index].ID)
 			}
 		case "tab":
-			return m, tea.Batch(common.SetResourceTab(common.Tab_Resources))
+			return m, tea.Batch(common.SetTab(common.Tab_Resources))
 		case "enter":
-			if common.CurrResoruceTab.Active == common.Tab_Tags {
+			if common.CurrTab == common.Tab_Tags {
 				index := m.tags_list.Index()
 				common.CurrTag = common.ListOfTags[index]
 
@@ -157,12 +155,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 				m.default_repo.Update(&data)
 
-				return m, tea.Batch(common.SetResourceTab(common.Tab_Resources))
+				return m, tea.Batch(common.SetTab(common.Tab_Resources))
 			}
 
 		case "e":
-			if common.CurrResoruceTab.Active == common.Tab_Resources {
-				// m.Loading = true
+			if common.CurrTab == common.Tab_Resources {
 				index := m.resources_list.Index()
 				common.CurrResource = common.ListOfResources[index]
 
@@ -170,16 +167,18 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 		case "esc", "shift+tab":
-			m.resources_list.SetItems(nil)
-			return m, tea.Batch(common.SetResourceTab(common.Tab_Tags))
+			if common.CurrTab == common.Tab_Resources {
+				m.resources_list.SetItems(nil)
+				return m, common.SetTab(common.Tab_Tags)
+			}
 
 		case "r":
 			var data interface{}
-			if common.CurrResoruceTab.Active == common.Tab_Tags {
+			if common.CurrTab == common.Tab_Tags {
 				index := m.tags_list.Index()
 				data = common.ListOfTags[index]
 			}
-			if common.CurrResoruceTab.Active == common.Tab_Resources {
+			if common.CurrTab == common.Tab_Resources {
 				index := m.resources_list.Index()
 				data = common.ListOfResources[index]
 			}
@@ -188,10 +187,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Batch(term.OpenVim("Update"))
 		case "c":
 			var data interface{}
-			if common.CurrResoruceTab.Active == common.Tab_Tags {
+			if common.CurrTab == common.Tab_Tags {
 				data = repositories.Tag{WorkspaceId: common.CurrWorkspace.ID}
 			}
-			if common.CurrResoruceTab.Active == common.Tab_Resources {
+			if common.CurrTab == common.Tab_Resources {
 				data = repositories.Resource{TagId: common.CurrTag.ID}
 			}
 
@@ -200,14 +199,14 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	}
 
-	if common.CurrResoruceTab.Active == common.Tab_Tags {
+	if common.CurrTab == common.Tab_Tags {
 		m.tags_list.SetItems(m.TagsOfList())
 		m.tags_list, cmd = m.tags_list.Update(msg)
 
 		cmds = append(cmds, cmd)
 	}
 
-	if common.CurrResoruceTab.Active == common.Tab_Resources {
+	if common.CurrTab == common.Tab_Resources {
 		common.ListOfTags, _ = m.tags_repo.List(common.CurrWorkspace.ID)
 		m.resources_list.SetItems(m.ResourcesOfList())
 		m.resources_list, cmd = m.resources_list.Update(msg)

@@ -100,7 +100,7 @@ func (m Model) Init() tea.Cmd {
 		cmd = common.ListResources(config.TagId)
 		cmds = append(cmds, cmd)
 
-		cmd = common.SetResourceTab(common.Tab_Resources)
+		cmd = common.SetTab(common.Tab_Resources)
 		cmds = append(cmds, cmd)
 	}
 

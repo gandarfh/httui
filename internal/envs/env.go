@@ -131,7 +131,7 @@ var (
 var (
 	noItemsStyle = lipgloss.NewStyle().MarginLeft(2).
 			Foreground(styles.DefaultTheme.SecondaryBorder)
-	titleStyle = lipgloss.NewStyle().Bold(true)
+	titleStyle = lipgloss.NewStyle().MarginTop(1).Bold(true)
 	itemStyle  = lipgloss.NewStyle().
 			Border(item_border).
 			BorderTop(false).

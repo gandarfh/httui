@@ -17,7 +17,7 @@ type Content struct {
 
 type Contents []Content
 
-func New(items Contents, active int, w, h int, loading common.Loading) string {
+func New(items Contents, active int, w, h int, loading_component common.Loading) string {
 	content := items[active].Content
 
 	table := wrapperStyle.
@@ -25,11 +25,9 @@ func New(items Contents, active int, w, h int, loading common.Loading) string {
 		BorderTop(false).
 		Width(w).
 		Height(h).
-		Render(
-			lipgloss.JoinVertical(0, loading.Msg, content.View()),
-		)
+		Render(content.View())
 
-	tabs := Tabs(items, active, w)
+	tabs := Tabs(items, active, w, loading_component.Msg)
 
 	return lipgloss.JoinVertical(0, tabs, table)
 }

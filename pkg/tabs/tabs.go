@@ -82,7 +82,7 @@ var (
 			Border(gapBorder, true)
 )
 
-func Tabs(items Contents, active int, size int) string {
+func Tabs(items Contents, active int, size int, loading string) string {
 	var listoftabs []string = []string{}
 
 	for i, item := range items {
@@ -94,8 +94,10 @@ func Tabs(items Contents, active int, size int) string {
 		listoftabs...,
 	)
 
+	loading = tab(loading, false, 1)
+
 	gap := tabGapStyle.Render(strings.Repeat(" ", max(0, (size)-lipgloss.Width(row)-2)))
-	row = lipgloss.JoinHorizontal(lipgloss.Bottom, row, gap)
+	row = lipgloss.JoinHorizontal(lipgloss.Bottom, row, loading, gap)
 
 	return row
 }

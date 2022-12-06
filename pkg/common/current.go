@@ -5,9 +5,43 @@ import (
 	"github.com/gandarfh/maid-san/internal/repositories"
 )
 
-type List struct {
-	Tags      []repositories.Tag
-	Resources []repositories.Resource
+type Page = int
+
+var (
+	CurrPage      Page
+	CurrEnv       repositories.Env
+	CurrWorkspace repositories.Workspace
+	CurrTag       repositories.Tag
+	CurrResource  repositories.Resource
+)
+
+const (
+	Page_Workspace Page = iota
+	Page_Resource
+	Page_Env
+	Page_Test
+)
+
+func SetPage(page int) tea.Cmd {
+	return func() tea.Msg {
+		CurrPage = page
+		return page
+	}
+}
+
+type Loading struct {
+	Msg   string
+	Value bool
+}
+
+func SetLoading(loading bool, msg ...string) tea.Cmd {
+	return func() tea.Msg {
+		if len(msg) == 0 {
+			return Loading{Msg: "", Value: loading}
+		}
+
+		return Loading{Msg: msg[0], Value: loading}
+	}
 }
 
 func SetWorkspace(workspaceId uint) tea.Cmd {
@@ -27,6 +61,18 @@ func SetTag(tagId uint) tea.Cmd {
 		return Loading{}
 	}
 }
+
+type List struct {
+	Tags      []repositories.Tag
+	Resources []repositories.Resource
+}
+
+var (
+	ListOfWorkspaces []repositories.Workspace
+	ListOfTags       []repositories.Tag
+	ListOfResources  []repositories.Resource
+	ListOfEnvs       []repositories.Env
+)
 
 func ListTags(workspaceId uint) tea.Cmd {
 	return func() tea.Msg {
@@ -52,63 +98,20 @@ func ClearResources() tea.Cmd {
 	}
 }
 
-type Page = int
+type Tab int
 
-func SetPage(page int) tea.Cmd {
-	return func() tea.Msg {
-		CurrPage = page
-		return page
-	}
-}
-
-const (
-	Page_Workspace Page = iota
-	Page_Resource
-	Page_Env
+var (
+	CurrTab = Tab_Tags
 )
 
-type ResourceTab struct {
-	Active int
-}
-
 const (
-	Tab_Tags = iota
+	Tab_Tags Tab = iota
 	Tab_Resources
 )
 
-func SetResourceTab(tab int) tea.Cmd {
+func SetTab(tab Tab) tea.Cmd {
 	return func() tea.Msg {
-		CurrResoruceTab.Active = tab
-		return CurrResoruceTab
+		CurrTab = tab
+		return CurrTab
 	}
 }
-
-type Loading struct {
-	Msg   string
-	Value bool
-}
-
-func SetLoading(loading bool, msg ...string) tea.Cmd {
-	return func() tea.Msg {
-		if len(msg) == 0 {
-			return Loading{Msg: "", Value: loading}
-		}
-
-		return Loading{Msg: msg[0], Value: loading}
-	}
-}
-
-var (
-	CurrPage        Page
-	CurrResoruceTab = ResourceTab{Active: Tab_Tags}
-
-	CurrEnv       repositories.Env
-	CurrWorkspace repositories.Workspace
-	CurrTag       repositories.Tag
-	CurrResource  repositories.Resource
-
-	ListOfWorkspaces []repositories.Workspace
-	ListOfTags       []repositories.Tag
-	ListOfResources  []repositories.Resource
-	ListOfEnvs       []repositories.Env
-)
