@@ -54,10 +54,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch msg := msg.(type) {
 	case Result:
-		// m.Loading = false
+		// m.loading = false
 		term := terminal.NewPreview(&msg.Response)
 
-		return m, tea.Batch(term.OpenVim("Exec"))
+		return m, tea.Batch(common.SetLoading(false), term.OpenVim("Exec"))
 
 	case terminal.Finish:
 		switch msg.Category {
@@ -153,7 +153,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				index := m.resources_list.Index()
 				common.CurrResource = common.ListOfResources[index]
 
-				return m, tea.Batch(m.Exec())
+				return m, tea.Batch(common.SetLoading(true, "Loading..."), m.Exec())
 			}
 
 		case "esc", "shift+tab":
