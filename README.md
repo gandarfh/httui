@@ -13,8 +13,7 @@
 This project will center all my tooling like: http client, db view, etc.
 
 ## Example of usage
-
-<img src="assets/exemple.svg" alt="logo" style="width: 100%;" />
+<!-- <img src="assets/exemple.svg" alt="logo" style="width: 100%;" /> -->
 
 ### Tech Stack
 
