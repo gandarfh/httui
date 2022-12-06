@@ -7,16 +7,7 @@ import (
 
 var (
 	wrapperStyle     = lipgloss.NewStyle().Align(lipgloss.Left)
-	tableBorderStyle = lipgloss.Border{
-		Top:         "",
-		Bottom:      "─",
-		Left:        "│",
-		Right:       "│",
-		TopLeft:     "│",
-		TopRight:    "│",
-		BottomLeft:  "╰",
-		BottomRight: "╯",
-	}
+	tableBorderStyle = lipgloss.RoundedBorder()
 )
 
 type Content struct {

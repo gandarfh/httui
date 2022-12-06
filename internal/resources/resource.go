@@ -2,6 +2,7 @@ package resources
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -123,7 +124,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmds = append(cmds, cmd)
 
 	case tea.WindowSizeMsg:
-		m.height = msg.Height - (msg.Height / 3) - 1
+		m.height = msg.Height - 5
 		m.width = msg.Width
 
 		m.tags_list.SetHeight(14)
@@ -224,7 +225,7 @@ func (m Model) View() string {
 		m.tags_list.Title = "Select some workspace!"
 	}
 
-	m.resources_list.Title = common.CurrTag.Name
+	m.resources_list.Title = fmt.Sprintf("%s -> %s", common.CurrWorkspace.Name, common.CurrTag.Name)
 
 	return lipgloss.JoinHorizontal(
 		lipgloss.Left,

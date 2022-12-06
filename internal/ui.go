@@ -66,6 +66,7 @@ func New() Model {
 func (m Model) Init() tea.Cmd {
 	var (
 		cmds []tea.Cmd
+		cmd  tea.Cmd
 	)
 
 	cmds = append(cmds, m.spinner.Tick)
@@ -78,28 +79,32 @@ func (m Model) Init() tea.Cmd {
 		cmds = append(cmds, p.Content.Init())
 	}
 
-	m.state = loaded_state
-
 	config, _ := m.default_repo.First()
 
 	if config.WorkspaceId != 0 {
-		cmd := common.SetPage(common.Page_Resource)
+		cmd = common.SetWorkspace(config.WorkspaceId)
 		cmds = append(cmds, cmd)
 
-		common.CurrWorkspace, _ = m.workspace_repo.FindOne(config.WorkspaceId)
 		cmd = common.ListTags(config.WorkspaceId)
 		cmds = append(cmds, cmd)
 
+		cmd = common.SetPage(common.Page_Resource)
+		cmds = append(cmds, cmd)
 	}
 
 	if config.TagId != 0 {
-		cmd := common.SetResourceTab(common.Tab_Resources)
+		cmd = common.SetTag(config.TagId)
 		cmds = append(cmds, cmd)
 
 		common.CurrTag, _ = m.tag_repo.FindOne(config.TagId)
 		cmd = common.ListResources(config.TagId)
 		cmds = append(cmds, cmd)
+
+		cmd = common.SetResourceTab(common.Tab_Resources)
+		cmds = append(cmds, cmd)
 	}
+
+	m.state = loaded_state
 
 	return tea.Batch(cmds...)
 }
@@ -156,8 +161,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m Model) View() string {
 	content := ""
 
-	w := m.width - (m.width / 12)
-	h := m.height - (m.height / 3)
+	w := m.width - 2
+	h := m.height - 4
 
 	if m.loading.Value {
 		m.loading.Msg = m.spinner.View() + m.loading.Msg
@@ -172,7 +177,13 @@ func (m Model) View() string {
 		content = tabs.New(m.pages, common.CurrPage, w, h, m.loading)
 	}
 
-	return lipgloss.Place(m.width, m.height, lipgloss.Center, lipgloss.Top, styles.Container.Base.Render(content))
+	return lipgloss.Place(
+		m.width,
+		m.height,
+		lipgloss.Center,
+		lipgloss.Top,
+		styles.Container.Base.Render(content),
+	)
 }
 
 func max(a, b int) int {

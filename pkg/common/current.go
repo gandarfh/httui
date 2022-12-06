@@ -10,20 +10,38 @@ type List struct {
 	Resources []repositories.Resource
 }
 
+func SetWorkspace(workspaceId uint) tea.Cmd {
+	return func() tea.Msg {
+		workspace_repo, _ := repositories.NewWorkspace()
+		CurrWorkspace, _ = workspace_repo.FindOne(workspaceId)
+
+		return Loading{}
+	}
+}
+
+func SetTag(tagId uint) tea.Cmd {
+	return func() tea.Msg {
+		tags_repo, _ := repositories.NewTag()
+		CurrTag, _ = tags_repo.FindOne(tagId)
+
+		return Loading{}
+	}
+}
+
 func ListTags(workspaceId uint) tea.Cmd {
 	return func() tea.Msg {
 		tags_repo, _ := repositories.NewTag()
-		tags, _ := tags_repo.List(workspaceId)
+		ListOfTags, _ = tags_repo.List(workspaceId)
 
-		return List{Tags: tags}
+		return List{Tags: ListOfTags}
 	}
 }
 
 func ListResources(tagId uint) tea.Cmd {
 	return func() tea.Msg {
 		resource_repo, _ := repositories.NewResource()
-		resources, _ := resource_repo.List(tagId)
-		return List{Resources: resources}
+		ListOfResources, _ = resource_repo.List(tagId)
+		return List{Resources: ListOfResources}
 	}
 }
 
