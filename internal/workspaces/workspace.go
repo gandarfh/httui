@@ -27,7 +27,6 @@ func New() Model {
 	workspace_repo, _ := repositories.NewWorkspace()
 	tags_repo, _ := repositories.NewTag()
 	default_repo, _ := repositories.NewDefault()
-	common.ListOfWorkspaces, _ = workspace_repo.List()
 
 	list := list.New(nil, Delegate{}, 0, 0)
 	list.Title = "All workspaces"
@@ -118,6 +117,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	}
 
+	common.ListOfWorkspaces, _ = m.workspace_repo.List()
 	m.workspace_list.SetItems(m.ItemsOfList())
 	m.workspace_list, cmd = m.workspace_list.Update(msg)
 	cmds = append(cmds, cmd)
@@ -210,7 +210,7 @@ func (d Delegate) Render(w io.Writer, m list.Model, index int, listItem list.Ite
 
 func (m Model) ItemsOfList() []list.Item {
 	list := []list.Item{}
-	common.ListOfTags, _ = m.tags_repo.List(common.CurrWorkspace.ID)
+	common.ListOfWorkspaces, _ = m.workspace_repo.List()
 
 	w := m.width - (m.width / 10)
 
