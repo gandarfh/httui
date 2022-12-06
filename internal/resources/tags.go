@@ -146,7 +146,7 @@ func (d ResourceDelegate) Render(w io.Writer, m list.Model, index int, listItem 
 		return
 	}
 
-	str := fmt.Sprintf("%s - %s %s", utils.AddWhiteSpace(strings.ToUpper(i.method), 6, 10), utils.AddWhiteSpace(i.name, 30, 26), utils.Truncate(i.endpoint, 18))
+	str := fmt.Sprintf("%s %s %s", utils.AddWhiteSpace(i.name, 30, 26), utils.AddWhiteSpace(strings.ToUpper(i.method), 10, 10), utils.Truncate(i.endpoint, 18))
 
 	if index == m.Index() {
 		fmt.Fprint(w, selectedItemStyle.Width(i.width).Render("> "+str))

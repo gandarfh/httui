@@ -144,19 +144,21 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "tab":
 			return m, tea.Batch(common.SetResourceTab(common.Tab_Resources))
 		case "enter":
-			index := m.tags_list.Index()
-			common.CurrTag = common.ListOfTags[index]
+			if common.CurrResoruceTab.Active == common.Tab_Tags {
+				index := m.tags_list.Index()
+				common.CurrTag = common.ListOfTags[index]
 
-			m.resources_list.SetItems(m.ResourcesOfList())
-			m.resources_list, cmd = m.resources_list.Update(msg)
+				m.resources_list.SetItems(m.ResourcesOfList())
+				m.resources_list, cmd = m.resources_list.Update(msg)
 
-			data := repositories.Default{
-				TagId: common.CurrTag.ID,
+				data := repositories.Default{
+					TagId: common.CurrTag.ID,
+				}
+
+				m.default_repo.Update(&data)
+
+				return m, tea.Batch(common.SetResourceTab(common.Tab_Resources))
 			}
-
-			m.default_repo.Update(&data)
-
-			return m, tea.Batch(common.SetResourceTab(common.Tab_Resources))
 
 		case "e":
 			if common.CurrResoruceTab.Active == common.Tab_Resources {
@@ -168,7 +170,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 		case "esc", "shift+tab":
-
 			m.resources_list.SetItems(nil)
 			return m, tea.Batch(common.SetResourceTab(common.Tab_Tags))
 
