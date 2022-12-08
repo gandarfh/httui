@@ -89,15 +89,15 @@ func Tabs(items Contents, active int, size int, loading string) string {
 		listoftabs = append(listoftabs, tab(item.Tab, i == active, i))
 	}
 
+	listoftabs = append(listoftabs, tab(loading, false, 1))
+
 	row := lipgloss.JoinHorizontal(
 		lipgloss.Top,
 		listoftabs...,
 	)
 
-	loading = tab(loading, false, 1)
-
 	gap := tabGapStyle.Render(strings.Repeat(" ", max(0, (size)-lipgloss.Width(row)-2)))
-	row = lipgloss.JoinHorizontal(lipgloss.Bottom, row, loading, gap)
+	row = lipgloss.JoinHorizontal(lipgloss.Bottom, row, gap)
 
 	return row
 }
