@@ -35,6 +35,7 @@ func New() Model {
 	list.SetShowHelp(false)
 
 	list.Styles.Title = titleStyle
+	list.Styles.NoItems = noItemsStyle
 
 	return Model{
 		workspace_repo: workspace_repo,
@@ -148,7 +149,7 @@ var (
 
 var (
 	noItemsStyle = lipgloss.NewStyle().MarginLeft(2).
-			Foreground(styles.DefaultTheme.SecondaryText)
+			Foreground(styles.DefaultTheme.SecondaryBorder)
 	titleStyle = lipgloss.NewStyle().MarginTop(1).Bold(true)
 	itemStyle  = lipgloss.NewStyle().
 			Border(item_border).
@@ -184,10 +185,10 @@ func (d Delegate) Render(w io.Writer, m list.Model, index int, listItem list.Ite
 				Foreground(styles.DefaultTheme.PrimaryText).
 				Render(
 					fmt.Sprintf(
-						"> %s %s",
+						"%s %s",
 						lipgloss.NewStyle().
 							Bold(true).
-							Render(utils.AddWhiteSpace(i.title, 30, 27)),
+							Render("> "+utils.AddWhiteSpace(i.title, 30, 27)),
 						lipgloss.NewStyle().
 							Foreground(styles.DefaultTheme.SecondaryText).
 							Render(i.host),

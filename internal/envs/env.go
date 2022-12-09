@@ -148,7 +148,7 @@ func (d Delegate) Render(w io.Writer, m list.Model, index int, listItem list.Ite
 		return
 	}
 
-  value := utils.Truncate(i.value, 20)
+	value := utils.Truncate(i.value, 20)
 
 	if index == m.Index() {
 		fmt.Fprint(w,
@@ -159,10 +159,10 @@ func (d Delegate) Render(w io.Writer, m list.Model, index int, listItem list.Ite
 				Foreground(styles.DefaultTheme.PrimaryText).
 				Render(
 					fmt.Sprintf(
-						"> %s %s",
+						"%s %s",
 						lipgloss.NewStyle().
 							Bold(true).
-							Render(utils.AddWhiteSpace(i.key, 30, 27)),
+							Render("> "+utils.AddWhiteSpace(i.key, 30, 27)),
 						lipgloss.NewStyle().
 							Foreground(styles.DefaultTheme.SecondaryText).
 							Render(value),
