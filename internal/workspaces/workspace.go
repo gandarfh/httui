@@ -143,16 +143,7 @@ func NewTagList() list.Model {
 }
 
 var (
-	item_border = lipgloss.Border{
-		Top:         " ",
-		Bottom:      " ",
-		Left:        " ",
-		Right:       " ",
-		TopLeft:     " ",
-		TopRight:    " ",
-		BottomLeft:  " ",
-		BottomRight: " ",
-	}
+	item_border = lipgloss.HiddenBorder()
 )
 
 var (

@@ -116,16 +116,7 @@ func NewTagList() list.Model {
 }
 
 var (
-	item_border = lipgloss.Border{
-		Top:         " ",
-		Bottom:      " ",
-		Left:        " ",
-		Right:       " ",
-		TopLeft:     " ",
-		TopRight:    " ",
-		BottomLeft:  " ",
-		BottomRight: " ",
-	}
+	item_border = lipgloss.HiddenBorder()
 )
 
 var (
@@ -139,8 +130,8 @@ var (
 )
 
 type Item struct {
-	title string
-	host  string
+	key   string
+	value string
 	width int
 }
 
@@ -157,6 +148,8 @@ func (d Delegate) Render(w io.Writer, m list.Model, index int, listItem list.Ite
 		return
 	}
 
+  value := utils.Truncate(i.value, 20)
+
 	if index == m.Index() {
 		fmt.Fprint(w,
 			lipgloss.NewStyle().
@@ -169,15 +162,15 @@ func (d Delegate) Render(w io.Writer, m list.Model, index int, listItem list.Ite
 						"> %s %s",
 						lipgloss.NewStyle().
 							Bold(true).
-							Render(utils.AddWhiteSpace(i.title, 30, 27)),
+							Render(utils.AddWhiteSpace(i.key, 30, 27)),
 						lipgloss.NewStyle().
 							Foreground(styles.DefaultTheme.SecondaryText).
-							Render(i.host),
+							Render(value),
 					),
 				),
 		)
 	} else {
-		fmt.Fprint(w, itemStyle.Render(fmt.Sprintf("  %s %s", lipgloss.NewStyle().Bold(true).Render(utils.AddWhiteSpace(i.title, 30, 27)), lipgloss.NewStyle().Render(i.host))))
+		fmt.Fprint(w, itemStyle.Render(fmt.Sprintf("  %s %s", lipgloss.NewStyle().Bold(true).Render(utils.AddWhiteSpace(i.key, 30, 27)), lipgloss.NewStyle().Render(value))))
 	}
 }
 
