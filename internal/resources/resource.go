@@ -125,8 +125,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.height = msg.Height - 4
 		m.width = msg.Width
 
-		m.tags_list.SetHeight(14)
-		m.resources_list.SetHeight(14)
+		m.tags_list.SetHeight(msg.Height/2 - 2)
+		m.resources_list.SetHeight(msg.Height/2 - 2)
 
 	case tea.KeyMsg:
 		switch keypress := msg.String(); keypress {

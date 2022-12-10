@@ -59,7 +59,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		m.height = msg.Height - (msg.Height / 3)
 		m.width = msg.Width
-		m.workspace_list.SetHeight(14)
+		m.workspace_list.SetHeight(msg.Height/2 - 2)
 
 	case tea.KeyMsg:
 		switch keypress := msg.String(); keypress {
