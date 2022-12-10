@@ -89,13 +89,21 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if common.CurrTab == common.Tab_Tags {
 				data := repositories.Tag{}
 				msg.Preview.Execute(&data)
-				m.tags_repo.Create(&data)
+
+				// dont without name data
+				if data.Name != "" {
+					m.tags_repo.Create(&data)
+				}
 			}
 
 			if common.CurrTab == common.Tab_Resources {
 				data := repositories.Resource{}
 				msg.Preview.Execute(&data)
-				m.resources_repo.Create(&data)
+
+				// dont without name data
+				if data.Name != "" {
+					m.resources_repo.Create(&data)
+				}
 			}
 
 			defer msg.Preview.Close()
