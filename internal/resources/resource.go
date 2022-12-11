@@ -131,10 +131,24 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case common.CommandClose:
 		switch msg.Category {
 		case "MOVE_TAG":
-			m.ChangeTag(msg.Value)
+			tag := m.ChangeTag(msg.Value)
+
+			// var cmd tea.Cmd = nil
+
+			for i, v := range m.tags_list.Items() {
+				if v.FilterValue() == tag.Name {
+					m.tags_list.Select(i)
+
+					index := m.tags_list.Index()
+					common.CurrTag = common.ListOfTags[index]
+					break
+				}
+			}
 
 			return m, tea.Batch(
 				common.ClearCommand(),
+				common.SetTab(common.Tab_Tags),
+				common.SetTab(common.Tab_Resources),
 			)
 		case "FILTER":
 			m.filter = msg.Value
@@ -356,7 +370,7 @@ func (m Model) Exec() tea.Cmd {
 	}
 }
 
-func (m Model) ChangeTag(newtag string) error {
+func (m Model) ChangeTag(newtag string) repositories.Tag {
 	tag, err := m.tags_repo.FindOneByname(newtag, common.CurrTag.WorkspaceId)
 	if err != nil {
 		log.Fatal(err)
@@ -368,7 +382,14 @@ func (m Model) ChangeTag(newtag string) error {
 	common.CurrResource.TagId = tag.ID
 	m.resources_repo.Update(&common.CurrResource)
 
-	return nil
+	return tag
+}
+
+func (m Model) SetCursor() tea.Cmd {
+	return func() tea.Msg {
+		m.tags_list.Select(2)
+		return common.Loading{}
+	}
 }
 
 func (m Model) EnterResource() tea.Cmd {

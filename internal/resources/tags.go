@@ -55,7 +55,7 @@ type TagItem struct {
 	width int
 }
 
-func (i TagItem) FilterValue() string { return " " }
+func (i TagItem) FilterValue() string { return i.title }
 
 type TagDelegate struct{}
 
