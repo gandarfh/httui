@@ -4,14 +4,14 @@ import (
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/gandarfh/maid-san/internal/command"
-	"github.com/gandarfh/maid-san/internal/envs"
-	"github.com/gandarfh/maid-san/internal/repositories"
-	"github.com/gandarfh/maid-san/internal/resources"
-	"github.com/gandarfh/maid-san/internal/workspaces"
-	"github.com/gandarfh/maid-san/pkg/common"
-	"github.com/gandarfh/maid-san/pkg/styles"
-	"github.com/gandarfh/maid-san/pkg/tabs"
+	"github.com/gandarfh/httui/internal/command"
+	"github.com/gandarfh/httui/internal/envs"
+	"github.com/gandarfh/httui/internal/repositories"
+	"github.com/gandarfh/httui/internal/resources"
+	"github.com/gandarfh/httui/internal/workspaces"
+	"github.com/gandarfh/httui/pkg/common"
+	"github.com/gandarfh/httui/pkg/styles"
+	"github.com/gandarfh/httui/pkg/tabs"
 )
 
 type state int

@@ -1,4 +1,4 @@
-module github.com/gandarfh/maid-san
+module github.com/gandarfh/httui
 
 go 1.19
 

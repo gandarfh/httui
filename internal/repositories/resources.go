@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"github.com/gandarfh/maid-san/external/database"
+	"github.com/gandarfh/httui/external/database"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )

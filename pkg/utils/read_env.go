@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/gandarfh/maid-san/internal/repositories"
+	"github.com/gandarfh/httui/internal/repositories"
 )
 
 var re_env = regexp.MustCompile(`\$+.\S+`)

@@ -2,7 +2,7 @@ package common
 
 import (
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/gandarfh/maid-san/internal/repositories"
+	"github.com/gandarfh/httui/internal/repositories"
 )
 
 type Page int

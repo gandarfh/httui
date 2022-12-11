@@ -7,11 +7,11 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/gandarfh/maid-san/internal/repositories"
-	"github.com/gandarfh/maid-san/pkg/common"
-	"github.com/gandarfh/maid-san/pkg/styles"
-	"github.com/gandarfh/maid-san/pkg/terminal"
-	"github.com/gandarfh/maid-san/pkg/utils"
+	"github.com/gandarfh/httui/internal/repositories"
+	"github.com/gandarfh/httui/pkg/common"
+	"github.com/gandarfh/httui/pkg/styles"
+	"github.com/gandarfh/httui/pkg/terminal"
+	"github.com/gandarfh/httui/pkg/utils"
 )
 
 type Model struct {

@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
-	"github.com/gandarfh/maid-san/pkg/styles"
+	"github.com/gandarfh/httui/pkg/styles"
 )
 
 var (

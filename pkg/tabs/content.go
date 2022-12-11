@@ -2,7 +2,7 @@ package tabs
 
 import (
 	"github.com/charmbracelet/lipgloss"
-	"github.com/gandarfh/maid-san/pkg/common"
+	"github.com/gandarfh/httui/pkg/common"
 )
 
 var (

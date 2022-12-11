@@ -3,7 +3,7 @@ package command
 import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/gandarfh/maid-san/pkg/common"
+	"github.com/gandarfh/httui/pkg/common"
 )
 
 type Model struct {

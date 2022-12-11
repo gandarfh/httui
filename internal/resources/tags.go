@@ -8,9 +8,9 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/gandarfh/maid-san/pkg/common"
-	"github.com/gandarfh/maid-san/pkg/styles"
-	"github.com/gandarfh/maid-san/pkg/utils"
+	"github.com/gandarfh/httui/pkg/common"
+	"github.com/gandarfh/httui/pkg/styles"
+	"github.com/gandarfh/httui/pkg/utils"
 )
 
 func NewTagList() list.Model {
