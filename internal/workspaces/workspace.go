@@ -87,6 +87,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Batch(term.OpenVim("Create"))
 
 		case "r":
+			index := m.workspace_list.Index()
+			common.CurrWorkspace = common.ListOfWorkspaces[index]
+
 			return m, tea.Batch(
 				common.OpenCommand("RENAME_WORKSPACE"),
 				common.SetCommand(common.CurrWorkspace.Name),

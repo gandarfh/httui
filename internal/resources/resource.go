@@ -224,6 +224,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "r":
 			var data interface{}
 			if common.CurrTab == common.Tab_Tags {
+				index := m.tags_list.Index()
+				common.CurrTag = common.ListOfTags[index]
+
 				return m, tea.Batch(
 					common.OpenCommand("RENAME_TAG"),
 					common.SetCommand(common.CurrTag.Name),
