@@ -73,7 +73,7 @@ func (c *client) Exec() (*http.Response, error) {
 	request.Header.Add("access-control-allow-origin", "*")
 	request.Header.Add("accept", "application/json, text/plain, */*")
 	request.Header.Add("Content-Type", "application/json; charset=utf-8")
-	request.Header.Add("x-ratelimit-limit", "80")
+
 	for _, item := range c.headers {
 		request.Header.Add(item.key, item.value)
 	}
@@ -88,10 +88,6 @@ func (c *client) Exec() (*http.Response, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	// if err := response.Body.Close(); err != nil {
-	// 	fmt.Println(err)
-	// }
 
 	return response, nil
 }

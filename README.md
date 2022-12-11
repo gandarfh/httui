@@ -1,91 +1,44 @@
 <div align="center">
   <img
-    src="assets/logo.png"
-    alt="logo"
-    style="width: 360px; height: 100%"
+    src="assets/hero.png"
+    alt="httui"
+    style="width: 100%"
   />
-  <h1 style="margin-top: 16px;">Maid-san</h1>
-  <p>My CLI with all my necessary tools for work.</p>
+  <p>httui is a Postman/Insomnia alternative</p>
 </div>
 
-## About the Project
+## Introduction
 
-This project will center all my tooling like: http client, db view, healthcheck micro-services, etc.
+httui was created to manage all my workspaces with rest apis and substitute applications like postman, insomnia, httpie.
 
-## Example of usage
-
-<img src="assets/exemple.svg" alt="logo" style="width: 100%;" />
+## Example
+https://user-images.githubusercontent.com/57275106/206926378-c9678fc3-d8e1-411e-9227-d2530de2b3ff.mp4
 
 ### Tech Stack
 
 - [Go Lang](https://go.dev/)
 - [Sqlite](https://www.sqlite.org/index.html)
+- [Bubbletea](https://github.com/charmbracelet/bubbletea)
+- [Gorm](https://gorm.io/gorm)
 
 ### Features
 
-- Http client.
-  - Multi workspaces with infinites resources.
-  - Variables to use in values.
-  - Open response into vim editor.
-- Connect with dbui to connect with sql databases.
-- Connect with mngr to connect with mongo databases.
-- Calendar to connect with my google calendar and Alexa
-- Review pull requests from github.
+- Multi workspaces
+
+```
+ ┌─────────┐ 1           N ┌────┐ 1         N ┌─────────┐
+ │Workspace├──────────────►│Tags├────────────►│Resources│
+ └─────────┘               └────┘             └─────────┘
+```
+
+- Fast rename (Rename only the name of workspace/tag/environment)
+- Filter Resources
+- Open in last resource opened
+- Move resources between tags
+- Custom environment to use in values
+- Open response into nvim editor
+- Update any information with nvim
 
 ## Contact
 
 Twitter - [@gandarfh](https://twitter.com/gandarfh)
-
-<!-- Acknowledgments -->
-
-## Acknowledgements
-
-- [Validator](github.com/go-playground/validator/v10)
-- [Liner](github.com/peterh/liner)
-- [Gorm](gorm.io/gorm)
-
-## Guide
-
-When create a new command, follow this simple structure:
-
-```go
-package commandname
-
-import (
-	"github.com/gandarfh/maid-san/pkg/repl"
-)
-
-type CommandName struct{}
-
-func (w *CommandName) Read(args ...string) error {
-	return nil
-}
-
-func (w *CommandName) Eval() error {
-	return nil
-}
-
-func (w *CommandName) Print() error {
-	return nil
-}
-
-func (w *CommandName) Run(args ...string) error {
-  if err := w.Read(args...); err != nil {
-		return err
-	}
-
-	if err := w.Eval(); err != nil {
-		return err
-	}
-
-	if err := w.Print(); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func Init() repl.Repl {
-	return &CommandName{}
-}
-```

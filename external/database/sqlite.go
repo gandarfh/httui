@@ -17,7 +17,7 @@ var newLogger = logger.New(
 
 func SqliteConnection() (*gorm.DB, error) {
 	home, _ := os.UserHomeDir()
-	db, err := gorm.Open(sqlite.Open(filepath.Join(home, "maidsan.db")), &gorm.Config{
+	db, err := gorm.Open(sqlite.Open(filepath.Join(home, "httui.db")), &gorm.Config{
 		Logger: newLogger,
 	})
 
