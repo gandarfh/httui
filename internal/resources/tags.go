@@ -29,32 +29,23 @@ func NewTagList() list.Model {
 }
 
 var (
-	item_border = lipgloss.Border{
-		Top:         " ",
-		Bottom:      " ",
-		Left:        " ",
-		Right:       " ",
-		TopLeft:     " ",
-		TopRight:    " ",
-		BottomLeft:  " ",
-		BottomRight: " ",
-	}
+	item_border = lipgloss.HiddenBorder()
 )
 
 var (
 	noItemsStyle = lipgloss.NewStyle().MarginLeft(2).
 			Foreground(styles.DefaultTheme.SecondaryBorder)
+
 	titleStyle = lipgloss.NewStyle().MarginTop(1).Bold(true)
-	itemStyle  = lipgloss.NewStyle().
+
+	itemStyle = lipgloss.NewStyle().
 			Border(item_border).
-			BorderTop(false).
-			BorderForeground(styles.DefaultTheme.SecondaryBorder)
+			BorderTop(false)
+
 	selectedItemStyle = lipgloss.NewStyle().
 				Bold(true).
 				Border(item_border).
-				BorderTop(false).
-				BorderForeground(styles.DefaultTheme.SecondaryBorder).
-				Foreground(styles.DefaultTheme.PrimaryText)
+				BorderTop(false)
 )
 
 type TagItem struct {
@@ -79,7 +70,22 @@ func (d TagDelegate) Render(w io.Writer, m list.Model, index int, listItem list.
 	str := fmt.Sprintf("%s", i.title)
 
 	if index == m.Index() {
-		fmt.Fprint(w, selectedItemStyle.Width(i.width).Render("> "+str))
+		if common.CurrTab == common.Tab_Tags {
+			fmt.Fprint(
+				w,
+				selectedItemStyle.
+					Foreground(styles.DefaultTheme.PrimaryText).
+					Width(i.width).Render("> "+str),
+			)
+		} else {
+			fmt.Fprint(
+				w,
+				selectedItemStyle.
+					Foreground(styles.DefaultTheme.SecondaryText).
+					Width(i.width).Render("> "+str),
+			)
+		}
+
 	} else {
 		fmt.Fprint(w, itemStyle.Width(i.width).Render("  "+str))
 	}
@@ -149,7 +155,21 @@ func (d ResourceDelegate) Render(w io.Writer, m list.Model, index int, listItem 
 	str := fmt.Sprintf("%s %s %s", utils.AddWhiteSpace(i.name, 30, 26), utils.AddWhiteSpace(strings.ToUpper(i.method), 10, 10), utils.Truncate(i.endpoint, 18))
 
 	if index == m.Index() {
-		fmt.Fprint(w, selectedItemStyle.Width(i.width).Render("> "+str))
+		if common.CurrTab == common.Tab_Resources {
+			fmt.Fprint(
+				w,
+				selectedItemStyle.
+					Foreground(styles.DefaultTheme.PrimaryText).
+					Width(i.width).Render("> "+str),
+			)
+		} else {
+			fmt.Fprint(
+				w,
+				selectedItemStyle.
+					Foreground(styles.DefaultTheme.SecondaryText).
+					Width(i.width).Render("> "+str),
+			)
+		}
 	} else {
 		fmt.Fprint(w, itemStyle.Width(i.width).Render("  "+str))
 	}
