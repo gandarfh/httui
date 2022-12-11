@@ -58,12 +58,13 @@ func (repo *ResourcesRepo) FindOne(id uint) (*Resource, error) {
 	return &resource, nil
 }
 
-func (repo *ResourcesRepo) List(tagId uint) ([]Resource, error) {
+func (repo *ResourcesRepo) List(tagId uint, filter string) ([]Resource, error) {
 	resources := []Resource{}
 
 	if err := repo.Sql.Model(&resources).
 		Preload("Tag").
 		Where("tag_id = ?", tagId).
+		Where("name LIKE '%" + filter + "%'").
 		Find(&resources).Error; err != nil {
 		return resources, err
 	}

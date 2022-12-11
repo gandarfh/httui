@@ -122,7 +122,7 @@ func NewResourceList() list.Model {
 func (m Model) ResourcesOfList() []list.Item {
 	list := []list.Item{}
 
-	common.ListOfResources, _ = m.resources_repo.List(common.CurrTag.ID)
+	common.ListOfResources, _ = m.resources_repo.List(common.CurrTag.ID, m.filter)
 	w := m.width - (m.width / 2)
 
 	for _, i := range common.ListOfResources {

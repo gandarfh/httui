@@ -31,15 +31,7 @@ type Model struct {
 	default_repo   *repositories.DefaultsRepo
 	tags_list      list.Model
 	resources_list list.Model
-}
-
-type height int
-
-func (m Model) SetHeight(h int) tea.Cmd {
-	return func() tea.Msg {
-		m.height = int(h)
-		return height(h)
-	}
+	filter         string
 }
 
 func New() Model {
@@ -71,9 +63,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		term := terminal.NewPreview(&msg.Response)
 
 		return m, tea.Batch(common.SetLoading(false), term.OpenVim("Exec"))
-
-	case height:
-		m.height = int(msg)
 
 	case terminal.Finish:
 		switch msg.Category {
@@ -141,8 +130,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmds = append(cmds, cmd)
 
 	case common.CommandClose:
-		m.ChangeTag(msg.Value)
-		// return m, common.ClearCommand()
+		switch msg.Category {
+		case "MOVE_TAG":
+			m.ChangeTag(msg.Value)
+			return m, common.ClearCommand()
+		case "FILTER":
+			m.filter = msg.Value
+		}
 
 	case tea.WindowSizeMsg:
 		m.height = msg.Height - 5
@@ -153,12 +147,16 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		switch msg.String() {
+		case "/":
+			return m, tea.Batch(
+				common.OpenCommand("FILTER"),
+			)
 		case "m":
 			index := m.resources_list.Index()
 			common.CurrResource = common.ListOfResources[index]
 
 			return m, tea.Batch(
-				common.OpenCommand(),
+				common.OpenCommand("MOVE_TAG"),
 				common.SetCommand(common.CurrResource.Tag.Name),
 			)
 		case "d":

@@ -30,6 +30,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch msg := msg.(type) {
 	case common.Command:
+		switch msg.Category {
+		case "FILTER":
+			m.textInput.Prompt = "/"
+		default:
+			m.textInput.Prompt = "> "
+		}
+
 		m.textInput.SetValue(msg.Value)
 
 	case tea.KeyMsg:

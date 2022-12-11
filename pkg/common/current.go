@@ -44,8 +44,9 @@ func SetPrevPage() tea.Cmd {
 }
 
 type Command struct {
-	Active bool
-	Value  string
+	Active   bool
+	Value    string
+	Category string
 }
 
 type CommandClose struct {
@@ -61,8 +62,9 @@ func SetCommand(value string) tea.Cmd {
 	}
 }
 
-func OpenCommand() tea.Cmd {
+func OpenCommand(category string) tea.Cmd {
 	return func() tea.Msg {
+    command.Category = category
 		command.Active = true
 		return command
 	}
@@ -79,6 +81,7 @@ func ClearCommand() tea.Cmd {
 	return func() tea.Msg {
 		command.Active = false
 		command.Value = ""
+    command.Category = ""
 		return command
 	}
 }
@@ -140,7 +143,7 @@ func ListTags(workspaceId uint) tea.Cmd {
 func ListResources(tagId uint) tea.Cmd {
 	return func() tea.Msg {
 		resource_repo, _ := repositories.NewResource()
-		ListOfResources, _ = resource_repo.List(tagId)
+		ListOfResources, _ = resource_repo.List(tagId, "")
 		return List{Resources: ListOfResources}
 	}
 }
