@@ -4,37 +4,40 @@
     alt="httui"
     style="width: 100%"
   />
-  <p>httui is a rest api client for terminal base.</p>
+  <p>httui is a Postman/Insomnia alternative</p>
 </div>
 
-## About the Project
+## Introduction
 
-This project will center all my tooling like: http client, db view, etc.
+httui was created to manage all my workspaces with rest apis and substitute applications like postman, insomnia, httpie.
 
-## Example of usage
-<!-- <img src="assets/exemple.svg" alt="logo" style="width: 100%;" /> -->
+## Example
 
 ### Tech Stack
 
 - [Go Lang](https://go.dev/)
 - [Sqlite](https://www.sqlite.org/index.html)
+- [Bubbletea](https://github.com/charmbracelet/bubbletea)
+- [Gorm](https://gorm.io/gorm)
 
 ### Features
 
-- Http client.
-  - Multi workspaces with infinites resources.
-  - Variables to use in values.
-  - Open response into vim editor.
-- Connect with sql databases.
-- Connect with mongodb databases.
-- Calendar to connect with my google calendar and Alexa
-- Review pull requests from github.
+- Multi workspaces
+
+```
+ ┌─────────┐ 1           N ┌────┐ 1         N ┌─────────┐
+ │Workspace├──────────────►│Tags├────────────►│Resources│
+ └─────────┘               └────┘             └─────────┘
+```
+
+- Fast rename (Rename only the name of workspace/tag/environment)
+- Filter Resources
+- Open in last resource opened
+- Move resources between tags
+- Custom environment to use in values
+- Open response into nvim editor
+- Update any information with nvim
 
 ## Contact
 
 Twitter - [@gandarfh](https://twitter.com/gandarfh)
-
-## Acknowledgements
-
-- [Bubbletea](https://github.com/charmbracelet/bubbletea)
-- [Gorm](https://gorm.io/gorm)
