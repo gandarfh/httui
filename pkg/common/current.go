@@ -19,13 +19,52 @@ const (
 	Page_Workspace Page = iota
 	Page_Resource
 	Page_Env
-	Page_Test
 )
 
 func SetPage(page int) tea.Cmd {
 	return func() tea.Msg {
 		CurrPage = page
 		return page
+	}
+}
+
+type Command struct {
+	Active bool
+	Value  string
+}
+
+type CommandClose struct {
+	Command
+}
+
+var command = Command{}
+
+func SetCommand(value string) tea.Cmd {
+	return func() tea.Msg {
+		command.Value = value
+		return command
+	}
+}
+
+func OpenCommand() tea.Cmd {
+	return func() tea.Msg {
+		command.Active = true
+		return command
+	}
+}
+
+func CloseCommand() tea.Cmd {
+	return func() tea.Msg {
+		command.Active = false
+		return CommandClose{command}
+	}
+}
+
+func ClearCommand() tea.Cmd {
+	return func() tea.Msg {
+		command.Active = false
+		command.Value = ""
+		return command
 	}
 }
 

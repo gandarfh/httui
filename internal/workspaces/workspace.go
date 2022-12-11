@@ -62,7 +62,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.workspace_list.SetHeight(msg.Height/2 - 2)
 
 	case tea.KeyMsg:
-		switch keypress := msg.String(); keypress {
+		switch msg.String() {
 		case "d":
 			index := m.workspace_list.Index()
 			workspaces, _ := m.workspace_repo.List()

@@ -7,15 +7,16 @@ import (
 )
 
 type Resource struct {
-	gorm.Model
+	gorm.Model  `json:"-"`
 	Name        string         `json:"name"`
 	Description string         `json:"description"`
-	TagId       uint           `json:"tagId"`
 	Endpoint    string         `json:"endpoint"`
 	Method      string         `json:"method"`
 	QueryParams datatypes.JSON `json:"queryParams"`
 	Headers     datatypes.JSON `json:"headers"`
 	Body        datatypes.JSON `json:"body"`
+	TagId       uint           `json:"-"`
+	Tag         Tag            `json:"-" gorm:"foreignKey:TagId"`
 }
 
 type ResourcesRepo struct {
@@ -24,42 +25,57 @@ type ResourcesRepo struct {
 
 func NewResource() (*ResourcesRepo, error) {
 	db, err := database.SqliteConnection()
-	db.AutoMigrate(&Tag{})
 	db.AutoMigrate(&Resource{})
 
 	return &ResourcesRepo{db}, err
 }
 
 func (repo *ResourcesRepo) Create(value *Resource) error {
-	db := repo.Sql.Create(value)
-	return db.Error
+	if err := repo.Sql.Create(value).Error; err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func (repo *ResourcesRepo) Update(resource *Resource, value *Resource) error {
-	db := repo.Sql.Model(resource)
-	db.Updates(value)
+func (repo *ResourcesRepo) Update(value *Resource) error {
+	if err := repo.Sql.Model(&Resource{}).
+		Where("id = ?", value.ID).
+		Updates(value).Error; err != nil {
+		return err
+	}
 
-	return db.Error
+	return nil
 }
 
 func (repo *ResourcesRepo) FindOne(id uint) (*Resource, error) {
-	workspace := Resource{}
+	resource := Resource{}
 
-	db := repo.Sql.Model(&workspace).Where("id IS ?", id).First(&workspace)
-	return &workspace, db.Error
+	if err := repo.Sql.Model(&resource).Where("id = ?", id).First(&resource).Error; err != nil {
+		return &resource, err
+	}
+
+	return &resource, nil
 }
 
 func (repo *ResourcesRepo) List(tagId uint) ([]Resource, error) {
 	resources := []Resource{}
 
-	db := repo.Sql.Model(&resources).
-		Where("tag_id IS ?", tagId).
-		Find(&resources)
+	if err := repo.Sql.Model(&resources).
+		Preload("Tag").
+		Where("tag_id = ?", tagId).
+		Find(&resources).Error; err != nil {
+		return resources, err
+	}
 
-	return resources, db.Error
+	return resources, nil
 }
 
 func (repo *ResourcesRepo) Delete(id uint) error {
-	db := repo.Sql.Model(&Resource{}).Where("id IS ?", id).Delete(&Resource{})
-	return db.Error
+	if err := repo.Sql.Model(&Resource{}).
+		Where("id = ?", id).
+		Delete(&Resource{}).Error; err != nil {
+		return err
+	}
+	return nil
 }

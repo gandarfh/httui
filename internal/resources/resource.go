@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strings"
 
@@ -30,6 +31,15 @@ type Model struct {
 	default_repo   *repositories.DefaultsRepo
 	tags_list      list.Model
 	resources_list list.Model
+}
+
+type height int
+
+func (m Model) SetHeight(h int) tea.Cmd {
+	return func() tea.Msg {
+		m.height = int(h)
+		return height(h)
+	}
 }
 
 func New() Model {
@@ -62,6 +72,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		return m, tea.Batch(common.SetLoading(false), term.OpenVim("Exec"))
 
+	case height:
+		m.height = int(msg)
+
 	case terminal.Finish:
 		switch msg.Category {
 		case "Update":
@@ -78,9 +91,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				index := m.resources_list.Index()
 				common.CurrResource = common.ListOfResources[index]
 
-				data := repositories.Resource{}
-				msg.Preview.Execute(&data)
-				m.resources_repo.Update(&common.CurrResource, &data)
+				msg.Preview.Execute(&common.CurrResource)
+				m.resources_repo.Update(&common.CurrResource)
 
 				return m, tea.Batch(common.ListResources(common.CurrTag.ID))
 			}
@@ -129,15 +141,27 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.resources_list, cmd = m.resources_list.Update(msg)
 		cmds = append(cmds, cmd)
 
+	case common.CommandClose:
+		m.ChangeTag(msg.Value)
+		// return m, common.ClearCommand()
+
 	case tea.WindowSizeMsg:
-		m.height = msg.Height - 4
+		m.height = msg.Height - 5
 		m.width = msg.Width
 
 		m.tags_list.SetHeight(msg.Height/2 - 2)
 		m.resources_list.SetHeight(msg.Height/2 - 2)
 
 	case tea.KeyMsg:
-		switch keypress := msg.String(); keypress {
+		switch msg.String() {
+		case "m":
+			index := m.tags_list.Index()
+			common.CurrResource = common.ListOfResources[index]
+
+			return m, tea.Batch(
+				common.OpenCommand(),
+				common.SetCommand(common.CurrResource.Tag.Name),
+			)
 		case "d":
 			if common.CurrTab == common.Tab_Tags {
 				index := m.tags_list.Index()
@@ -319,6 +343,21 @@ func (m Model) Exec() tea.Cmd {
 			Response: result,
 		}
 	}
+}
+
+func (m Model) ChangeTag(newtag string) error {
+	tag, err := m.tags_repo.FindOneByname(newtag, common.CurrTag.WorkspaceId)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	index := m.tags_list.Index()
+	common.CurrResource = common.ListOfResources[index]
+
+	common.CurrResource.TagId = tag.ID
+	m.resources_repo.Update(&common.CurrResource)
+
+	return nil
 }
 
 func Curl(req *http.Request) string {

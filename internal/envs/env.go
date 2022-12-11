@@ -53,7 +53,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.env_list.SetHeight(msg.Height/2 - 2)
 
 	case tea.KeyMsg:
-		switch keypress := msg.String(); keypress {
+		switch msg.String() {
 		case "d":
 			index := m.env_list.Index()
 			m.env_repo.Delete(common.ListOfEnvs[index].ID)

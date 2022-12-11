@@ -4,6 +4,7 @@ import (
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/gandarfh/maid-san/internal/command"
 	"github.com/gandarfh/maid-san/internal/envs"
 	"github.com/gandarfh/maid-san/internal/repositories"
 	"github.com/gandarfh/maid-san/internal/resources"
@@ -32,6 +33,8 @@ type Model struct {
 	width          int
 	height         int
 	state          state
+	command_page   common.Component
+	command_active bool
 }
 
 func New() Model {
@@ -60,6 +63,8 @@ func New() Model {
 		pages:          pages,
 		state:          start_state,
 		spinner:        s,
+		command_page:   command.New(),
+		command_active: false,
 	}
 }
 
@@ -70,6 +75,7 @@ func (m Model) Init() tea.Cmd {
 	)
 
 	cmds = append(cmds, m.spinner.Tick)
+	cmds = append(cmds, m.command_page.Init())
 
 	m.pages[common.Page_Workspace].Content = workspaces.New()
 	m.pages[common.Page_Resource].Content = resources.New()
@@ -116,12 +122,18 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	)
 
 	switch msg := msg.(type) {
+	case common.CommandClose:
+		m.command_active = false
+
+	case common.Command:
+		m.command_active = msg.Active
+
 	case common.Loading:
 		m.loading = msg
 
 	case tea.WindowSizeMsg:
-		m.height = msg.Height
 		m.width = msg.Width
+		m.height = msg.Height - 5
 
 		m.state = loaded_state
 
@@ -135,23 +147,31 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 
 	case tea.KeyMsg:
-		switch keypress := msg.String(); keypress {
-		case "ctrl+c", "q":
-			return m, tea.Quit
-		case "right", "l":
-			common.CurrPage = min(common.CurrPage+1, len(m.pages)-1)
-			return m, nil
-		case "left", "h":
-			common.CurrPage = max(common.CurrPage-1, 0)
-			return m, nil
+		if !m.command_active {
+			switch msg.String() {
+			case "ctrl+c", "q":
+				return m, tea.Quit
+			case "right", "l":
+				common.CurrPage = min(common.CurrPage+1, len(m.pages)-1)
+				return m, nil
+			case "left", "h":
+				common.CurrPage = max(common.CurrPage-1, 0)
+				return m, nil
+			}
 		}
 	}
 
-	m.spinner, cmd = m.spinner.Update(msg)
-	cmds = append(cmds, cmd)
-
 	if m.state == loaded_state {
-		m.pages[common.CurrPage].Content, cmd = m.pages[common.CurrPage].Content.Update(msg)
+		if m.command_active {
+			m.command_page, cmd = m.command_page.Update(msg)
+			cmds = append(cmds, cmd)
+		} else {
+			m.pages[common.CurrPage].Content, cmd = m.pages[common.CurrPage].Content.Update(msg)
+			cmds = append(cmds, cmd)
+
+		}
+
+		m.spinner, cmd = m.spinner.Update(msg)
 		cmds = append(cmds, cmd)
 	}
 
@@ -161,20 +181,21 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m Model) View() string {
 	content := ""
 
-	w := m.width - 2
-	h := m.height - 4
-
 	if m.loading.Value {
 		m.loading.Msg = m.spinner.View() + m.loading.Msg
 	} else {
 		m.loading.Msg = ""
 	}
 
-	switch m.state {
-	case loaded_state:
-		content = tabs.New(m.pages, common.CurrPage, w, h, m.loading)
-	default:
-		content = tabs.New(m.pages, common.CurrPage, w, h, m.loading)
+	w := m.width - 2
+
+	if m.command_active {
+		content = lipgloss.JoinVertical(
+			lipgloss.Top, tabs.New(m.pages, common.CurrPage, w, m.height, m.loading),
+			m.command_page.View(),
+		)
+	} else {
+		content = tabs.New(m.pages, common.CurrPage, w, m.height, m.loading)
 	}
 
 	return lipgloss.Place(

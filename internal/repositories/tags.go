@@ -34,6 +34,16 @@ func (repo *TagsRepo) FindOne(tagId uint) (Tag, error) {
 	return tag, db.Error
 }
 
+func (repo *TagsRepo) FindOneByname(name string, workspaceId uint) (Tag, error) {
+	tag := Tag{}
+
+	db := repo.Sql.Model(&tag).
+		Where("name = ? AND workspace_id = ?", name, workspaceId).
+		First(&tag)
+
+	return tag, db.Error
+}
+
 func (repo *TagsRepo) List(workspaceId uint) ([]Tag, error) {
 	tags := []Tag{}
 
