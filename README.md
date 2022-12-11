@@ -12,6 +12,7 @@
 httui was created to manage all my workspaces with rest apis and substitute applications like postman, insomnia, httpie.
 
 ## Example
+https://user-images.githubusercontent.com/57275106/206926378-c9678fc3-d8e1-411e-9227-d2530de2b3ff.mp4
 
 ### Tech Stack
 
