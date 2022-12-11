@@ -47,6 +47,18 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	)
 
 	switch msg := msg.(type) {
+	case common.CommandClose:
+		switch msg.Category {
+		case "RENAME_ENV":
+			index := m.env_list.Index()
+			common.CurrEnv = common.ListOfEnvs[index]
+
+			common.CurrEnv.Key = msg.Value
+
+			m.env_repo.Update(&common.CurrEnv)
+
+		}
+
 	case tea.WindowSizeMsg:
 		m.height = msg.Height - (msg.Height / 3)
 		m.width = msg.Width
@@ -67,6 +79,15 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			index := m.env_list.Index()
 			common.CurrEnv = common.ListOfEnvs[index]
 
+			return m, tea.Batch(
+				common.OpenCommand("RENAME_ENV"),
+				common.SetCommand(common.CurrEnv.Key),
+			)
+
+		case "R":
+			index := m.env_list.Index()
+			common.CurrEnv = common.ListOfEnvs[index]
+
 			term := terminal.NewPreview(&common.CurrEnv)
 			return m, tea.Batch(term.OpenVim("Update"))
 
@@ -75,9 +96,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case terminal.Finish:
 		switch msg.Category {
 		case "Update":
-			data := repositories.Env{}
-			msg.Preview.Execute(&data)
-			m.env_repo.Update(&common.CurrEnv, &data)
+			msg.Preview.Execute(&common.CurrEnv)
+			m.env_repo.Update(&common.CurrEnv)
 
 		case "Create":
 			data := repositories.Env{}

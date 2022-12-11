@@ -34,16 +34,14 @@ func (repo *EnvsRepo) Create(env *Env) error {
 	return db.Error
 }
 
-func (repo *EnvsRepo) Update(resource *Env, value *Env) error {
-	data := Env{
-		Key:   value.Key,
-		Value: value.Value,
+func (repo *EnvsRepo) Update(value *Env) error {
+	if err := repo.Sql.Session(&gorm.Session{FullSaveAssociations: true}).
+		Where("id = ?", value.ID).
+		Updates(value).Error; err != nil {
+		return err
 	}
 
-	db := repo.Sql.Model(resource).Session(&gorm.Session{FullSaveAssociations: true})
-	db.Updates(data)
-
-	return db.Error
+	return nil
 }
 
 func (repo *EnvsRepo) Delete(id uint) error {
