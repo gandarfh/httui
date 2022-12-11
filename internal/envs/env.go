@@ -66,6 +66,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		switch msg.String() {
+		case "/":
+			return m, nil
 		case "d":
 			index := m.env_list.Index()
 			m.env_repo.Delete(common.ListOfEnvs[index].ID)

@@ -33,6 +33,7 @@ func New() Model {
 	list.SetShowPagination(false)
 	list.SetShowStatusBar(false)
 	list.SetShowHelp(false)
+	list.SetShowFilter(false)
 
 	list.Styles.Title = titleStyle
 	list.Styles.NoItems = noItemsStyle
@@ -74,6 +75,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.KeyMsg:
 		switch msg.String() {
+		case "/":
+			return m, nil
 		case "d":
 			index := m.workspace_list.Index()
 			workspaces, _ := m.workspace_repo.List()
@@ -148,19 +151,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m Model) View() string {
 	return m.workspace_list.View()
-}
-func NewTagList() list.Model {
-	list := list.New(nil, Delegate{}, 0, 0)
-
-	list.SetShowStatusBar(false)
-	list.SetFilteringEnabled(false)
-	list.SetShowFilter(false)
-	list.SetShowHelp(false)
-
-	list.Styles.Title = titleStyle
-	list.Styles.NoItems = noItemsStyle
-
-	return list
 }
 
 var (
