@@ -130,19 +130,18 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case common.CommandClose:
 		switch msg.Category {
 		case "MOVE_TAG":
-			tag := m.ChangeTag(msg.Value)
+			m.ChangeTag(msg.Value)
+			// tag := m.ChangeTag(msg.Value)
 
-			// var cmd tea.Cmd = nil
-
-			for i, v := range m.tags_list.Items() {
-				if v.FilterValue() == tag.Name {
-					m.tags_list.Select(i)
-
-					index := m.tags_list.Index()
-					common.CurrTag = common.ListOfTags[index]
-					break
-				}
-			}
+			// for i, v := range m.tags_list.Items() {
+			// 	if v.FilterValue() == tag.Name {
+			// 		m.tags_list.Select(i)
+			//
+			// 		index := m.tags_list.Index()
+			// 		common.CurrTag = common.ListOfTags[index]
+			// 		break
+			// 	}
+			// }
 
 			return m, tea.Batch(
 				common.ClearCommand(),
@@ -203,10 +202,20 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 		case "enter", "right", "l":
-			return m, m.EnterResource()
+			if common.CurrTab == common.Tab_Tags {
+				return m, m.EnterResource()
+			}
+			if common.CurrTab == common.Tab_Resources {
+				return m, common.SetNextPage()
+			}
 
 		case "left", "h":
-			return m, common.SetTab(common.Tab_Tags)
+			if common.CurrTab == common.Tab_Resources {
+				return m, common.SetTab(common.Tab_Tags)
+			}
+			if common.CurrTab == common.Tab_Tags {
+				return m, common.SetPrevPage()
+			}
 
 		case "e":
 			if common.CurrTab == common.Tab_Resources {

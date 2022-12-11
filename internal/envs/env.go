@@ -70,6 +70,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			index := m.env_list.Index()
 			m.env_repo.Delete(common.ListOfEnvs[index].ID)
 
+		case "h":
+			return m, common.SetPrevPage()
+
 		case "c":
 			data := repositories.Env{}
 			term := terminal.NewPreview(&data)
