@@ -150,6 +150,7 @@ func ListResources(tagId uint) tea.Cmd {
 
 func ClearResources() tea.Cmd {
 	return func() tea.Msg {
+    CurrTag = repositories.Tag{}
 		ListOfResources = []repositories.Resource{}
 		return List{Resources: []repositories.Resource{}}
 	}

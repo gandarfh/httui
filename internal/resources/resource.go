@@ -114,7 +114,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case common.Tab:
 		common.CurrTab = msg
 		common.ListOfResources = []repositories.Resource{}
-		return m, tea.Batch(common.ClearResources())
 
 	case common.List:
 		common.ListOfTags = msg.Tags
@@ -150,6 +149,14 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				common.SetTab(common.Tab_Tags),
 				common.SetTab(common.Tab_Resources),
 			)
+		case "RENAME_TAG":
+			index := m.tags_list.Index()
+			common.CurrTag = common.ListOfTags[index]
+
+			common.CurrTag.Name = msg.Value
+
+			m.tags_repo.Update(&common.CurrTag)
+
 		case "FILTER":
 			m.filter = msg.Value
 		case "CREATE_SIMPLE_TAG":
@@ -214,8 +221,23 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.resources_list.SetItems(nil)
 				return m, common.SetTab(common.Tab_Tags)
 			}
-
 		case "r":
+			var data interface{}
+			if common.CurrTab == common.Tab_Tags {
+				return m, tea.Batch(
+					common.OpenCommand("RENAME_TAG"),
+					common.SetCommand(common.CurrTag.Name),
+				)
+			}
+			if common.CurrTab == common.Tab_Resources {
+				index := m.resources_list.Index()
+				data = common.ListOfResources[index]
+
+				term := terminal.NewPreview(&data)
+				return m, tea.Batch(term.OpenVim("Update"))
+			}
+
+		case "R":
 			var data interface{}
 			if common.CurrTab == common.Tab_Tags {
 				index := m.tags_list.Index()

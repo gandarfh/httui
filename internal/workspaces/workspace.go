@@ -56,6 +56,17 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	)
 
 	switch msg := msg.(type) {
+	case common.CommandClose:
+		switch msg.Category {
+		case "RENAME_WORKSPACE":
+			index := m.workspace_list.Index()
+			common.CurrWorkspace = common.ListOfWorkspaces[index]
+
+			common.CurrWorkspace.Name = msg.Value
+
+			m.workspace_repo.Update(&common.CurrWorkspace)
+		}
+
 	case tea.WindowSizeMsg:
 		m.height = msg.Height - (msg.Height / 3)
 		m.width = msg.Width
@@ -76,13 +87,19 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Batch(term.OpenVim("Create"))
 
 		case "r":
+			return m, tea.Batch(
+				common.OpenCommand("RENAME_WORKSPACE"),
+				common.SetCommand(common.CurrWorkspace.Name),
+			)
+
+		case "R":
 			index := m.workspace_list.Index()
 			common.CurrWorkspace = common.ListOfWorkspaces[index]
 
 			term := terminal.NewPreview(&common.CurrWorkspace)
 			return m, tea.Batch(term.OpenVim("Update"))
 
-		case "enter":
+		case "enter", "l":
 			index := m.workspace_list.Index()
 			common.CurrWorkspace = common.ListOfWorkspaces[index]
 
@@ -93,6 +110,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.default_repo.Update(&data)
 
 			return m, tea.Batch(
+				common.ClearResources(),
 				common.SetPage(common.Page_Resource),
 				common.SetTab(common.Tab_Tags),
 				common.ListTags(common.CurrWorkspace.ID),
