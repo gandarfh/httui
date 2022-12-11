@@ -71,9 +71,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				index := m.tags_list.Index()
 				common.CurrTag = common.ListOfTags[index]
 
-				data := repositories.Tag{}
-				msg.Preview.Execute(&data)
-				m.tags_repo.Update(&common.CurrTag, &data)
+				msg.Preview.Execute(&common.CurrTag)
+				m.tags_repo.Update(&common.CurrTag)
 			}
 
 			if common.CurrTab == common.Tab_Resources {
@@ -133,9 +132,20 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.Category {
 		case "MOVE_TAG":
 			m.ChangeTag(msg.Value)
-			return m, common.ClearCommand()
+
+			return m, tea.Batch(
+				common.ClearCommand(),
+			)
 		case "FILTER":
 			m.filter = msg.Value
+		case "CREATE_SIMPLE_TAG":
+			data := repositories.Tag{Name: msg.Value, WorkspaceId: common.CurrWorkspace.ID}
+
+			// dont without name data
+			if data.Name != "" {
+				m.tags_repo.Create(&data)
+			}
+			return m, common.ClearCommand()
 		}
 
 	case tea.WindowSizeMsg:
@@ -151,6 +161,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Batch(
 				common.OpenCommand("FILTER"),
 			)
+
 		case "m":
 			index := m.resources_list.Index()
 			common.CurrResource = common.ListOfResources[index]
@@ -159,6 +170,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				common.OpenCommand("MOVE_TAG"),
 				common.SetCommand(common.CurrResource.Tag.Name),
 			)
+
 		case "d":
 			if common.CurrTab == common.Tab_Tags {
 				index := m.tags_list.Index()
@@ -168,6 +180,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				index := m.resources_list.Index()
 				m.resources_repo.Delete(common.ListOfResources[index].ID)
 			}
+
 		case "enter", "right", "l":
 			return m, m.EnterResource()
 
@@ -201,7 +214,21 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			term := terminal.NewPreview(&data)
 			return m, tea.Batch(term.OpenVim("Update"))
+
 		case "c":
+			var data interface{}
+			if common.CurrTab == common.Tab_Tags {
+				return m, tea.Batch(
+					common.OpenCommand("CREATE_SIMPLE_TAG"),
+				)
+			}
+			if common.CurrTab == common.Tab_Resources {
+				data = repositories.Resource{TagId: common.CurrTag.ID}
+				term := terminal.NewPreview(&data)
+				return m, tea.Batch(term.OpenVim("Create"))
+			}
+
+		case "C":
 			var data interface{}
 			if common.CurrTab == common.Tab_Tags {
 				data = repositories.Tag{WorkspaceId: common.CurrWorkspace.ID}
@@ -355,9 +382,7 @@ func (m Model) EnterResource() tea.Cmd {
 
 		m.default_repo.Update(&data)
 
-		if len(common.CurrTag.Resources) > 0 {
-			return common.SetTab(common.Tab_Resources)
-		}
+		return common.SetTab(common.Tab_Resources)
 	}
 
 	return nil

@@ -9,7 +9,7 @@ type Tag struct {
 	gorm.Model
 	Name        string     `json:"name"`
 	Description string     `json:"description"`
-	Resources   []Resource `json:"resources"`
+	Resources   []Resource `json:"resources" gorm:"foreignKey:TagId;constraint:OnUpdate:CASCADE;"`
 	WorkspaceId uint       `json:"workspaceId"`
 }
 
@@ -63,11 +63,15 @@ func (repo *TagsRepo) Create(value *Tag) error {
 	return db.Error
 }
 
-func (repo *TagsRepo) Update(tag *Tag, value *Tag) error {
-	db := repo.Sql.Model(tag)
-	db.Updates(value)
+func (repo *TagsRepo) Update(value *Tag) error {
+	if err := repo.Sql.
+		Session(&gorm.Session{FullSaveAssociations: true}).
+		Where("id = ?", value.ID).
+		Updates(value).Error; err != nil {
+		return err
+	}
 
-	return db.Error
+	return nil
 }
 
 func (repo *TagsRepo) Delete(id uint) error {

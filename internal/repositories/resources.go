@@ -15,7 +15,7 @@ type Resource struct {
 	QueryParams datatypes.JSON `json:"queryParams"`
 	Headers     datatypes.JSON `json:"headers"`
 	Body        datatypes.JSON `json:"body"`
-	TagId       uint           `json:"-"`
+	TagId       uint           `json:"tag_id"`
 	Tag         Tag            `json:"-" gorm:"foreignKey:TagId"`
 }
 
