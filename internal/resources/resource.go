@@ -345,7 +345,7 @@ func (m Model) ChangeTag(newtag string) error {
 }
 
 func (m Model) EnterResource() tea.Cmd {
-	if common.CurrTab == common.Tab_Tags {
+	if common.CurrTab == common.Tab_Tags && len(common.ListOfTags) > 0 {
 		index := m.tags_list.Index()
 		common.CurrTag = common.ListOfTags[index]
 

@@ -33,7 +33,8 @@ var (
 )
 
 var (
-	noItemsStyle = lipgloss.NewStyle().MarginLeft(2).
+	noItemsStyle = lipgloss.NewStyle().
+			MarginLeft(2).MarginRight(12).
 			Foreground(styles.DefaultTheme.SecondaryBorder)
 
 	titleStyle = lipgloss.NewStyle().MarginTop(1).Bold(true)
