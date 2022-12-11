@@ -1,11 +1,10 @@
 <div align="center">
   <img
-    src="assets/logo.png"
-    alt="logo"
-    style="width: 360px; height: 100%"
+    src="assets/hero.png"
+    alt="httui"
+    style="width: 100%"
   />
-  <h1 style="margin-top: 16px;">Maid-san</h1>
-  <p>My CLI with all my necessary tools for work.</p>
+  <p>httui is a rest api client for terminal base.</p>
 </div>
 
 ## About the Project
