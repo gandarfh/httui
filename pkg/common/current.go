@@ -5,7 +5,7 @@ import (
 	"github.com/gandarfh/maid-san/internal/repositories"
 )
 
-type Page = int
+type Page int
 
 var (
 	CurrPage      Page
@@ -21,10 +21,25 @@ const (
 	Page_Env
 )
 
-func SetPage(page int) tea.Cmd {
+func SetPage(page Page) tea.Cmd {
 	return func() tea.Msg {
-		CurrPage = page
+		CurrPage = Page(page)
 		return page
+	}
+}
+
+func SetNextPage() tea.Cmd {
+	return func() tea.Msg {
+		totalpages := 3
+		CurrPage = Page(min(int(CurrPage)+1, totalpages-1))
+		return CurrPage
+	}
+}
+
+func SetPrevPage() tea.Cmd {
+	return func() tea.Msg {
+		CurrPage = Page(max(int(CurrPage)-1, 0))
+		return CurrPage
 	}
 }
 
@@ -153,4 +168,18 @@ func SetTab(tab Tab) tea.Cmd {
 		CurrTab = tab
 		return CurrTab
 	}
+}
+
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }

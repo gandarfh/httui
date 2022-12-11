@@ -35,11 +35,14 @@ func (repo *TagsRepo) FindOne(tagId uint) (Tag, error) {
 }
 
 func (repo *TagsRepo) FindOneByname(name string, workspaceId uint) (Tag, error) {
-	tag := Tag{}
+	tag := Tag{
+		Name:        name,
+		WorkspaceId: workspaceId,
+	}
 
 	db := repo.Sql.Model(&tag).
 		Where("name = ? AND workspace_id = ?", name, workspaceId).
-		First(&tag)
+		FirstOrCreate(&tag)
 
 	return tag, db.Error
 }
@@ -48,6 +51,7 @@ func (repo *TagsRepo) List(workspaceId uint) ([]Tag, error) {
 	tags := []Tag{}
 
 	db := repo.Sql.Model(&tags).
+		Preload("Resources").
 		Where("workspace_id IS ?", workspaceId).
 		Find(&tags)
 

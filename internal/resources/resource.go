@@ -101,7 +101,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if common.CurrTab == common.Tab_Tags {
 				data := repositories.Tag{}
 				msg.Preview.Execute(&data)
-
 				// dont without name data
 				if data.Name != "" {
 					m.tags_repo.Create(&data)
@@ -155,7 +154,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "m":
-			index := m.tags_list.Index()
+			index := m.resources_list.Index()
 			common.CurrResource = common.ListOfResources[index]
 
 			return m, tea.Batch(
@@ -171,24 +170,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				index := m.resources_list.Index()
 				m.resources_repo.Delete(common.ListOfResources[index].ID)
 			}
-		case "tab":
-			return m, tea.Batch(common.SetTab(common.Tab_Resources))
-		case "enter":
-			if common.CurrTab == common.Tab_Tags {
-				index := m.tags_list.Index()
-				common.CurrTag = common.ListOfTags[index]
+		case "enter", "right", "l":
+			return m, m.EnterResource()
 
-				m.resources_list.SetItems(m.ResourcesOfList())
-				m.resources_list, cmd = m.resources_list.Update(msg)
-
-				data := repositories.Default{
-					TagId: common.CurrTag.ID,
-				}
-
-				m.default_repo.Update(&data)
-
-				return m, tea.Batch(common.SetTab(common.Tab_Resources))
-			}
+		case "left", "h":
+			return m, common.SetTab(common.Tab_Tags)
 
 		case "e":
 			if common.CurrTab == common.Tab_Resources {
@@ -198,7 +184,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, tea.Batch(common.SetLoading(true, "Loading..."), m.Exec())
 			}
 
-		case "esc", "shift+tab":
+		case "esc":
 			if common.CurrTab == common.Tab_Resources {
 				m.resources_list.SetItems(nil)
 				return m, common.SetTab(common.Tab_Tags)
@@ -232,15 +218,15 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	if common.CurrTab == common.Tab_Tags {
+		common.ListOfTags, _ = m.tags_repo.List(common.CurrWorkspace.ID)
 		m.tags_list.SetItems(m.TagsOfList())
 		m.tags_list, cmd = m.tags_list.Update(msg)
 
 		cmds = append(cmds, cmd)
 	}
 
+	m.resources_list.SetItems(m.ResourcesOfList())
 	if common.CurrTab == common.Tab_Resources {
-		common.ListOfTags, _ = m.tags_repo.List(common.CurrWorkspace.ID)
-		m.resources_list.SetItems(m.ResourcesOfList())
 		m.resources_list, cmd = m.resources_list.Update(msg)
 
 		cmds = append(cmds, cmd)
@@ -351,11 +337,30 @@ func (m Model) ChangeTag(newtag string) error {
 		log.Fatal(err)
 	}
 
-	index := m.tags_list.Index()
+	index := m.resources_list.Index()
 	common.CurrResource = common.ListOfResources[index]
 
 	common.CurrResource.TagId = tag.ID
 	m.resources_repo.Update(&common.CurrResource)
+
+	return nil
+}
+
+func (m Model) EnterResource() tea.Cmd {
+	if common.CurrTab == common.Tab_Tags {
+		index := m.tags_list.Index()
+		common.CurrTag = common.ListOfTags[index]
+
+		data := repositories.Default{
+			TagId: common.CurrTag.ID,
+		}
+
+		m.default_repo.Update(&data)
+
+		if len(common.CurrTag.Resources) > 0 {
+			return common.SetTab(common.Tab_Resources)
+		}
+	}
 
 	return nil
 }

@@ -149,14 +149,14 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		if !m.command_active {
 			switch msg.String() {
+			case "tab":
+				return m, common.SetNextPage()
+
+			case "shift+tab":
+				return m, common.SetPrevPage()
+
 			case "ctrl+c", "q":
 				return m, tea.Quit
-			case "right", "l":
-				common.CurrPage = min(common.CurrPage+1, len(m.pages)-1)
-				return m, nil
-			case "left", "h":
-				common.CurrPage = max(common.CurrPage-1, 0)
-				return m, nil
 			}
 		}
 	}
@@ -191,11 +191,11 @@ func (m Model) View() string {
 
 	if m.command_active {
 		content = lipgloss.JoinVertical(
-			lipgloss.Top, tabs.New(m.pages, common.CurrPage, w, m.height, m.loading),
+			lipgloss.Top, tabs.New(m.pages, int(common.CurrPage), w, m.height, m.loading),
 			m.command_page.View(),
 		)
 	} else {
-		content = tabs.New(m.pages, common.CurrPage, w, m.height, m.loading)
+		content = tabs.New(m.pages, int(common.CurrPage), w, m.height, m.loading)
 	}
 
 	return lipgloss.Place(
@@ -205,18 +205,4 @@ func (m Model) View() string {
 		lipgloss.Top,
 		styles.Container.Base.Render(content),
 	)
-}
-
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
 }
