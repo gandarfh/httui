@@ -29,7 +29,7 @@ type Model struct {
 	tags_repo      *repositories.TagsRepo
 	resources_repo *repositories.ResourcesRepo
 	default_repo   *repositories.DefaultsRepo
-	tags_list      list.Model
+	Tags_list      list.Model
 	resources_list list.Model
 	filter         string
 }
@@ -43,7 +43,7 @@ func New() Model {
 		tags_repo:      tags_repo,
 		resources_repo: resources_repo,
 		default_repo:   default_repo,
-		tags_list:      NewTagList(),
+		Tags_list:      NewTagList(),
 		resources_list: NewResourceList(),
 	}
 }
@@ -68,7 +68,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.Category {
 		case "Update":
 			if common.CurrTab == common.Tab_Tags {
-				index := m.tags_list.Index()
+				index := m.Tags_list.Index()
 				common.CurrTag = common.ListOfTags[index]
 
 				msg.Preview.Execute(&common.CurrTag)
@@ -119,8 +119,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		common.ListOfTags = msg.Tags
 		common.ListOfResources = msg.Resources
 
-		m.tags_list.SetItems(m.TagsOfList())
-		m.tags_list, cmd = m.tags_list.Update(msg)
+		m.Tags_list.SetItems(m.TagsOfList())
+		m.Tags_list, cmd = m.Tags_list.Update(msg)
 		cmds = append(cmds, cmd)
 
 		m.resources_list.SetItems(m.ResourcesOfList())
@@ -131,17 +131,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.Category {
 		case "MOVE_TAG":
 			m.ChangeTag(msg.Value)
-			// tag := m.ChangeTag(msg.Value)
-
-			// for i, v := range m.tags_list.Items() {
-			// 	if v.FilterValue() == tag.Name {
-			// 		m.tags_list.Select(i)
-			//
-			// 		index := m.tags_list.Index()
-			// 		common.CurrTag = common.ListOfTags[index]
-			// 		break
-			// 	}
-			// }
 
 			return m, tea.Batch(
 				common.ClearCommand(),
@@ -149,7 +138,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				common.SetTab(common.Tab_Resources),
 			)
 		case "RENAME_TAG":
-			index := m.tags_list.Index()
+			index := m.Tags_list.Index()
 			common.CurrTag = common.ListOfTags[index]
 
 			common.CurrTag.Name = msg.Value
@@ -172,7 +161,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.height = msg.Height - 5
 		m.width = msg.Width
 
-		m.tags_list.SetHeight(msg.Height/2 - 2)
+		m.Tags_list.SetHeight(msg.Height/2 - 2)
 		m.resources_list.SetHeight(msg.Height/2 - 2)
 
 	case tea.KeyMsg:
@@ -193,7 +182,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case "d":
 			if common.CurrTab == common.Tab_Tags {
-				index := m.tags_list.Index()
+				index := m.Tags_list.Index()
 				m.tags_repo.Delete(common.ListOfTags[index].ID)
 			}
 			if common.CurrTab == common.Tab_Resources {
@@ -233,7 +222,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "r":
 			var data interface{}
 			if common.CurrTab == common.Tab_Tags {
-				index := m.tags_list.Index()
+				index := m.Tags_list.Index()
 				common.CurrTag = common.ListOfTags[index]
 
 				return m, tea.Batch(
@@ -252,7 +241,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "R":
 			var data interface{}
 			if common.CurrTab == common.Tab_Tags {
-				index := m.tags_list.Index()
+				index := m.Tags_list.Index()
 				data = common.ListOfTags[index]
 			}
 			if common.CurrTab == common.Tab_Resources {
@@ -292,8 +281,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	if common.CurrTab == common.Tab_Tags {
 		common.ListOfTags, _ = m.tags_repo.List(common.CurrWorkspace.ID)
-		m.tags_list.SetItems(m.TagsOfList())
-		m.tags_list, cmd = m.tags_list.Update(msg)
+		m.Tags_list.SetItems(m.TagsOfList())
+		m.Tags_list, cmd = m.Tags_list.Update(msg)
 
 		cmds = append(cmds, cmd)
 	}
@@ -311,16 +300,16 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m Model) View() string {
 	if common.CurrWorkspace.Name != "" {
 		common.ListOfTags, _ = m.tags_repo.List(common.CurrWorkspace.ID)
-		m.tags_list.Title = common.CurrWorkspace.Name
+		m.Tags_list.Title = common.CurrWorkspace.Name
 	} else {
-		m.tags_list.Title = "Select some workspace!"
+		m.Tags_list.Title = "Select some workspace!"
 	}
 
 	m.resources_list.Title = fmt.Sprintf("%s -> %s", common.CurrWorkspace.Name, common.CurrTag.Name)
 
 	return lipgloss.JoinHorizontal(
 		lipgloss.Left,
-		m.tags_list.View(),
+		m.Tags_list.View(),
 		divider.Height(m.height).String(),
 		m.resources_list.View(),
 	)
@@ -419,16 +408,9 @@ func (m Model) ChangeTag(newtag string) repositories.Tag {
 	return tag
 }
 
-func (m Model) SetCursor() tea.Cmd {
-	return func() tea.Msg {
-		m.tags_list.Select(2)
-		return common.Loading{}
-	}
-}
-
 func (m Model) EnterResource() tea.Cmd {
 	if common.CurrTab == common.Tab_Tags && len(common.ListOfTags) > 0 {
-		index := m.tags_list.Index()
+		index := m.Tags_list.Index()
 		common.CurrTag = common.ListOfTags[index]
 
 		data := repositories.Default{

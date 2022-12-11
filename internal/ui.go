@@ -22,6 +22,12 @@ const (
 	loaded_state
 )
 
+func SetState(value state) tea.Cmd {
+	return func() tea.Msg {
+		return value
+	}
+}
+
 type Model struct {
 	default_repo   *repositories.DefaultsRepo
 	workspace_repo *repositories.WorkspacesRepo
@@ -46,9 +52,9 @@ func New() Model {
 	)
 
 	pages := tabs.Contents{
-		{Tab: "Workspaces"},
-		{Tab: "Resouces"},
-		{Tab: "Environments"},
+		{Tab: "Workspaces", Content: workspaces.New()},
+		{Tab: "Resouces", Content: resources.New()},
+		{Tab: "Environments", Content: envs.New()},
 	}
 
 	s := spinner.New()
@@ -77,40 +83,12 @@ func (m Model) Init() tea.Cmd {
 	cmds = append(cmds, m.spinner.Tick)
 	cmds = append(cmds, m.command_page.Init())
 
-	m.pages[common.Page_Workspace].Content = workspaces.New()
-	m.pages[common.Page_Resource].Content = resources.New()
-	m.pages[common.Page_Env].Content = envs.New()
-
 	for _, p := range m.pages {
 		cmds = append(cmds, p.Content.Init())
 	}
 
-	config, _ := m.default_repo.First()
-
-	if config.WorkspaceId != 0 {
-		cmd = common.SetWorkspace(config.WorkspaceId)
-		cmds = append(cmds, cmd)
-
-		cmd = common.ListTags(config.WorkspaceId)
-		cmds = append(cmds, cmd)
-
-		cmd = common.SetPage(common.Page_Resource)
-		cmds = append(cmds, cmd)
-	}
-
-	if config.TagId != 0 {
-		cmd = common.SetTag(config.TagId)
-		cmds = append(cmds, cmd)
-
-		common.CurrTag, _ = m.tag_repo.FindOne(config.TagId)
-		cmd = common.ListResources(config.TagId)
-		cmds = append(cmds, cmd)
-
-		cmd = common.SetTab(common.Tab_Resources)
-		cmds = append(cmds, cmd)
-	}
-
-	m.state = loaded_state
+	cmd = SetState(start_state)
+	cmds = append(cmds, cmd)
 
 	return tea.Batch(cmds...)
 }
@@ -122,6 +100,42 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	)
 
 	switch msg := msg.(type) {
+	case state:
+		m.state = msg
+		switch msg {
+		case start_state:
+			config, _ := m.default_repo.First()
+			if config.WorkspaceId != 0 {
+				cmd = common.SetPage(common.Page_Resource)
+				cmds = append(cmds, cmd)
+
+				cmd = common.SetWorkspace(config.WorkspaceId)
+				cmds = append(cmds, cmd)
+
+				cmd = common.ListTags(config.WorkspaceId)
+				cmds = append(cmds, cmd)
+			}
+
+			if config.TagId != 0 {
+				cmd = common.SetTag(config.TagId)
+				cmds = append(cmds, cmd)
+
+				common.CurrTag, _ = m.tag_repo.FindOne(config.TagId)
+				cmd = common.ListResources(config.TagId)
+				cmds = append(cmds, cmd)
+
+				cmd = common.SetTab(common.Tab_Resources)
+				cmds = append(cmds, cmd)
+			}
+
+			cmd = SetState(loaded_state)
+			cmds = append(cmds, cmd)
+			// return m, tea.Batch(cmds...)
+		case loaded_state:
+			// log.Fatal("Loaded")
+		default:
+		}
+
 	case common.CommandClose:
 		m.command_active = false
 
@@ -135,7 +149,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.width = msg.Width
 		m.height = msg.Height - 5
 
-		m.state = loaded_state
+		// cmd = SetState(loaded_state)
+		// cmds = append(cmds, cmd)
 
 		for p, i := range m.pages {
 			m.pages[p].Content, cmd = i.Content.Update(msg)
@@ -144,6 +159,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case common.Page:
 		common.CurrPage = msg
+
+		// config, _ := m.default_repo.First()
+
 		return m, nil
 
 	case tea.KeyMsg:
@@ -160,6 +178,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		}
 	}
+
+	// cmd = SetState(loaded_state)
+	// cmds = append(cmds, cmd)
 
 	if m.state == loaded_state {
 		if m.command_active {
