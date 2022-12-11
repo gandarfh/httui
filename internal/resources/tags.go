@@ -124,7 +124,7 @@ func (m Model) ResourcesOfList() []list.Item {
 	list := []list.Item{}
 
 	common.ListOfResources, _ = m.resources_repo.List(common.CurrTag.ID, m.filter)
-	w := m.width - (m.width / 2)
+	w := m.width - (m.width / 3) - 1
 
 	for _, i := range common.ListOfResources {
 		list = append(list, ResourceItem{i.Name, i.Method, i.Endpoint, w})
@@ -153,7 +153,10 @@ func (d ResourceDelegate) Render(w io.Writer, m list.Model, index int, listItem 
 		return
 	}
 
-	str := fmt.Sprintf("%s %s %s", utils.AddWhiteSpace(i.name, 30, 26), utils.AddWhiteSpace(strings.ToUpper(i.method), 10, 10), utils.Truncate(i.endpoint, 18))
+	str := fmt.Sprintf("%s %s %s", utils.AddWhiteSpace(i.name, 30, 26), utils.AddWhiteSpace(strings.ToUpper(i.method), 10, 10), i.endpoint)
+	if len(str) > i.width-10 {
+		str = utils.Truncate(str, i.width-10)
+	}
 
 	if index == m.Index() {
 		if common.CurrTab == common.Tab_Resources {
