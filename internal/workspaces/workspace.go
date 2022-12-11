@@ -102,9 +102,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case terminal.Finish:
 		switch msg.Category {
 		case "Update":
-			data := repositories.Workspace{}
-			msg.Preview.Execute(&data)
-			m.workspace_repo.Update(&common.CurrWorkspace, &data)
+			msg.Preview.Execute(&common.CurrWorkspace)
+			m.workspace_repo.Update(&common.CurrWorkspace)
 
 		case "Create":
 			data := repositories.Workspace{}

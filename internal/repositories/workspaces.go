@@ -9,7 +9,7 @@ type Workspace struct {
 	gorm.Model
 	Name string `gorm:"unique" json:"name"`
 	Host string `json:"host"`
-	Tags []Tag  `json:"tags"`
+	Tags []Tag  `json:"tags" gorm:"foreignKey:WorkspaceId;constraint:Onupdate:CASCADE;"`
 }
 
 type WorkspacesRepo struct {
@@ -28,23 +28,42 @@ func (repo *WorkspacesRepo) Create(value *Workspace) error {
 	return db.Error
 }
 
-func (repo *WorkspacesRepo) Update(workspace *Workspace, value *Workspace) error {
-	db := repo.Sql.Model(workspace).Updates(value)
-	return db.Error
+func (repo *WorkspacesRepo) Update(value *Workspace) error {
+	if err := repo.Sql.
+		Session(&gorm.Session{FullSaveAssociations: true}).
+		Where("id = ?", value.ID).
+		Updates(value).Error; err != nil {
+		return err
+	}
+
+	return nil
+
 }
 
 func (repo *WorkspacesRepo) FindOne(id uint) (Workspace, error) {
 	workspace := Workspace{}
 
-	db := repo.Sql.Model(&workspace).Where("id IS ?", id).First(&workspace)
-	return workspace, db.Error
+	if err := repo.Sql.Model(&workspace).
+		Preload("Tags").
+		Preload("Tags.Resources").
+		Where("id IS ?", id).First(&workspace).Error; err != nil {
+		return workspace, err
+	}
+
+	return workspace, nil
 }
 
 func (repo *WorkspacesRepo) List() ([]Workspace, error) {
 	workspaces := []Workspace{}
 
-	db := repo.Sql.Model(&workspaces).Find(&workspaces)
-	return workspaces, db.Error
+	if err := repo.Sql.Model(&workspaces).
+		Preload("Tags").
+		Preload("Tags.Resources").
+		Find(&workspaces).Error; err != nil {
+		return workspaces, err
+	}
+
+	return workspaces, nil
 }
 
 func (repo *WorkspacesRepo) Delete(id uint) error {
