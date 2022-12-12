@@ -81,6 +81,7 @@ func (m Model) Init() tea.Cmd {
 	)
 
 	cmds = append(cmds, m.spinner.Tick)
+
 	cmds = append(cmds, m.command_page.Init())
 
 	for _, p := range m.pages {
@@ -130,9 +131,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			cmd = SetState(loaded_state)
 			cmds = append(cmds, cmd)
-			// return m, tea.Batch(cmds...)
-		case loaded_state:
-			// log.Fatal("Loaded")
 		default:
 		}
 
@@ -148,9 +146,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		m.height = msg.Height - 5
-
-		// cmd = SetState(loaded_state)
-		// cmds = append(cmds, cmd)
 
 		for p, i := range m.pages {
 			m.pages[p].Content, cmd = i.Content.Update(msg)
@@ -179,8 +174,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	}
 
-	// cmd = SetState(loaded_state)
-	// cmds = append(cmds, cmd)
+	m.spinner, cmd = m.spinner.Update(msg)
+	cmds = append(cmds, cmd)
 
 	if m.state == loaded_state {
 		if m.command_active {
@@ -191,9 +186,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			cmds = append(cmds, cmd)
 
 		}
-
-		m.spinner, cmd = m.spinner.Update(msg)
-		cmds = append(cmds, cmd)
 	}
 
 	return m, tea.Batch(cmds...)
