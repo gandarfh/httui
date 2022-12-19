@@ -12,7 +12,17 @@
 httui was created to manage all my workspaces with rest apis and substitute applications like postman, insomnia, httpie.
 
 ## Example
-https://user-images.githubusercontent.com/57275106/206926378-c9678fc3-d8e1-411e-9227-d2530de2b3ff.mp4
+
+Create Workspsace
+<img src="assets/create-workspace.gif" alt="create workspace" style="width: 100%;" />
+
+Create Resource
+<img src="assets/create-resource.gif" alt="create resource" style="width: 100%;" />
+
+Execute Resource with environment variable
+<img src="assets/exec-resource.gif" alt="exec resource" style="width: 100%;" />
+
+Creating a Workspace
 
 ### Tech Stack
 
@@ -24,13 +34,6 @@ https://user-images.githubusercontent.com/57275106/206926378-c9678fc3-d8e1-411e-
 ### Features
 
 - Multi workspaces
-
-```
- ┌─────────┐ 1           N ┌────┐ 1         N ┌─────────┐
- │Workspace├──────────────►│Tags├────────────►│Resources│
- └─────────┘               └────┘             └─────────┘
-```
-
 - Fast rename (Rename only the name of workspace/tag/environment)
 - Filter Resources
 - Open in last resource opened
