@@ -13,16 +13,17 @@ httui was created to manage all my workspaces with rest apis and substitute appl
 
 ## Example
 
-Create Workspsace
+> Create Workspsace
+
 <img src="assets/create-workspace.gif" alt="create workspace" style="width: 100%;" />
 
-Create Resource
+> Create Resource
+
 <img src="assets/create-resource.gif" alt="create resource" style="width: 100%;" />
 
-Execute Resource with environment variable
-<img src="assets/exec-resource.gif" alt="exec resource" style="width: 100%;" />
+> Execute Resource with environment variable
 
-Creating a Workspace
+<img src="assets/exec-resource.gif" alt="exec resource" style="width: 100%;" />
 
 ### Tech Stack
 
