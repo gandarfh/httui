@@ -9,9 +9,9 @@ import (
 type Resource struct {
 	gorm.Model  `json:"-"`
 	Name        string         `json:"name"`
-	Description string         `json:"description"`
-	Endpoint    string         `json:"endpoint"`
 	Method      string         `json:"method"`
+	Endpoint    string         `json:"endpoint"`
+	Description string         `json:"description"`
 	QueryParams datatypes.JSON `json:"queryParams"`
 	Headers     datatypes.JSON `json:"headers"`
 	Body        datatypes.JSON `json:"body"`
