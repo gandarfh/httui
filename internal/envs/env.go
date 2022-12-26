@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/charmbracelet/bubbles/help"
+	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -19,9 +21,11 @@ type Model struct {
 	height   int
 	env_list list.Model
 	env_repo *repositories.EnvsRepo
+	help     help.Model
+	keys     KeyMap
 }
 
-func New() Model {
+func New() common.Component {
 	env_repo, _ := repositories.NewEnvs()
 
 	list := list.New(nil, Delegate{}, 0, 0)
@@ -33,7 +37,12 @@ func New() Model {
 	list.Styles.Title = titleStyle
 	list.Styles.NoItems = noItemsStyle
 
-	return Model{env_repo: env_repo, env_list: list}
+	return Model{
+		env_repo: env_repo,
+		env_list: list,
+		keys:     keys,
+		help:     help.New(),
+	}
 }
 
 func (m Model) Init() tea.Cmd {
@@ -65,22 +74,22 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.env_list.SetHeight(msg.Height/2 - 2)
 
 	case tea.KeyMsg:
-		switch msg.String() {
-		case "/":
+		switch {
+		case key.Matches(msg, m.keys.Filter):
 			return m, nil
-		case "d":
+		case key.Matches(msg, m.keys.Delete):
 			index := m.env_list.Index()
 			m.env_repo.Delete(common.ListOfEnvs[index].ID)
 
-		case "h":
+		case key.Matches(msg, m.keys.Left):
 			return m, common.SetPrevPage()
 
-		case "c":
+		case key.Matches(msg, m.keys.Create):
 			data := repositories.Env{}
 			term := terminal.NewPreview(&data)
 			return m, tea.Batch(term.OpenVim("Create"))
 
-		case "r":
+		case key.Matches(msg, m.keys.FastRename):
 			index := m.env_list.Index()
 			common.CurrEnv = common.ListOfEnvs[index]
 
@@ -89,7 +98,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				common.SetCommand(common.CurrEnv.Key),
 			)
 
-		case "R":
+		case key.Matches(msg, m.keys.CustomRename):
 			index := m.env_list.Index()
 			common.CurrEnv = common.ListOfEnvs[index]
 

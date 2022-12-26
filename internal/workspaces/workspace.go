@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/charmbracelet/bubbles/help"
+	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -21,9 +23,11 @@ type Model struct {
 	workspace_repo *repositories.WorkspacesRepo
 	default_repo   *repositories.DefaultsRepo
 	tags_repo      *repositories.TagsRepo
+	keys           KeyMap
+	help           help.Model
 }
 
-func New() Model {
+func New() common.Component {
 	workspace_repo, _ := repositories.NewWorkspace()
 	tags_repo, _ := repositories.NewTag()
 	default_repo, _ := repositories.NewDefault()
@@ -43,6 +47,8 @@ func New() Model {
 		tags_repo:      tags_repo,
 		default_repo:   default_repo,
 		workspace_list: list,
+		help:           help.New(),
+		keys:           keys,
 	}
 }
 
@@ -74,22 +80,22 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.workspace_list.SetHeight(msg.Height/2 - 2)
 
 	case tea.KeyMsg:
-		switch msg.String() {
-		case "/":
+		switch {
+		case key.Matches(msg, m.keys.Filter):
 			return m, nil
-		case "d":
+		case key.Matches(msg, m.keys.Delete):
 			index := m.workspace_list.Index()
 			workspaces, _ := m.workspace_repo.List()
 			common.CurrWorkspace = workspaces[index]
 
 			m.workspace_repo.Delete(common.CurrWorkspace.ID)
 
-		case "c":
+		case key.Matches(msg, m.keys.Create):
 			data := repositories.Workspace{}
 			term := terminal.NewPreview(&data)
 			return m, tea.Batch(term.OpenVim("Create"))
 
-		case "r":
+		case key.Matches(msg, m.keys.FastRename):
 			index := m.workspace_list.Index()
 			common.CurrWorkspace = common.ListOfWorkspaces[index]
 
@@ -98,14 +104,14 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				common.SetCommand(common.CurrWorkspace.Name),
 			)
 
-		case "R":
+		case key.Matches(msg, m.keys.CustomRename):
 			index := m.workspace_list.Index()
 			common.CurrWorkspace = common.ListOfWorkspaces[index]
 
 			term := terminal.NewPreview(&common.CurrWorkspace)
 			return m, tea.Batch(term.OpenVim("Update"))
 
-		case "enter", "l":
+		case key.Matches(msg, m.keys.Enter):
 			index := m.workspace_list.Index()
 			common.CurrWorkspace = common.ListOfWorkspaces[index]
 

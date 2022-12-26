@@ -29,18 +29,18 @@ func SetState(value state) tea.Cmd {
 }
 
 type Model struct {
+	pages          tabs.Contents
+	spinner        spinner.Model
+	width          int
+	height         int
+	state          state
+	command_active bool
+	loading        common.Loading
+	command_page   common.Component
 	default_repo   *repositories.DefaultsRepo
 	workspace_repo *repositories.WorkspacesRepo
 	tag_repo       *repositories.TagsRepo
 	resource_repo  *repositories.ResourcesRepo
-	pages          tabs.Contents
-	spinner        spinner.Model
-	loading        common.Loading
-	width          int
-	height         int
-	state          state
-	command_page   common.Component
-	command_active bool
 }
 
 func New() Model {
@@ -81,7 +81,6 @@ func (m Model) Init() tea.Cmd {
 	)
 
 	cmds = append(cmds, m.spinner.Tick)
-
 	cmds = append(cmds, m.command_page.Init())
 
 	for _, p := range m.pages {
@@ -148,15 +147,14 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.height = msg.Height - 5
 
 		for p, i := range m.pages {
-			m.pages[p].Content, cmd = i.Content.Update(msg)
+			content, cmd := i.Content.Update(msg)
+			m.pages[p].Content = content.(common.Component)
+
 			cmds = append(cmds, cmd)
 		}
 
 	case common.Page:
 		common.CurrPage = msg
-
-		// config, _ := m.default_repo.First()
-
 		return m, nil
 
 	case tea.KeyMsg:
@@ -179,10 +177,14 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	if m.state == loaded_state {
 		if m.command_active {
-			m.command_page, cmd = m.command_page.Update(msg)
+			content, cmd := m.command_page.Update(msg)
+			m.command_page = content.(common.Component)
+
 			cmds = append(cmds, cmd)
 		} else {
-			m.pages[common.CurrPage].Content, cmd = m.pages[common.CurrPage].Content.Update(msg)
+			content, cmd := m.pages[common.CurrPage].Content.Update(msg)
+			m.pages[common.CurrPage].Content = content.(common.Component)
+
 			cmds = append(cmds, cmd)
 
 		}
@@ -204,11 +206,16 @@ func (m Model) View() string {
 
 	if m.command_active {
 		content = lipgloss.JoinVertical(
-			lipgloss.Top, tabs.New(m.pages, int(common.CurrPage), w, m.height, m.loading),
+			lipgloss.Top,
+			tabs.New(m.pages, int(common.CurrPage), w, m.height, m.loading),
 			m.command_page.View(),
 		)
 	} else {
-		content = tabs.New(m.pages, int(common.CurrPage), w, m.height, m.loading)
+		content = lipgloss.JoinVertical(
+			lipgloss.Right,
+			tabs.New(m.pages, int(common.CurrPage), w, m.height, m.loading),
+			lipgloss.NewStyle().MarginRight(2).Render(m.pages[common.CurrPage].Content.Help()),
+		)
 	}
 
 	return lipgloss.Place(

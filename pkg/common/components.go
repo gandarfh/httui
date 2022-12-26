@@ -4,4 +4,5 @@ import tea "github.com/charmbracelet/bubbletea"
 
 type Component interface {
 	tea.Model
+	Help() string
 }

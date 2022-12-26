@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/charmbracelet/bubbles/help"
+	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -32,9 +34,13 @@ type Model struct {
 	Tags_list      list.Model
 	resources_list list.Model
 	filter         string
+	keys_tags      KeyMapTag
+	keys_resource  KeyMapResource
+	help_resource  help.Model
+	help_tags      help.Model
 }
 
-func New() Model {
+func New() common.Component {
 	tags_repo, _ := repositories.NewTag()
 	resources_repo, _ := repositories.NewResource()
 	default_repo, _ := repositories.NewDefault()
@@ -45,6 +51,9 @@ func New() Model {
 		default_repo:   default_repo,
 		Tags_list:      NewTagList(),
 		resources_list: NewResourceList(),
+		keys_tags:      keys_tags,
+		help_resource:  help.New(),
+		help_tags:      help.New(),
 	}
 }
 
@@ -165,13 +174,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.resources_list.SetHeight(msg.Height/2 - 2)
 
 	case tea.KeyMsg:
-		switch msg.String() {
-		case "/":
+		switch {
+		case key.Matches(msg, m.keys_tags.Filter):
 			return m, tea.Batch(
 				common.OpenCommand("FILTER"),
 			)
 
-		case "m":
+		case key.Matches(msg, m.keys_tags.Move):
 			index := m.resources_list.Index()
 			common.CurrResource = common.ListOfResources[index]
 
@@ -180,7 +189,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				common.SetCommand(common.CurrResource.Tag.Name),
 			)
 
-		case "d":
+		case key.Matches(msg, m.keys_tags.Delete):
 			if common.CurrTab == common.Tab_Tags {
 				index := m.Tags_list.Index()
 				m.tags_repo.Delete(common.ListOfTags[index].ID)
@@ -190,7 +199,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.resources_repo.Delete(common.ListOfResources[index].ID)
 			}
 
-		case "enter", "right", "l":
+		case key.Matches(msg, m.keys_tags.Enter):
 			if common.CurrTab == common.Tab_Tags {
 				return m, m.EnterResource()
 			}
@@ -198,7 +207,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, common.SetNextPage()
 			}
 
-		case "left", "h":
+		case key.Matches(msg, m.keys_tags.Back):
 			if common.CurrTab == common.Tab_Resources {
 				return m, common.SetTab(common.Tab_Tags)
 			}
@@ -206,7 +215,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, common.SetPrevPage()
 			}
 
-		case "e":
+		case key.Matches(msg, m.keys_tags.Exec):
 			if common.CurrTab == common.Tab_Resources {
 				index := m.resources_list.Index()
 				common.CurrResource = common.ListOfResources[index]
@@ -214,12 +223,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, tea.Batch(common.SetLoading(true, "Loading..."), m.Exec())
 			}
 
-		case "esc":
+		case key.Matches(msg, m.keys_tags.Close):
 			if common.CurrTab == common.Tab_Resources {
 				m.resources_list.SetItems(nil)
 				return m, common.SetTab(common.Tab_Tags)
 			}
-		case "r":
+		case key.Matches(msg, m.keys_tags.FastRename):
 			var data interface{}
 			if common.CurrTab == common.Tab_Tags {
 				index := m.Tags_list.Index()
@@ -238,7 +247,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, tea.Batch(term.OpenVim("Update"))
 			}
 
-		case "R":
+		case key.Matches(msg, m.keys_tags.CustomRename):
 			var data interface{}
 			if common.CurrTab == common.Tab_Tags {
 				index := m.Tags_list.Index()
@@ -252,7 +261,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			term := terminal.NewPreview(&data)
 			return m, tea.Batch(term.OpenVim("Update"))
 
-		case "c":
+		case key.Matches(msg, m.keys_tags.Create):
 			var data interface{}
 			if common.CurrTab == common.Tab_Tags {
 				return m, tea.Batch(
@@ -265,7 +274,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, tea.Batch(term.OpenVim("Create"))
 			}
 
-		case "C":
+		case key.Matches(msg, m.keys_tags.FullCreate):
 			var data interface{}
 			if common.CurrTab == common.Tab_Tags {
 				data = repositories.Tag{WorkspaceId: common.CurrWorkspace.ID}
@@ -307,11 +316,14 @@ func (m Model) View() string {
 
 	m.resources_list.Title = fmt.Sprintf("%s -> %s", common.CurrWorkspace.Name, common.CurrTag.Name)
 
-	return lipgloss.JoinHorizontal(
-		lipgloss.Left,
-		m.Tags_list.View(),
-		divider.Height(m.height).String(),
-		m.resources_list.View(),
+	return lipgloss.JoinVertical(
+		lipgloss.Right,
+		lipgloss.JoinHorizontal(
+			lipgloss.Left,
+			m.Tags_list.View(),
+			divider.Height(m.height).String(),
+			m.resources_list.View(),
+		),
 	)
 }
 
