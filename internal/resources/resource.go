@@ -52,6 +52,7 @@ func New() common.Component {
 		Tags_list:      NewTagList(),
 		resources_list: NewResourceList(),
 		keys_tags:      keys_tags,
+		keys_resource:  keys_resources,
 		help_resource:  help.New(),
 		help_tags:      help.New(),
 	}
@@ -69,8 +70,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch msg := msg.(type) {
 	case Result:
-		term := terminal.NewPreview(&msg.Response)
+		if msg.Err != nil {
+			term := terminal.NewPreview(&msg.Err)
+			return m, tea.Batch(common.SetLoading(false), term.OpenVim("Exec"))
+		}
 
+		term := terminal.NewPreview(&msg.Response)
 		return m, tea.Batch(common.SetLoading(false), term.OpenVim("Exec"))
 
 	case terminal.Finish:
@@ -203,6 +208,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if common.CurrTab == common.Tab_Tags {
 				return m, m.EnterResource()
 			}
+			if common.CurrTab == common.Tab_Resources {
+				return m, common.SetNextPage()
+			}
+
+		case key.Matches(msg, m.keys_tags.Next):
 			if common.CurrTab == common.Tab_Resources {
 				return m, common.SetNextPage()
 			}
@@ -374,7 +384,13 @@ func (m Model) Exec() tea.Cmd {
 			}
 		}
 
-		data, _ := res.Exec()
+		data, err := res.Exec()
+		if err != nil {
+			return Result{
+				Err:     err,
+				Loading: false,
+			}
+		}
 
 		var response any
 		readbody, _ := ioutil.ReadAll(data.Body)
