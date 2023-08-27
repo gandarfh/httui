@@ -16,16 +16,10 @@ type EnvsRepo struct {
 }
 
 func NewEnvs() (*EnvsRepo, error) {
-	db, err := database.SqliteConnection()
+	db := database.Client
 	db.AutoMigrate(&Env{})
 
-	if err != nil {
-		return nil, err
-	}
-
-	return &EnvsRepo{
-		Sql: db,
-	}, nil
+	return &EnvsRepo{db}, nil
 }
 
 func (repo *EnvsRepo) Create(env *Env) error {

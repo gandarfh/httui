@@ -17,10 +17,10 @@ type WorkspacesRepo struct {
 }
 
 func NewWorkspace() (*WorkspacesRepo, error) {
-	db, err := database.SqliteConnection()
+	db := database.Client
 	db.AutoMigrate(&Workspace{})
 
-	return &WorkspacesRepo{db}, err
+	return &WorkspacesRepo{db}, nil
 }
 
 func (repo *WorkspacesRepo) Create(value *Workspace) error {

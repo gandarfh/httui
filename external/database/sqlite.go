@@ -15,22 +15,25 @@ var newLogger = logger.New(
 	logger.Config{},
 )
 
-func SqliteConnection() (*gorm.DB, error) {
+var Client *gorm.DB
+
+func SqliteConnection() error {
 	home, _ := os.UserHomeDir()
 	db, err := gorm.Open(sqlite.Open(filepath.Join(home, "httui.db")), &gorm.Config{
 		Logger: newLogger,
 	})
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	sqldb, _ := db.DB()
 
 	if err := sqldb.Ping(); err != nil {
 		defer sqldb.Close()
-		return nil, err
+		return err
 	}
 
-	return db, nil
+	Client = db
+	return nil
 }

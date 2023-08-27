@@ -16,7 +16,7 @@ type Default struct {
 }
 
 func NewDefault() (*DefaultsRepo, error) {
-	db, err := database.SqliteConnection()
+	db := database.Client
 	db.AutoMigrate(&Default{})
 
 	items := []Default{}
@@ -26,7 +26,7 @@ func NewDefault() (*DefaultsRepo, error) {
 		db.Create(&Default{})
 	}
 
-	return &DefaultsRepo{db}, err
+	return &DefaultsRepo{db}, nil
 }
 
 func (repo *DefaultsRepo) Update(value *Default) error {

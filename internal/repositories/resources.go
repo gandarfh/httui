@@ -24,10 +24,10 @@ type ResourcesRepo struct {
 }
 
 func NewResource() (*ResourcesRepo, error) {
-	db, err := database.SqliteConnection()
+	db := database.Client
 	db.AutoMigrate(&Resource{})
 
-	return &ResourcesRepo{db}, err
+	return &ResourcesRepo{db}, nil
 }
 
 func (repo *ResourcesRepo) Create(value *Resource) error {

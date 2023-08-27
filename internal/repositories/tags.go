@@ -18,10 +18,10 @@ type TagsRepo struct {
 }
 
 func NewTag() (*TagsRepo, error) {
-	db, err := database.SqliteConnection()
+	db := database.Client
 	db.AutoMigrate(&Tag{})
 
-	return &TagsRepo{db}, err
+	return &TagsRepo{db}, nil
 }
 
 func (repo *TagsRepo) FindOne(tagId uint) (Tag, error) {
