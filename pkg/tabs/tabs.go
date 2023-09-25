@@ -82,14 +82,15 @@ var (
 			Border(gapBorder, true)
 )
 
-func Tabs(items Contents, active int, size int, loading string) string {
+func Tabs(items Contents, active int, size int, loading string, env string) string {
 	var listoftabs []string = []string{}
 
 	for i, item := range items {
 		listoftabs = append(listoftabs, tab(item.Tab, i == active, i))
 	}
 
-	listoftabs = append(listoftabs, tab(loading, false, 1))
+	listoftabs = append(listoftabs, tab(env, false, 1))
+	listoftabs = append(listoftabs, tab(loading, false, 2))
 
 	row := lipgloss.JoinHorizontal(
 		lipgloss.Top,

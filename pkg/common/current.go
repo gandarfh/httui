@@ -11,12 +11,12 @@ var (
 	CurrPage      Page
 	CurrEnv       repositories.Env
 	CurrWorkspace repositories.Workspace
-	CurrTag       repositories.Tag
-	CurrResource  repositories.Resource
+	CurrRequest   repositories.Request
 )
 
 const (
-	Page_Workspace Page = iota
+	Page_Request Page = iota
+	Page_Workspace
 	Page_Resource
 	Page_Env
 )
@@ -30,15 +30,23 @@ func SetPage(page Page) tea.Cmd {
 
 func SetNextPage() tea.Cmd {
 	return func() tea.Msg {
-		totalpages := 3
-		CurrPage = Page(min(int(CurrPage)+1, totalpages-1))
+		if CurrPage == 2 {
+			CurrPage = 0
+		} else {
+			totalpages := 3
+			CurrPage = Page(min(int(CurrPage)+1, totalpages-1))
+		}
 		return CurrPage
 	}
 }
 
 func SetPrevPage() tea.Cmd {
 	return func() tea.Msg {
-		CurrPage = Page(max(int(CurrPage)-1, 0))
+		if CurrPage == 0 {
+			CurrPage = 2
+		} else {
+			CurrPage = Page(max(int(CurrPage)-1, 0))
+		}
 		return CurrPage
 	}
 }
@@ -47,6 +55,7 @@ type Command struct {
 	Active   bool
 	Value    string
 	Category string
+	Prefix   string
 }
 
 type CommandClose struct {
@@ -62,9 +71,11 @@ func SetCommand(value string) tea.Cmd {
 	}
 }
 
-func OpenCommand(category string) tea.Cmd {
+func OpenCommand(category, prefix string) tea.Cmd {
 	return func() tea.Msg {
-    command.Category = category
+		command.Category = category
+		command.Prefix = prefix
+		command.Value = ""
 		command.Active = true
 		return command
 	}
@@ -80,9 +91,20 @@ func CloseCommand() tea.Cmd {
 func ClearCommand() tea.Cmd {
 	return func() tea.Msg {
 		command.Active = false
+		command.Prefix = ""
 		command.Value = ""
-    command.Category = ""
+		command.Category = ""
 		return command
+	}
+}
+
+type Environment struct {
+	Name string
+}
+
+func SetEnvironment(name string) tea.Cmd {
+	return func() tea.Msg {
+		return Environment{Name: name}
 	}
 }
 
@@ -103,67 +125,38 @@ func SetLoading(loading bool, msg ...string) tea.Cmd {
 
 func SetWorkspace(workspaceId uint) tea.Cmd {
 	return func() tea.Msg {
-		workspace_repo, _ := repositories.NewWorkspace()
+		workspace_repo := repositories.NewWorkspace()
 		CurrWorkspace, _ = workspace_repo.FindOne(workspaceId)
 
 		return Loading{}
 	}
 }
 
-func SetTag(tagId uint) tea.Cmd {
-	return func() tea.Msg {
-		tags_repo, _ := repositories.NewTag()
-		CurrTag, _ = tags_repo.FindOne(tagId)
-
-		return Loading{}
-	}
-}
-
 type List struct {
-	Tags      []repositories.Tag
-	Resources []repositories.Resource
+	Requests []repositories.Request
 }
 
 var (
 	ListOfWorkspaces []repositories.Workspace
-	ListOfTags       []repositories.Tag
-	ListOfResources  []repositories.Resource
+	ListOfRequests   []repositories.Request
 	ListOfEnvs       []repositories.Env
 )
 
-func ListTags(workspaceId uint) tea.Cmd {
+func ListRequests(parentId uint) tea.Cmd {
 	return func() tea.Msg {
-		tags_repo, _ := repositories.NewTag()
-		ListOfTags, _ = tags_repo.List(workspaceId)
-
-		return List{Tags: ListOfTags}
-	}
-}
-
-func ListResources(tagId uint) tea.Cmd {
-	return func() tea.Msg {
-		resource_repo, _ := repositories.NewResource()
-		ListOfResources, _ = resource_repo.List(tagId, "")
-		return List{Resources: ListOfResources}
-	}
-}
-
-func ClearResources() tea.Cmd {
-	return func() tea.Msg {
-    CurrTag = repositories.Tag{}
-		ListOfResources = []repositories.Resource{}
-		return List{Resources: []repositories.Resource{}}
+		requests, _ := repositories.NewRequest().List(&parentId, "")
+		return List{Requests: requests}
 	}
 }
 
 type Tab int
 
 var (
-	CurrTab = Tab_Tags
+	CurrTab = Tab_Requests
 )
 
 const (
-	Tab_Tags Tab = iota
+	Tab_Requests Tab = iota
 	Tab_Resources
 )
 
