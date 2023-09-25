@@ -12,10 +12,10 @@ type DefaultsRepo struct {
 type Default struct {
 	gorm.Model
 	WorkspaceId uint `json:"workspaceId"`
-	TagId       uint `json:"tagId"`
+	RequestId   uint `json:"requestId"`
 }
 
-func NewDefault() (*DefaultsRepo, error) {
+func NewDefault() *DefaultsRepo {
 	db := database.Client
 	db.AutoMigrate(&Default{})
 
@@ -26,7 +26,7 @@ func NewDefault() (*DefaultsRepo, error) {
 		db.Create(&Default{})
 	}
 
-	return &DefaultsRepo{db}, nil
+	return &DefaultsRepo{db}
 }
 
 func (repo *DefaultsRepo) Update(value *Default) error {

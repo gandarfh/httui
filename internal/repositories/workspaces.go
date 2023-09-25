@@ -8,19 +8,18 @@ import (
 type Workspace struct {
 	gorm.Model
 	Name string `gorm:"unique" json:"name"`
-	Host string `json:"host"`
-	Tags []Tag  `json:"tags" gorm:"foreignKey:WorkspaceId;constraint:Onupdate:CASCADE;"`
+	Envs []Env  `json:"envs" gorm:"foreignKey:WorkspaceId;constraint:Onupdate:CASCADE;"`
 }
 
 type WorkspacesRepo struct {
 	Sql *gorm.DB
 }
 
-func NewWorkspace() (*WorkspacesRepo, error) {
+func NewWorkspace() *WorkspacesRepo {
 	db := database.Client
 	db.AutoMigrate(&Workspace{})
 
-	return &WorkspacesRepo{db}, nil
+	return &WorkspacesRepo{db}
 }
 
 func (repo *WorkspacesRepo) Create(value *Workspace) error {
@@ -44,8 +43,6 @@ func (repo *WorkspacesRepo) FindOne(id uint) (Workspace, error) {
 	workspace := Workspace{}
 
 	if err := repo.Sql.Model(&workspace).
-		Preload("Tags").
-		Preload("Tags.Resources").
 		Where("id IS ?", id).First(&workspace).Error; err != nil {
 		return workspace, err
 	}
@@ -57,8 +54,6 @@ func (repo *WorkspacesRepo) List() ([]Workspace, error) {
 	workspaces := []Workspace{}
 
 	if err := repo.Sql.Model(&workspaces).
-		Preload("Tags").
-		Preload("Tags.Resources").
 		Find(&workspaces).Error; err != nil {
 		return workspaces, err
 	}

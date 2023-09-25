@@ -7,19 +7,20 @@ import (
 
 type Env struct {
 	gorm.Model
-	Key   string `json:"key"`
-	Value string `json:"value"`
+	WorkspaceId uint   `json:"workspaceId"`
+	Key         string `json:"key"`
+	Value       string `json:"value"`
 }
 
 type EnvsRepo struct {
 	Sql *gorm.DB
 }
 
-func NewEnvs() (*EnvsRepo, error) {
+func NewEnvs() *EnvsRepo {
 	db := database.Client
 	db.AutoMigrate(&Env{})
 
-	return &EnvsRepo{db}, nil
+	return &EnvsRepo{db}
 }
 
 func (repo *EnvsRepo) Create(env *Env) error {
@@ -29,13 +30,8 @@ func (repo *EnvsRepo) Create(env *Env) error {
 }
 
 func (repo *EnvsRepo) Update(value *Env) error {
-	if err := repo.Sql.Session(&gorm.Session{FullSaveAssociations: true}).
-		Where("id = ?", value.ID).
-		Updates(value).Error; err != nil {
-		return err
-	}
-
-	return nil
+	return repo.Sql.Model(value).
+		Save(value).Error
 }
 
 func (repo *EnvsRepo) Delete(id uint) error {
@@ -53,17 +49,19 @@ func (repo *EnvsRepo) Find(id uint) (Env, error) {
 	return value, db.Error
 }
 
-func (repo *EnvsRepo) FindByKey(key string) (Env, error) {
+func (repo *EnvsRepo) FindByKey(key string, workspaceId uint) (Env, error) {
 	value := Env{Key: key}
 	db := repo.Sql.Model(&Env{})
-	db.Where("key = ?", key).FirstOrCreate(&value)
+	db.Where("key = ?", key).
+		Where("workspace_id = ?", workspaceId).
+		FirstOrCreate(&value)
 
 	return value, db.Error
 }
 
-func (repo *EnvsRepo) List() ([]Env, error) {
+func (repo *EnvsRepo) List(workspaceId uint) ([]Env, error) {
 	envs := []Env{}
-	db := repo.Sql.Find(&envs)
+	db := repo.Sql.Where("workspace_id = ?", workspaceId).Find(&envs)
 
 	return envs, db.Error
 }
