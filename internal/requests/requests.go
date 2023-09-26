@@ -21,7 +21,7 @@ type Model struct {
 	state            common.State
 	help             help.Model
 	keys             KeyMap
-	List     list.Model
+	List             list.Model
 	request_detail   ModelDetail
 	title            string
 	filter           string
@@ -37,7 +37,7 @@ func New() Model {
 	m := Model{
 		Width:          100,
 		state:          common.Start_state,
-		List:   NewRequestList(),
+		List:           NewRequestList(),
 		request_detail: NewDetail(),
 		help:           help.New(),
 		keys:           keys,
@@ -121,8 +121,14 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			)
 
 		case key.Matches(msg, m.keys.Create):
+			parentId := common.CurrRequest.ParentID
+
+			if common.CurrRequest.Type == "group" {
+				parentId = &common.CurrRequest.ID
+			}
+
 			term := terminal.NewPreview(&repositories.Request{
-				ParentID: common.CurrRequest.ParentID,
+				ParentID: parentId,
 			})
 
 			return m, tea.Batch(term.OpenVim("Create"))
