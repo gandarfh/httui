@@ -5,21 +5,23 @@ import (
 )
 
 type KeyMap struct {
-	Filter     key.Binding
-	Workspace  key.Binding
-	OpenGroup  key.Binding
-	CloseGroup key.Binding
-	Delete     key.Binding
-	Create     key.Binding
-	Edit       key.Binding
-	Exec       key.Binding
-	Envs       key.Binding
+	Filter          key.Binding
+	SetWorkspace    key.Binding
+	CreateWorkspace key.Binding
+	OpenGroup       key.Binding
+	CloseGroup      key.Binding
+	Delete          key.Binding
+	Create          key.Binding
+	Edit            key.Binding
+	Exec            key.Binding
+	Envs            key.Binding
 }
 
 func (k KeyMap) ShortHelp() []key.Binding {
 	return []key.Binding{
 		k.Filter,
-		k.Workspace,
+		k.SetWorkspace,
+		k.CreateWorkspace,
 		k.OpenGroup,
 		k.CloseGroup,
 		k.Delete,
@@ -39,9 +41,13 @@ var keys = KeyMap{
 		key.WithKeys("/"),
 		key.WithHelp("/", "Filter"),
 	),
-	Workspace: key.NewBinding(
+	SetWorkspace: key.NewBinding(
 		key.WithKeys("ctrl+s"),
 		key.WithHelp("ctrl+s", "Select Workspaces"),
+	),
+	CreateWorkspace: key.NewBinding(
+		key.WithKeys("S"),
+		key.WithHelp("shift+s", "Create Workspaces"),
 	),
 	OpenGroup: key.NewBinding(
 		key.WithKeys("o", "enter", "l"),

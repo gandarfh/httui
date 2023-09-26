@@ -17,7 +17,6 @@ func (m Model) OpenRequest() Model {
 	common.CurrRequest = common.ListOfRequests[index]
 
 	if common.CurrRequest.Type == "group" {
-		m.request_list.Title = common.CurrRequest.Name
 		m.parentId = &common.CurrRequest.ID
 		m.previousParentId = common.CurrRequest.ParentID
 	}
@@ -59,13 +58,13 @@ func (m Model) BackRequest() Model {
 }
 
 func (m Model) WindowSize(msg tea.WindowSizeMsg) Model {
-	m.height = msg.Height - 5
-	m.width = msg.Width
+	m.Height = msg.Height
+	m.Width = msg.Width + 1
 
-	m.request_list.SetHeight(msg.Height/2 - 2)
-	m.request_list.SetWidth(msg.Width/3 - 2)
-	m.request_detail.Height = (msg.Height - msg.Height/3 - 2)
-	m.request_detail.Width = msg.Width - (msg.Width / 4)
+	m.request_list.SetHeight(m.Height/2 - 2)
+	m.request_list.SetWidth(m.Width / 5)
+	m.request_detail.Height = ((m.Height) - 9)
+	m.request_detail.Width = m.Width - m.request_list.Width() + 1
 
 	return m
 }

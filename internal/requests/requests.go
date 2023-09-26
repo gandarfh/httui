@@ -16,8 +16,8 @@ import (
 )
 
 type Model struct {
-	width            int
-	height           int
+	Width            int
+	Height           int
 	state            common.State
 	help             help.Model
 	keys             KeyMap
@@ -33,9 +33,9 @@ var (
 	divider = lipgloss.NewStyle().MarginLeft(1).Border(lipgloss.NormalBorder(), false, true, false, false)
 )
 
-func New() common.Component {
-
+func New() Model {
 	m := Model{
+		Width:          100,
 		state:          common.Start_state,
 		request_list:   NewRequestList(),
 		request_detail: NewDetail(),
@@ -50,7 +50,7 @@ func (m Model) Init() tea.Cmd {
 	return nil
 }
 
-func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var (
 		cmd  tea.Cmd
 		cmds []tea.Cmd
@@ -73,6 +73,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case common.Loaded_state:
 			m.request_detail.Request = common.CurrRequest
 			m.request_detail.Preview = fmt.Sprintf("%s - %s", common.CurrRequest.Method, common.CurrRequest.Endpoint)
+			m.request_list.Title = fmt.Sprintf("[%s]", common.CurrWorkspace.Name)
 
 			m.parentId = common.CurrRequest.ParentID
 		}
@@ -90,9 +91,14 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				common.OpenCommand("FILTER", ""),
 			)
 
-		case key.Matches(msg, m.keys.Workspace):
+		case key.Matches(msg, m.keys.SetWorkspace):
 			return m, tea.Batch(
 				common.OpenCommand("SET_WORKSPACE", ""),
+			)
+
+		case key.Matches(msg, m.keys.CreateWorkspace):
+			return m, tea.Batch(
+				common.OpenCommand("CREATE_WORKSPACE", ""),
 			)
 
 		case key.Matches(msg, m.keys.Exec):
@@ -146,6 +152,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case common.Tab:
 		common.CurrTab = msg
 
+	case common.Environment:
+		m.request_list.Title = fmt.Sprintf("[%s]", msg.Name)
+
 	case common.List:
 		common.ListOfRequests = msg.Requests
 
@@ -176,17 +185,21 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			data := []map[string]any{}
 			msg.Preview.Execute(&data)
 
-			for _, env := range data {
+			for _, item := range data {
 				env := repositories.Env{
-					Model: gorm.Model{
-						ID: uint(env["id"].(float64)),
-					},
 					WorkspaceId: common.CurrWorkspace.ID,
-					Key:         env["key"].(string),
-					Value:       env["value"].(string),
+					Key:         item["key"].(string),
+					Value:       item["value"].(string),
 				}
 
-				repositories.NewEnvs().Update(&env)
+				if item["id"] != nil {
+					env.Model = gorm.Model{
+						ID: uint(item["id"].(float64)),
+					}
+					repositories.NewEnvs().Update(&env)
+				} else {
+					repositories.NewEnvs().Create(&env)
+				}
 			}
 		}
 
@@ -204,6 +217,18 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case "FILTER":
 			m.filter = msg.Value
+
+		case "CREATE_WORKSPACE":
+			workspace := repositories.Workspace{Name: msg.Value}
+			repositories.NewWorkspace().Create(&workspace)
+			common.CurrWorkspace = workspace
+
+			repositories.NewDefault().Update(&repositories.Default{
+				WorkspaceId: workspace.ID,
+			})
+
+			cmd = common.SetEnvironment(workspace.Name)
+			cmds = append(cmds, cmd)
 
 		case "SET_WORKSPACE":
 			workspace := repositories.Workspace{}
@@ -233,13 +258,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m Model) View() string {
-	return lipgloss.JoinVertical(
-		lipgloss.Right,
-		lipgloss.JoinHorizontal(
-			lipgloss.Left,
-			m.request_list.View(),
-			divider.Height(m.height).String(),
-			m.request_detail.View(),
-		),
+	return lipgloss.JoinHorizontal(
+		lipgloss.Left,
+		m.request_list.View(),
+		divider.Height(m.Height-1).String(),
+		m.request_detail.View(),
 	)
 }

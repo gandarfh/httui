@@ -24,7 +24,7 @@ func NewEnvs() *EnvsRepo {
 }
 
 func (repo *EnvsRepo) Create(env *Env) error {
-	db := repo.Sql.Create(&Env{Value: env.Value, Key: env.Key})
+	db := repo.Sql.Create(env)
 
 	return db.Error
 }

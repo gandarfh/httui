@@ -105,7 +105,7 @@ func (m Model) RequestOfList() []list.Item {
 	list := []list.Item{}
 	common.ListOfRequests, _ = repositories.NewRequest().List(m.parentId, m.filter)
 
-	w := (m.width / 7)
+	w := (m.Width / 7)
 
 	for _, i := range common.ListOfRequests {
 		list = append(list, RequestItem{i.Name, i.Type, w})

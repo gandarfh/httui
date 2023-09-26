@@ -9,28 +9,23 @@ import (
 	"github.com/gandarfh/httui/internal/requests"
 	"github.com/gandarfh/httui/pkg/common"
 	"github.com/gandarfh/httui/pkg/styles"
-	"github.com/gandarfh/httui/pkg/tabs"
 )
 
 type Model struct {
 	width          int
 	height         int
 	workspaceName  string
-	pages          tabs.Contents
 	spinner        spinner.Model
 	state          common.State
 	command_active bool
 	environment    common.Environment
 	loading        common.Loading
+	requests_page  requests.Model
 	command_page   common.Component
 	request_repo   *repositories.RequestsRepo
 }
 
 func New() Model {
-	pages := tabs.Contents{
-		{Tab: "Requests", Content: requests.New()},
-	}
-
 	s := spinner.New()
 	s.Spinner = spinner.Dot
 	s.Style = lipgloss.NewStyle().MarginLeft(2).Foreground(styles.DefaultTheme.PrimaryText)
@@ -38,10 +33,10 @@ func New() Model {
 	return Model{
 		environment:    common.Environment{Name: common.CurrWorkspace.Name},
 		request_repo:   repositories.NewRequest(),
-		pages:          pages,
 		state:          common.Start_state,
 		spinner:        s,
 		command_page:   command.New(),
+		requests_page:  requests.New(),
 		command_active: false,
 	}
 }
@@ -53,11 +48,8 @@ func (m Model) Init() tea.Cmd {
 	)
 
 	cmds = append(cmds, m.spinner.Tick)
-	cmds = append(cmds, m.command_page.Init())
-
-	for _, p := range m.pages {
-		cmds = append(cmds, p.Content.Init())
-	}
+	// cmds = append(cmds, m.command_page.Init())
+	// cmds = append(cmds, m.requests_page.Init())
 
 	cmd = common.SetState(common.Start_state)
 	cmds = append(cmds, cmd)
@@ -89,6 +81,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			cmd = common.SetState(common.Loaded_state)
 			cmds = append(cmds, cmd)
+
+			cmds = append(cmds, m.requests_page.Init())
 		default:
 		}
 
@@ -106,14 +100,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
-		m.height = msg.Height - 5
+		m.height = msg.Height
 
-		for p, i := range m.pages {
-			content, cmd := i.Content.Update(msg)
-			m.pages[p].Content = content.(common.Component)
-
-			cmds = append(cmds, cmd)
-		}
+		m.requests_page.Width = m.width
+		m.requests_page.Height = m.height
 
 	case common.Page:
 		common.CurrPage = msg
@@ -131,19 +121,15 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	m.spinner, cmd = m.spinner.Update(msg)
 	cmds = append(cmds, cmd)
 
-	if m.state == common.Loaded_state {
-		if m.command_active {
-			content, cmd := m.command_page.Update(msg)
-			m.command_page = content.(common.Component)
+	if m.command_active {
+		content, cmd := m.command_page.Update(msg)
+		m.command_page = content.(common.Component)
 
-			cmds = append(cmds, cmd)
-		} else {
-			content, cmd := m.pages[common.CurrPage].Content.Update(msg)
-			m.pages[common.CurrPage].Content = content.(common.Component)
+		cmds = append(cmds, cmd)
 
-			cmds = append(cmds, cmd)
-
-		}
+	} else {
+		m.requests_page, cmd = m.requests_page.Update(msg)
+		cmds = append(cmds, cmd)
 	}
 
 	return m, tea.Batch(cmds...)
@@ -158,27 +144,19 @@ func (m Model) View() string {
 		m.loading.Msg = ""
 	}
 
-	w := m.width - 2
-
 	if m.command_active {
 		content = lipgloss.JoinVertical(
-			lipgloss.Top,
-			tabs.New(m.pages, int(common.CurrPage), w, m.height, m.loading, m.environment),
+			lipgloss.Left,
+			m.requests_page.View(),
 			m.command_page.View(),
 		)
 	} else {
 		content = lipgloss.JoinVertical(
 			lipgloss.Right,
-			tabs.New(m.pages, int(common.CurrPage), w, m.height, m.loading, m.environment),
-			lipgloss.NewStyle().MarginRight(2).Render(m.pages[common.CurrPage].Content.Help()),
+			m.requests_page.View(),
+			lipgloss.NewStyle().Render(m.requests_page.Help()),
 		)
 	}
 
-	return lipgloss.Place(
-		m.width,
-		m.height,
-		lipgloss.Center,
-		lipgloss.Top,
-		styles.Container.Base.Render(content),
-	)
+	return styles.Container.Base.Width(m.width).MaxWidth(m.width).Render(content)
 }

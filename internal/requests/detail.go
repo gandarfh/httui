@@ -52,70 +52,78 @@ func DataToString(jsonString string, size int) string {
 }
 
 func (m ModelDetail) View() string {
-	title_row := lipgloss.NewStyle().Render(lipgloss.JoinHorizontal(
+	title_row := lipgloss.NewStyle().Width(m.Width).Border(lipgloss.RoundedBorder()).Render(lipgloss.JoinHorizontal(
 		lipgloss.Left,
-		lipgloss.NewStyle().Width(m.Width-(m.Width/3)-2).Bold(true).Border(lipgloss.RoundedBorder()).MarginRight(1).Render(" Name: "+m.Request.Name),
-		lipgloss.NewStyle().Width(m.Width/3).Bold(true).Border(lipgloss.RoundedBorder()).Render(fmt.Sprint(" Id: ", m.Request.ID)),
+		lipgloss.NewStyle().Width(m.Width-m.Width/3).Bold(true).Render(" Name: "+m.Request.Name),
+		lipgloss.NewStyle().Width(m.Width/6).String(),
+		lipgloss.NewStyle().Width(m.Width/6).Bold(true).Render(fmt.Sprint(" ID: ", m.Request.ID)),
 	))
 
 	preview_row := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Render(
 		lipgloss.Place(
-			m.Width+1,
+			m.Width,
 			1,
 			lipgloss.Left,
 			lipgloss.Top,
 			lipgloss.NewStyle().Bold(true).Render(fmt.Sprint(" Preview: ", utils.ReplaceByEnv(utils.Truncate(m.Preview, 100)))),
 		))
 
-	renderer, _ := glamour.NewTermRenderer(
+	bodyrenderer, _ := glamour.NewTermRenderer(
 		glamour.WithAutoStyle(),
-		glamour.WithWordWrap(m.Width/2+2),
+		glamour.WithWordWrap(m.Width-m.Width/3),
+	)
+
+	paramrenderer, _ := glamour.NewTermRenderer(
+		glamour.WithAutoStyle(),
+		glamour.WithWordWrap(m.Width/3),
 	)
 
 	rawbody, _ := m.Request.Body.MarshalJSON()
-	body, _ := renderer.Render("```json\n" + DataToString(string(rawbody), 400) + "\n```")
+	body, _ := bodyrenderer.Render("```json\n" + DataToString(string(rawbody), 400) + "\n```")
 
-	body_box := lipgloss.NewStyle().Height(m.Height).Border(lipgloss.RoundedBorder()).Render(
-		lipgloss.JoinVertical(
-			lipgloss.Left,
-			lipgloss.NewStyle().Bold(true).Render(fmt.Sprint(" Body:")),
-			body,
-		))
+	body_box := lipgloss.JoinVertical(
+		lipgloss.Left,
+		lipgloss.NewStyle().Bold(true).Render(fmt.Sprint(" Body:")),
+		body,
+	)
 
 	rawparams, _ := m.Request.QueryParams.MarshalJSON()
-	query, _ := renderer.Render("```json\n" + DataToString(fmt.Sprintf(`{"items": %s}`, string(rawparams)), 70) + "\n```")
+	query, _ := paramrenderer.Render("```json\n" + DataToString(fmt.Sprintf(`{"items": %s}`, string(rawparams)), 90) + "\n```")
 
-	query_box := lipgloss.NewStyle().Height(m.Height/2 - 1).Border(lipgloss.RoundedBorder()).Render(
-		lipgloss.JoinVertical(
-			lipgloss.Left,
-			lipgloss.NewStyle().Bold(true).Render(fmt.Sprint(" Params:")),
-			query,
-		))
+	query_box := lipgloss.NewStyle().Height(m.Height / 2).Render(lipgloss.JoinVertical(
+		lipgloss.Left,
+		lipgloss.NewStyle().Bold(true).Render(fmt.Sprint(" Params:")),
+		query,
+	))
 
 	rawheader, _ := m.Request.Headers.MarshalJSON()
-	header, _ := renderer.Render("```json\n" + DataToString(fmt.Sprintf(`{"items": %s}`, string(rawheader)), 70) + "\n```")
+	header, _ := paramrenderer.Render("```json\n" + DataToString(fmt.Sprintf(`{"items": %s}`, string(rawheader)), 90) + "\n```")
 
-	header_box := lipgloss.NewStyle().Height(m.Height/2 - 1).Border(lipgloss.RoundedBorder()).Render(
-		lipgloss.JoinVertical(
-			lipgloss.Left,
-			lipgloss.NewStyle().Bold(true).Render(fmt.Sprint(" Headers:")),
-			header,
-		),
-	)
-
-	params_box := lipgloss.JoinVertical(
+	header_box := lipgloss.JoinVertical(
 		lipgloss.Left,
-		query_box,
-		header_box,
+		lipgloss.NewStyle().Bold(true).Render(fmt.Sprint(" Headers:")),
+		header,
 	)
 
-	content_row := lipgloss.JoinHorizontal(
+	params_box := lipgloss.
+		NewStyle().
+		Height(m.Height).
+		Width(m.Width / 3).
+		Render(lipgloss.JoinVertical(
+			lipgloss.Left,
+			query_box,
+			lipgloss.NewStyle().Width(m.Width/3).Border(lipgloss.NormalBorder(), true, false, false, false).String(),
+			header_box,
+		))
+
+	content_row := lipgloss.NewStyle().Width(m.Width).Height(m.Height).Border(lipgloss.RoundedBorder()).Render(lipgloss.JoinHorizontal(
 		lipgloss.Left,
 		body_box,
+		lipgloss.NewStyle().Height(m.Height).Width(1).Border(lipgloss.NormalBorder(), false, true, false, false).String(),
 		params_box,
-	)
+	))
 
-	container := lipgloss.NewStyle().Padding(1).Render(lipgloss.JoinVertical(
+	container := lipgloss.NewStyle().Padding(0, 1).Render(lipgloss.JoinVertical(
 		lipgloss.Top,
 		title_row,
 		preview_row,
