@@ -13,7 +13,7 @@ func (m Model) OpenRequest() Model {
 		return m
 	}
 
-	index := m.request_list.Index()
+	index := m.List.Index()
 	common.CurrRequest = common.ListOfRequests[index]
 
 	if common.CurrRequest.Type == "group" {
@@ -61,10 +61,10 @@ func (m Model) WindowSize(msg tea.WindowSizeMsg) Model {
 	m.Height = msg.Height
 	m.Width = msg.Width + 1
 
-	m.request_list.SetHeight(m.Height/2 - 2)
-	m.request_list.SetWidth(m.Width / 5)
+	m.List.SetHeight(m.Height/2 - 2)
+	m.List.SetWidth(m.Width / 5)
 	m.request_detail.Height = ((m.Height) - 9)
-	m.request_detail.Width = m.Width - m.request_list.Width() + 1
+	m.request_detail.Width = m.Width - m.List.Width() + 1
 
 	return m
 }

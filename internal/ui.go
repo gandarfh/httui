@@ -27,7 +27,7 @@ type Model struct {
 
 func New() Model {
 	s := spinner.New()
-	s.Spinner = spinner.Dot
+	s.Spinner = spinner.Points
 	s.Style = lipgloss.NewStyle().MarginLeft(2).Foreground(styles.DefaultTheme.PrimaryText)
 
 	return Model{
@@ -48,8 +48,8 @@ func (m Model) Init() tea.Cmd {
 	)
 
 	cmds = append(cmds, m.spinner.Tick)
-	// cmds = append(cmds, m.command_page.Init())
-	// cmds = append(cmds, m.requests_page.Init())
+	cmds = append(cmds, m.command_page.Init())
+	cmds = append(cmds, m.requests_page.Init())
 
 	cmd = common.SetState(common.Start_state)
 	cmds = append(cmds, cmd)
@@ -139,7 +139,7 @@ func (m Model) View() string {
 	content := ""
 
 	if m.loading.Value {
-		m.loading.Msg = m.spinner.View() + m.loading.Msg
+		m.requests_page.List.Title = m.requests_page.List.Title + m.spinner.View()
 	} else {
 		m.loading.Msg = ""
 	}

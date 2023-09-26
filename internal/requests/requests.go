@@ -21,7 +21,7 @@ type Model struct {
 	state            common.State
 	help             help.Model
 	keys             KeyMap
-	request_list     list.Model
+	List     list.Model
 	request_detail   ModelDetail
 	title            string
 	filter           string
@@ -37,7 +37,7 @@ func New() Model {
 	m := Model{
 		Width:          100,
 		state:          common.Start_state,
-		request_list:   NewRequestList(),
+		List:   NewRequestList(),
 		request_detail: NewDetail(),
 		help:           help.New(),
 		keys:           keys,
@@ -73,7 +73,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		case common.Loaded_state:
 			m.request_detail.Request = common.CurrRequest
 			m.request_detail.Preview = fmt.Sprintf("%s - %s", common.CurrRequest.Method, common.CurrRequest.Endpoint)
-			m.request_list.Title = fmt.Sprintf("[%s]", common.CurrWorkspace.Name)
+			m.List.Title = fmt.Sprintf("[%s]", common.CurrWorkspace.Name)
 
 			m.parentId = common.CurrRequest.ParentID
 		}
@@ -102,7 +102,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			)
 
 		case key.Matches(msg, m.keys.Exec):
-			index := m.request_list.Index()
+			index := m.List.Index()
 			common.CurrRequest = common.ListOfRequests[index]
 			m = m.OpenRequest()
 
@@ -113,7 +113,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			return m, tea.Batch(common.SetLoading(true, "Loading..."), m.Exec())
 
 		case key.Matches(msg, m.keys.Delete):
-			index := m.request_list.Index()
+			index := m.List.Index()
 			common.CurrRequest = common.ListOfRequests[index]
 
 			return m, tea.Batch(
@@ -128,7 +128,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			return m, tea.Batch(term.OpenVim("Create"))
 
 		case key.Matches(msg, m.keys.Edit):
-			index := m.request_list.Index()
+			index := m.List.Index()
 			common.CurrRequest = common.ListOfRequests[index]
 			m = m.OpenRequest()
 
@@ -153,13 +153,13 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		common.CurrTab = msg
 
 	case common.Environment:
-		m.request_list.Title = fmt.Sprintf("[%s]", msg.Name)
+		m.List.Title = fmt.Sprintf("[%s]", msg.Name)
 
 	case common.List:
 		common.ListOfRequests = msg.Requests
 
-		m.request_list.SetItems(m.RequestOfList())
-		m.request_list, cmd = m.request_list.Update(msg)
+		m.List.SetItems(m.RequestOfList())
+		m.List, cmd = m.List.Update(msg)
 		cmds = append(cmds, cmd)
 
 	case terminal.Finish:
@@ -250,8 +250,8 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	m.request_detail, cmd = m.request_detail.Update(msg)
 	cmds = append(cmds, cmd)
 
-	m.request_list.SetItems(m.RequestOfList())
-	m.request_list, cmd = m.request_list.Update(msg)
+	m.List.SetItems(m.RequestOfList())
+	m.List, cmd = m.List.Update(msg)
 	cmds = append(cmds, cmd)
 
 	return m, tea.Batch(cmds...)
@@ -260,7 +260,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 func (m Model) View() string {
 	return lipgloss.JoinHorizontal(
 		lipgloss.Left,
-		m.request_list.View(),
+		m.List.View(),
 		divider.Height(m.Height-1).String(),
 		m.request_detail.View(),
 	)
