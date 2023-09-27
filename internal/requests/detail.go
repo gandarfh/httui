@@ -11,6 +11,10 @@ import (
 	"github.com/gandarfh/httui/pkg/utils"
 )
 
+var (
+	styleConfig = glamour.DarkStyleConfig
+)
+
 type ModelDetail struct {
 	Width   int
 	Height  int
@@ -19,6 +23,8 @@ type ModelDetail struct {
 }
 
 func NewDetail() ModelDetail {
+	styleConfig.CodeBlock.Chroma.Error.BackgroundColor = nil
+
 	return ModelDetail{}
 }
 
@@ -69,13 +75,13 @@ func (m ModelDetail) View() string {
 		))
 
 	bodyrenderer, _ := glamour.NewTermRenderer(
-		glamour.WithAutoStyle(),
+		glamour.WithStyles(styleConfig),
 		glamour.WithWordWrap(m.Width-m.Width/3),
 	)
 
 	paramrenderer, _ := glamour.NewTermRenderer(
-		glamour.WithAutoStyle(),
-		glamour.WithWordWrap(m.Width/3),
+		glamour.WithStyles(styleConfig),
+		glamour.WithWordWrap(m.Width/3-10),
 	)
 
 	rawbody, _ := m.Request.Body.MarshalJSON()
@@ -88,7 +94,7 @@ func (m ModelDetail) View() string {
 	)
 
 	rawparams, _ := m.Request.QueryParams.MarshalJSON()
-	query, _ := paramrenderer.Render("```json\n" + DataToString(fmt.Sprintf(`{"items": %s}`, string(rawparams)), 90) + "\n```")
+	query, _ := paramrenderer.Render("```json\n" + DataToString(fmt.Sprintf(`{"items": %s}`, string(rawparams)), 80) + "\n```")
 
 	query_box := lipgloss.NewStyle().Height(m.Height / 2).Render(lipgloss.JoinVertical(
 		lipgloss.Left,
@@ -97,7 +103,7 @@ func (m ModelDetail) View() string {
 	))
 
 	rawheader, _ := m.Request.Headers.MarshalJSON()
-	header, _ := paramrenderer.Render("```json\n" + DataToString(fmt.Sprintf(`{"items": %s}`, string(rawheader)), 90) + "\n```")
+	header, _ := paramrenderer.Render("```json\n" + DataToString(fmt.Sprintf(`{"items": %s}`, string(rawheader)), 80) + "\n```")
 
 	header_box := lipgloss.JoinVertical(
 		lipgloss.Left,
