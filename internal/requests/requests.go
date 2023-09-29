@@ -181,8 +181,11 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			return m, tea.Batch(common.ListRequests(*common.CurrRequest.ParentID))
 
 		case "Edit":
-			msg.Preview.Execute(&common.CurrRequest)
-			repositories.NewRequest().Update(&common.CurrRequest)
+			request := repositories.Request{}
+			msg.Preview.Execute(&request)
+			request.ID = common.CurrRequest.ID
+
+			repositories.NewRequest().Update(&request)
 			m.parentId = common.CurrRequest.ParentID
 
 			return m, tea.Batch(common.ListRequests(*common.CurrRequest.ParentID))

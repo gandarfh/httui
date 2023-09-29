@@ -66,7 +66,7 @@ func ReadResponse(key string) (string, error) {
 
 type TransformFunc func(text string) string
 
-func ReplaceByEnv(raw string, transforms ...TransformFunc) string {
+func ReplaceByOperator(raw string, transforms ...TransformFunc) string {
 	listOfEnvs := re_env.FindAllString(raw, -1)
 	listOfResponses := re_response.FindAllString(raw, -1)
 

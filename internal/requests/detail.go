@@ -54,7 +54,7 @@ func DataToString(jsonString string, size int) string {
 		return ""
 	}
 
-	return utils.Truncate(utils.ReplaceByEnv(string(indentedJSON)), size)
+	return utils.Truncate(utils.ReplaceByOperator(string(indentedJSON)), size)
 }
 
 func (m ModelDetail) View() string {
@@ -71,7 +71,7 @@ func (m ModelDetail) View() string {
 			1,
 			lipgloss.Left,
 			lipgloss.Top,
-			lipgloss.NewStyle().Bold(true).Render(fmt.Sprint(" Preview: ", utils.ReplaceByEnv(utils.Truncate(m.Preview, 100)))),
+			lipgloss.NewStyle().Bold(true).Render(fmt.Sprint(" Preview: ", utils.ReplaceByOperator(utils.Truncate(m.Preview, 100)))),
 		))
 
 	bodyrenderer, _ := glamour.NewTermRenderer(

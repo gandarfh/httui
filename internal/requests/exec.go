@@ -23,14 +23,13 @@ type Result struct {
 
 func (m Model) Exec() tea.Cmd {
 	return func() tea.Msg {
-		// workspace := common.CurrWorkspace
 		request := common.CurrRequest
 
-		url := utils.ReplaceByEnv(request.Endpoint)
+		url := utils.ReplaceByOperator(request.Endpoint)
 		res := client.Request(url, strings.ToUpper(request.Method))
 
 		rawbody, _ := request.Body.MarshalJSON()
-		bodystring := utils.ReplaceByEnv(string(rawbody))
+		bodystring := utils.ReplaceByOperator(string(rawbody))
 
 		var body any
 		if err := json.Unmarshal([]byte(bodystring), &body); err != nil {
@@ -43,22 +42,22 @@ func (m Model) Exec() tea.Cmd {
 			res.Body(nil)
 		}
 
-		rawheaders, _ := request.Headers.MarshalJSON()
-		headersstring := utils.ReplaceByEnv(string(rawheaders))
+		parentHeaders := utils.GetAllParentsHeaders(request.ParentID, request.Headers.Data())
+		headers := append(request.Headers.Data(), parentHeaders...)
 
-		headers := []map[string]string{}
-		json.Unmarshal([]byte(headersstring), &headers)
+		headers = utils.ProcessParamsOperators(headers)
+
 		for _, item := range headers {
 			for k, v := range item {
 				res.Header(k, v)
 			}
 		}
 
-		rawparams, _ := request.QueryParams.MarshalJSON()
-		paramsstring := utils.ReplaceByEnv(string(rawparams))
+		parentParams := utils.GetAllParentsParams(request.ParentID, request.QueryParams.Data())
+		params := append(request.QueryParams.Data(), parentParams...)
 
-		params := []map[string]string{}
-		json.Unmarshal([]byte(paramsstring), &params)
+		params = utils.ProcessParamsOperators(params)
+
 		for _, item := range params {
 			for k, v := range item {
 				res.Params(k, v)
