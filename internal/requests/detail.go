@@ -41,14 +41,7 @@ func (m ModelDetail) Update(msg tea.Msg) (ModelDetail, tea.Cmd) {
 	return m, tea.Batch(cmds...)
 }
 
-func DataToString(jsonString string, size int) string {
-	var data map[string]interface{}
-	err := json.Unmarshal([]byte(jsonString), &data)
-	if err != nil {
-		return ""
-	}
-
-	// Em seguida, serialize a estrutura de dados de volta em JSON com indentação
+func DataToString(data interface{}, size int) string {
 	indentedJSON, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
 		return ""
@@ -84,8 +77,8 @@ func (m ModelDetail) View() string {
 		glamour.WithWordWrap(m.Width/3-10),
 	)
 
-	rawbody, _ := m.Request.Body.MarshalJSON()
-	body, _ := bodyrenderer.Render("```json\n" + DataToString(string(rawbody), 400) + "\n```")
+	rawbody := m.Request.Body.Data()
+	body, _ := bodyrenderer.Render("```json\n" + DataToString(rawbody, 400) + "\n```")
 
 	body_box := lipgloss.JoinVertical(
 		lipgloss.Left,
@@ -93,8 +86,8 @@ func (m ModelDetail) View() string {
 		body,
 	)
 
-	rawparams, _ := m.Request.QueryParams.MarshalJSON()
-	query, _ := paramrenderer.Render("```json\n" + DataToString(fmt.Sprintf(`{"items": %s}`, string(rawparams)), 80) + "\n```")
+	rawparams := utils.GetAllParentsParams(m.Request.ParentID, m.Request.QueryParams.Data())
+	query, _ := paramrenderer.Render("```json\n" + DataToString(rawparams, 80) + "\n  ```")
 
 	query_box := lipgloss.NewStyle().Height(m.Height / 2).Render(lipgloss.JoinVertical(
 		lipgloss.Left,
@@ -102,8 +95,8 @@ func (m ModelDetail) View() string {
 		query,
 	))
 
-	rawheader, _ := m.Request.Headers.MarshalJSON()
-	header, _ := paramrenderer.Render("```json\n" + DataToString(fmt.Sprintf(`{"items": %s}`, string(rawheader)), 80) + "\n```")
+	rawheader := utils.GetAllParentsHeaders(m.Request.ParentID, m.Request.Headers.Data())
+	header, _ := paramrenderer.Render("```json\n" + DataToString(rawheader, 80) + "\n  ```")
 
 	header_box := lipgloss.JoinVertical(
 		lipgloss.Left,
