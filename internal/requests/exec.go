@@ -42,9 +42,7 @@ func (m Model) Exec() tea.Cmd {
 			res.Body(nil)
 		}
 
-		parentHeaders := utils.GetAllParentsHeaders(request.ParentID, request.Headers.Data())
-		headers := append(request.Headers.Data(), parentHeaders...)
-
+		headers := utils.GetAllParentsHeaders(request.ParentID, request.Headers.Data())
 		headers = utils.ProcessParamsOperators(headers)
 
 		for _, item := range headers {
@@ -53,9 +51,7 @@ func (m Model) Exec() tea.Cmd {
 			}
 		}
 
-		parentParams := utils.GetAllParentsParams(request.ParentID, request.QueryParams.Data())
-		params := append(request.QueryParams.Data(), parentParams...)
-
+		params := utils.GetAllParentsParams(request.ParentID, request.QueryParams.Data())
 		params = utils.ProcessParamsOperators(params)
 
 		for _, item := range params {
