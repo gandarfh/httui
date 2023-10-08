@@ -2,7 +2,6 @@ package requests
 
 import (
 	"fmt"
-	"log"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/gandarfh/httui/internal/repositories"
@@ -14,12 +13,12 @@ func (m Model) StateActions(msg common.State) (Model, tea.Cmd) {
 
 	switch msg {
 	case common.Start_state:
-		log.Println("=======================")
-		log.Printf("[%s] Process!\n", "Start")
 		conf, _ := repositories.NewDefault().First()
 
 		request, _ := repositories.NewRequest().FindOne(conf.RequestId)
 		common.CurrRequest = *request
+
+		m.parentId = common.CurrRequest.ParentID
 
 		workspace, _ := repositories.NewWorkspace().FindOne(conf.WorkspaceId)
 		common.CurrWorkspace = workspace
@@ -27,8 +26,6 @@ func (m Model) StateActions(msg common.State) (Model, tea.Cmd) {
 		return m, common.SetState(common.Loaded_state)
 
 	case common.Loaded_state:
-		log.Printf("[%s] Process!\n", "Loaded")
-
 		m.List.SetItems(m.RequestOfList())
 
 		m.detail.Request = common.CurrRequest

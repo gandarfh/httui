@@ -38,8 +38,6 @@ func New() tea.Model {
 	s.Spinner = spinner.Points
 	s.Style = lipgloss.NewStyle().MarginLeft(2).Foreground(styles.DefaultTheme.PrimaryText)
 
-
-
 	m := Model{
 		Width:          100,
 		state:          common.Start_state,
