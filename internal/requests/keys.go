@@ -31,8 +31,6 @@ func (k KeyMap) ShortHelp() []key.Binding {
 		k.Edit,
 		k.Exec,
 		k.Envs,
-		k.Detail,
-		k.Quit,
 	}
 }
 
