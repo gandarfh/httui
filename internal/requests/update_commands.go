@@ -17,6 +17,7 @@ func (m Model) CommandsActions(msg common.CommandClose) (Model, tea.Cmd) {
 
 	case "FILTER":
 		m.filter = msg.Value
+		return m, tea.Batch(common.ListRequests(nil))
 
 	case "CREATE_WORKSPACE":
 		workspace := repositories.Workspace{Name: msg.Value}

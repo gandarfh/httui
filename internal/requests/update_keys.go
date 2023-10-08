@@ -113,7 +113,7 @@ func (m Model) ShowRequestDetails(direction string) Model {
 		index -= 1
 	}
 
-	if size == index || index <= 0 {
+	if size == index || index < 0 {
 		index = m.List.Cursor()
 	}
 
