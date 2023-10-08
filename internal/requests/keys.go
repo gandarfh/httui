@@ -15,6 +15,8 @@ type KeyMap struct {
 	Edit            key.Binding
 	Exec            key.Binding
 	Envs            key.Binding
+	Detail          key.Binding
+	Quit            key.Binding
 }
 
 func (k KeyMap) ShortHelp() []key.Binding {
@@ -29,6 +31,8 @@ func (k KeyMap) ShortHelp() []key.Binding {
 		k.Edit,
 		k.Exec,
 		k.Envs,
+		k.Detail,
+		k.Quit,
 	}
 }
 
@@ -37,6 +41,12 @@ func (k KeyMap) FullHelp() [][]key.Binding {
 }
 
 var keys = KeyMap{
+	Quit: key.NewBinding(
+		key.WithKeys("ctrl+c", "q"),
+	),
+	Detail: key.NewBinding(
+		key.WithKeys("j", "k"),
+	),
 	Filter: key.NewBinding(
 		key.WithKeys("/"),
 		key.WithHelp("/", "Filter"),
@@ -50,7 +60,7 @@ var keys = KeyMap{
 		key.WithHelp("shift+s", "Create Workspaces"),
 	),
 	OpenGroup: key.NewBinding(
-		key.WithKeys("o", "enter", "l"),
+		key.WithKeys("o", "esc", "enter", "l"),
 		key.WithHelp("o/l/enter", "Open"),
 	),
 	CloseGroup: key.NewBinding(

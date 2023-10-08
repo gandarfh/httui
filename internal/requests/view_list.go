@@ -14,18 +14,19 @@ import (
 )
 
 func NewRequestList() list.Model {
-	list := list.New(nil, RequestDelegate{}, 0, 0)
+	component := list.New(nil, RequestDelegate{}, 0, 0)
 
-	list.SetShowStatusBar(false)
-	list.SetShowPagination(false)
-	list.SetFilteringEnabled(false)
-	list.SetShowFilter(false)
-	list.SetShowHelp(false)
+	component.DisableQuitKeybindings()
+	component.SetShowStatusBar(false)
+	component.SetShowPagination(false)
+	component.SetFilteringEnabled(false)
+	component.SetShowFilter(false)
+	component.SetShowHelp(false)
 
-	list.Styles.Title = titleStyle
-	list.Styles.NoItems = noItemsStyle
+	component.Styles.Title = titleStyle
+	component.Styles.NoItems = noItemsStyle
 
-	return list
+	return component
 }
 
 var (

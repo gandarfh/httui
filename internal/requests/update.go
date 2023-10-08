@@ -2,69 +2,103 @@ package requests
 
 import (
 	"fmt"
+	"log"
 
+	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/gandarfh/httui/internal/repositories"
 	"github.com/gandarfh/httui/pkg/common"
+	"github.com/gandarfh/httui/pkg/terminal"
 )
 
-func (m Model) OpenRequest() Model {
-	if len(common.ListOfRequests) == 0 {
-		return m
+func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	var (
+		cmd  tea.Cmd
+		cmds []tea.Cmd
+	)
+
+	log.Printf("[%T]: %v\n", msg, msg)
+	switch msg := msg.(type) {
+	case Result:
+		if msg.Err != nil {
+			term := terminal.NewPreview(&msg.Err)
+			return m, tea.Batch(common.SetLoading(false), term.OpenVim("Exec"))
+		}
+
+		term := terminal.NewPreview(&msg.Response)
+		return m, tea.Batch(common.SetLoading(false), term.OpenVim("Exec"))
+
+	case common.State:
+		m, cmd = m.StateActions(msg)
+		cmds = append(cmds, cmd)
+
+	case tea.KeyMsg:
+		m, cmd = m.KeyActions(msg)
+		cmds = append(cmds, cmd)
+
+	case common.Tab:
+		common.CurrTab = msg
+
+	case common.Environment:
+		m.List.Title = fmt.Sprintf("[%s]", msg.Name)
+
+	case common.List:
+		common.ListOfRequests = msg.Requests
+
+		m.List.SetItems(m.RequestOfList())
+		m.List, cmd = m.List.Update(msg)
+		cmds = append(cmds, cmd)
+
+	case spinner.TickMsg:
+		if m.loading.Value {
+			m.spinner, cmd = m.spinner.Update(msg)
+			m.List.Title = fmt.Sprintf("[%s]", common.CurrWorkspace.Name) + m.spinner.View()
+
+			return m, cmd
+		}
+
+	case common.Loading:
+		m.loading = msg
+
+		if m.loading.Value {
+			cmds = append(cmds, m.spinner.Tick)
+		}
+
+	case terminal.Finish:
+		m.List.Title = fmt.Sprintf("[%s]", common.CurrWorkspace.Name)
+		m, cmd = m.TerminalActions(msg)
+
+		cmds = append(cmds, cmd)
+
+	case common.Command:
+		m.command_active = msg.Active
+
+	case common.CommandClose:
+		m.command_active = false
+		m, cmd = m.CommandsActions(msg)
+		cmds = append(cmds, cmd)
+
+	case tea.WindowSizeMsg:
+		m.Height = msg.Height
+		m.Width = msg.Width + 1
+
+		m.List.SetHeight(m.Height/2 - 2)
+		m.List.SetWidth(m.Width / 5)
+		m.detail.Height = ((m.Height) - 9)
+		m.detail.Width = m.Width - m.List.Width() + 1
 	}
 
-	index := m.List.Index()
-	common.CurrRequest = common.ListOfRequests[index]
+	if m.command_active {
+		content, cmd := m.command_bar.Update(msg)
+		m.command_bar = content.(common.Component)
 
-	if common.CurrRequest.Type == "group" {
-		m.parentId = &common.CurrRequest.ID
-		m.previousParentId = common.CurrRequest.ParentID
+		return m, cmd
 	}
 
-	if common.CurrRequest.Type == "request" {
-		m.parentId = common.CurrRequest.ParentID
+	m.detail, cmd = m.detail.Update(msg)
+	cmds = append(cmds, cmd)
 
-		m.request_detail.Request = common.CurrRequest
-		m.request_detail.Preview = fmt.Sprintf("%s - %s", common.CurrRequest.Method, common.CurrRequest.Endpoint)
+	m.List, cmd = m.List.Update(msg)
+	cmds = append(cmds, cmd)
 
-		repositories.NewDefault().Update(&repositories.Default{
-			RequestId: common.CurrRequest.ID,
-		})
-	}
-
-	return m
-}
-
-func (m Model) BackRequest() Model {
-	if m.parentId == nil {
-		return m
-	}
-
-	if len(common.ListOfRequests) == 0 {
-		m.parentId = m.previousParentId
-		return m
-	}
-
-	group, _ := repositories.NewRequest().FindOne(*m.parentId)
-	common.CurrRequest = *group
-
-	m.parentId = common.CurrRequest.ParentID
-
-	repositories.NewDefault().Update(&repositories.Default{
-		RequestId: common.CurrRequest.ID,
-	})
-
-	return m
-}
-
-func (m Model) WindowSize(msg tea.WindowSizeMsg) Model {
-	m.Height = msg.Height
-	m.Width = msg.Width + 1
-
-	m.List.SetHeight(m.Height/2 - 2)
-	m.List.SetWidth(m.Width / 5)
-	m.request_detail.Height = ((m.Height) - 9)
-	m.request_detail.Width = m.Width - m.List.Width() + 1
-
-	return m
+	return m, tea.Batch(cmds...)
 }

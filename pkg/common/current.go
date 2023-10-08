@@ -142,9 +142,9 @@ var (
 	ListOfEnvs       []repositories.Env
 )
 
-func ListRequests(parentId uint) tea.Cmd {
+func ListRequests(parentId *uint) tea.Cmd {
 	return func() tea.Msg {
-		requests, _ := repositories.NewRequest().List(&parentId, "")
+		requests, _ := repositories.NewRequest().List(parentId, "")
 		return List{Requests: requests}
 	}
 }

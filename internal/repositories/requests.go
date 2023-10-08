@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"log"
+
 	"github.com/gandarfh/httui/external/database"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
@@ -64,15 +66,18 @@ func (repo *RequestsRepo) FindOne(id uint) (*Request, error) {
 func (repo *RequestsRepo) List(parentId *uint, filter string) ([]Request, error) {
 	requests := []Request{}
 
+	log.Println("LISTING")
 	query := repo.Sql.Model(&requests).
 		Preload("Requests").
 		Where("name LIKE ?", "%"+filter+"%")
 
+		// if filter == "" {
 	if parentId == nil {
 		query = query.Where("parent_id IS NULL")
 	} else {
 		query = query.Where("parent_id = ?", *parentId)
 	}
+	// }
 
 	if err := query.Find(&requests).Error; err != nil {
 		return requests, err
