@@ -78,6 +78,22 @@ func (m Model) KeyActions(msg tea.KeyMsg) (Model, tea.Cmd) {
 		common.CurrRequest = common.ListOfRequests[index]
 		m = m.OpenRequest()
 
+		if common.CurrRequest.Type == "group" {
+			requests, _ := repositories.NewRequest().List(&common.CurrRequest.ID, "")
+
+			group := struct {
+				Group    repositories.Request
+				Requests []repositories.Request
+			}{
+				Group:    common.CurrRequest,
+				Requests: requests,
+			}
+
+			term := terminal.NewPreview(&group)
+
+			return m, tea.Batch(term.OpenVim("Edit"))
+		}
+
 		term := terminal.NewPreview(&common.CurrRequest)
 
 		return m, tea.Batch(term.OpenVim("Edit"))

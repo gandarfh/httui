@@ -21,6 +21,24 @@ func (m Model) TerminalActions(msg terminal.Finish) (Model, tea.Cmd) {
 		return m, tea.Batch(common.ListRequests(common.CurrRequest.ParentID))
 
 	case "Edit":
+		if common.CurrRequest.Type == "group" {
+			var group = struct {
+				Group    repositories.Request
+				Requests []repositories.Request
+			}{}
+
+			msg.Preview.Execute(&group)
+
+			for _, request := range group.Requests {
+				repositories.NewRequest().Update(&request)
+			}
+
+			repositories.NewRequest().Update(&group.Group)
+			m.parentId = group.Group.ParentID
+
+			return m, tea.Batch(common.ListRequests(common.CurrRequest.ParentID))
+		}
+
 		request := repositories.Request{}
 		msg.Preview.Execute(&request)
 		request.ID = common.CurrRequest.ID

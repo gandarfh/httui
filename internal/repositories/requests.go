@@ -7,7 +7,7 @@ import (
 )
 
 type Request struct {
-	gorm.Model       `json:"-"`
+	gorm.Model                                                  // `json:"-"`
 	Type             string                                     `json:"type"` // group | request
 	Name             string                                     `json:"name"`
 	Description      string                                     `json:"description"`
