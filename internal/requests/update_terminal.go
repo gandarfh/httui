@@ -30,6 +30,10 @@ func (m Model) TerminalActions(msg terminal.Finish) (Model, tea.Cmd) {
 			msg.Preview.Execute(&group)
 
 			for _, request := range group.Requests {
+				if request.ID == 0 {
+					repositories.NewRequest().Create(&request)
+				}
+
 				repositories.NewRequest().Update(&request)
 			}
 
