@@ -32,8 +32,10 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmds = append(cmds, cmd)
 
 	case tea.KeyMsg:
-		m, cmd = m.KeyActions(msg)
-		cmds = append(cmds, cmd)
+		if !m.command_active {
+			m, cmd = m.KeyActions(msg)
+			cmds = append(cmds, cmd)
+		}
 
 	case common.Tab:
 		common.CurrTab = msg
