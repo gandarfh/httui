@@ -13,6 +13,11 @@ func (m Model) TerminalActions(msg terminal.Finish) (Model, tea.Cmd) {
 	case "Create":
 		request := repositories.Request{}
 		msg.Preview.Execute(&request)
+
+		if request.Name == "" {
+			return m, nil
+		}
+
 		repositories.NewRequest().Create(&request)
 
 		common.CurrRequest = request

@@ -38,7 +38,7 @@ func (m Model) KeyActions(msg tea.KeyMsg) (Model, tea.Cmd) {
 
 	case key.Matches(msg, m.keys.CreateWorkspace):
 		return m, tea.Batch(
-			common.OpenCommand("CREATE_WORKSPACE", ""),
+			common.OpenCommand("CREATE_WORKSPACE", "Type a name for workspace: "),
 		)
 
 	case key.Matches(msg, m.keys.Exec):
