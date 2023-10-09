@@ -15,6 +15,8 @@ func (m Model) CommandsActions(msg common.CommandClose) (Model, tea.Cmd) {
 			repositories.NewRequest().Delete(common.CurrRequest.ID)
 		}
 
+		return m, tea.Batch(common.ListRequests(common.CurrRequest.ParentID))
+
 	case "FILTER":
 		m.filter = msg.Value
 		return m, tea.Batch(common.ListRequests(nil))
