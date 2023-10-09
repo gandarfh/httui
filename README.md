@@ -4,6 +4,8 @@
 
 **httui** is an alternative to the `Postman`/`Insomnia` application designed to run in the terminal. It's a TUI (Text User Interface) based application that simplifies the process of creating, executing, and managing HTTP requests directly in the terminal. Additionally, it has native integration with VIM, making request editing even more convenient for users familiar with this text editor.
 
+https://github.com/gandarfh/httui/assets/57275106/d6865bd4-036d-4a2c-916d-7f89089b0749
+
 # Features
 
 ## 1. Variables in Multiple Environments
