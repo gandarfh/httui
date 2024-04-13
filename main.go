@@ -5,7 +5,7 @@ import (
 	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/gandarfh/httui/external/database"
+	"github.com/gandarfh/httui/internal/repositories"
 	"github.com/gandarfh/httui/internal/requests"
 )
 
@@ -17,7 +17,7 @@ func main() {
 	}
 	defer f.Close()
 
-	if err := database.SqliteConnection(); err != nil {
+	if err := repositories.SqliteConnection(); err != nil {
 		fmt.Println("Error running program:", err)
 		os.Exit(1)
 	}
