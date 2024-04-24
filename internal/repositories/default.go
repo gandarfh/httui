@@ -1,7 +1,6 @@
 package repositories
 
 import (
-	"github.com/gandarfh/httui/external/database"
 	"gorm.io/gorm"
 )
 
@@ -16,17 +15,14 @@ type Default struct {
 }
 
 func NewDefault() *DefaultsRepo {
-	db := database.Client
-	db.AutoMigrate(&Default{})
-
 	items := []Default{}
-	db.Find(&items)
+	Database.Find(&items)
 
 	if len(items) == 0 {
-		db.Create(&Default{})
+		Database.Create(&Default{})
 	}
 
-	return &DefaultsRepo{db}
+	return &DefaultsRepo{Database}
 }
 
 func (repo *DefaultsRepo) Update(value *Default) error {

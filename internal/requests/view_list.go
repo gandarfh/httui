@@ -7,8 +7,6 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/gandarfh/httui/internal/repositories"
-	"github.com/gandarfh/httui/pkg/common"
 	"github.com/gandarfh/httui/pkg/styles"
 	"github.com/gandarfh/httui/pkg/utils"
 )
@@ -30,24 +28,15 @@ func NewRequestList() list.Model {
 }
 
 var (
-	item_border = lipgloss.HiddenBorder()
-)
-
-var (
 	noItemsStyle = lipgloss.NewStyle().
 			MarginLeft(2).MarginRight(12).
 			Foreground(styles.DefaultTheme.SecondaryBorder)
 
 	titleStyle = lipgloss.NewStyle().MarginTop(1).Bold(true)
 
-	itemStyle = lipgloss.NewStyle().
-			Border(item_border).
-			BorderTop(false)
+	itemStyle = lipgloss.NewStyle().PaddingBottom(1)
 
-	selectedItemStyle = lipgloss.NewStyle().
-				Bold(true).
-				Border(item_border).
-				BorderTop(false)
+	selectedItemStyle = lipgloss.NewStyle().PaddingBottom(1).Bold(true)
 )
 
 type RequestItem struct {
@@ -79,38 +68,17 @@ func (d RequestDelegate) Render(w io.Writer, m list.Model, index int, listItem l
 	}
 
 	str := fmt.Sprintf("%s %s", prefix, utils.Truncate(i.title, i.width-10))
+	// str := fmt.Sprintf("%s %s", prefix, i.title)
 
 	if index == m.Index() {
-		if common.CurrTab == common.Tab_Requests {
-			fmt.Fprint(
-				w,
-				selectedItemStyle.
-					Foreground(styles.DefaultTheme.PrimaryText).
-					Width(i.width).Render("> "+str),
-			)
-		} else {
-			fmt.Fprint(
-				w,
-				selectedItemStyle.
-					Foreground(styles.DefaultTheme.SecondaryText).
-					Width(i.width).Render("> "+str),
-			)
-		}
+		fmt.Fprint(
+			w,
+			selectedItemStyle.
+				Foreground(styles.DefaultTheme.PrimaryText).
+				Render("> "+str),
+		)
 
 	} else {
-		fmt.Fprint(w, itemStyle.Width(i.width).Render("  "+str))
+		fmt.Fprint(w, itemStyle.Render("  "+str))
 	}
-}
-
-func (m Model) RequestOfList() []list.Item {
-	list := []list.Item{}
-	common.ListOfRequests, _ = repositories.NewRequest().List(m.parentId, m.filter)
-
-	w := (m.Width / 7)
-
-	for _, i := range common.ListOfRequests {
-		list = append(list, RequestItem{i.Name, i.Type, w})
-	}
-
-	return list
 }

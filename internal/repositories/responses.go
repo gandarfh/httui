@@ -1,7 +1,6 @@
 package repositories
 
 import (
-	"github.com/gandarfh/httui/external/database"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
@@ -26,8 +25,7 @@ type ResponsesRepo struct {
 }
 
 func NewResponse() *ResponsesRepo {
-	db := database.Client
-	db.AutoMigrate(&Response{})
+	db := Database
 
 	return &ResponsesRepo{db}
 }

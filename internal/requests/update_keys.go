@@ -1,8 +1,6 @@
 package requests
 
 import (
-	"fmt"
-
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/gandarfh/httui/internal/repositories"
@@ -13,18 +11,23 @@ import (
 func (m Model) KeyActions(msg tea.KeyMsg) (Model, tea.Cmd) {
 	switch {
 	case key.Matches(msg, m.keys.Quit):
-		return m, tea.Quit
+		return m, tea.Sequence(common.SetState(common.Exit_state), tea.Quit)
 
 	case key.Matches(msg, m.keys.Detail):
 		m = m.ShowRequestDetails(msg.String())
+		return m, m.Detail.SetRequest(m.Requests.Current)
 
 	case key.Matches(msg, m.keys.OpenGroup):
 		m = m.OpenRequest()
-		return m, tea.Batch(common.ListRequests(m.parentId))
+		m = m.ShowRequestDetails(msg.String())
+		return m, tea.Batch(
+			LoadRequestsByParentId(m.parentId),
+			m.Detail.SetRequest(m.Requests.Current),
+		)
 
 	case key.Matches(msg, m.keys.CloseGroup):
 		m = m.BackRequest()
-		return m, tea.Batch(common.ListRequests(m.previousParentId))
+		return m, tea.Batch(LoadRequestsByParentId(m.previousParentId))
 
 	case key.Matches(msg, m.keys.Filter):
 		return m, tea.Batch(
@@ -43,10 +46,10 @@ func (m Model) KeyActions(msg tea.KeyMsg) (Model, tea.Cmd) {
 
 	case key.Matches(msg, m.keys.Exec):
 		index := m.List.Index()
-		common.CurrRequest = common.ListOfRequests[index]
+		m.Requests.Current = m.Requests.List[index]
 		m = m.OpenRequest()
 
-		if common.CurrRequest.Type == "group" {
+		if m.Requests.Current.Type == "group" {
 			break
 		}
 
@@ -54,17 +57,17 @@ func (m Model) KeyActions(msg tea.KeyMsg) (Model, tea.Cmd) {
 
 	case key.Matches(msg, m.keys.Delete):
 		index := m.List.Index()
-		common.CurrRequest = common.ListOfRequests[index]
+		m.Requests.Current = m.Requests.List[index]
 
 		return m, tea.Batch(
 			common.OpenCommand("DELETE", "Type 'Y' to confirm, or any other key to cancel: "),
 		)
 
 	case key.Matches(msg, m.keys.Create):
-		parentId := common.CurrRequest.ParentID
+		parentId := m.Requests.Current.ParentID
 
-		if common.CurrRequest.Type == "group" {
-			parentId = &common.CurrRequest.ID
+		if m.Requests.Current.Type == "group" {
+			parentId = &m.Requests.Current.ID
 		}
 
 		term := terminal.NewPreview(&repositories.Request{
@@ -75,17 +78,17 @@ func (m Model) KeyActions(msg tea.KeyMsg) (Model, tea.Cmd) {
 
 	case key.Matches(msg, m.keys.Edit):
 		index := m.List.Index()
-		common.CurrRequest = common.ListOfRequests[index]
+		m.Requests.Current = m.Requests.List[index]
 		m = m.OpenRequest()
 
-		if common.CurrRequest.Type == "group" {
-			requests, _ := repositories.NewRequest().List(&common.CurrRequest.ID, "")
+		if m.Requests.Current.Type == "group" {
+			requests, _ := repositories.NewRequest().List(&m.Requests.Current.ID, "")
 
 			group := struct {
 				Group    repositories.Request
 				Requests []repositories.Request
 			}{
-				Group:    common.CurrRequest,
+				Group:    m.Requests.Current,
 				Requests: requests,
 			}
 
@@ -94,12 +97,12 @@ func (m Model) KeyActions(msg tea.KeyMsg) (Model, tea.Cmd) {
 			return m, tea.Batch(term.OpenVim("Edit"))
 		}
 
-		term := terminal.NewPreview(&common.CurrRequest)
+		term := terminal.NewPreview(&m.Requests.Current)
 
 		return m, tea.Batch(term.OpenVim("Edit"))
 
 	case key.Matches(msg, m.keys.Envs):
-		envs, _ := repositories.NewEnvs().List(common.CurrWorkspace.ID)
+		envs, _ := repositories.NewEnvs().List(m.Workspace.ID)
 
 		data := []map[string]any{}
 		for _, env := range envs {
@@ -115,12 +118,12 @@ func (m Model) KeyActions(msg tea.KeyMsg) (Model, tea.Cmd) {
 }
 
 func (m Model) ShowRequestDetails(direction string) Model {
-	size := len(common.ListOfRequests)
+	size := len(m.Requests.List)
 	if size == 0 {
 		return m
 	}
 
-	index := m.List.Cursor()
+	index := m.List.Index()
 
 	switch direction {
 	case "down", "j":
@@ -130,42 +133,36 @@ func (m Model) ShowRequestDetails(direction string) Model {
 	}
 
 	if size == index || index < 0 {
-		index = m.List.Cursor()
+		index = m.List.Index()
 	}
 
-	common.CurrRequest = common.ListOfRequests[index]
+	m.Requests.Current = m.Requests.List[index]
 
-	if common.CurrRequest.Type == "request" {
-		m.parentId = common.CurrRequest.ParentID
-
-		m.detail.Request = common.CurrRequest
-		m.detail.Preview = fmt.Sprintf("%s - %s", common.CurrRequest.Method, common.CurrRequest.Endpoint)
+	if m.Requests.Current.Type == "request" {
+		m.parentId = m.Requests.Current.ParentID
 	}
 
 	return m
 }
 
 func (m Model) OpenRequest() Model {
-	if len(common.ListOfRequests) == 0 {
+	if len(m.Requests.List) == 0 {
 		return m
 	}
 
 	index := m.List.Index()
-	common.CurrRequest = common.ListOfRequests[index]
+	m.Requests.Current = m.Requests.List[index]
 
-	if common.CurrRequest.Type == "group" {
-		m.parentId = &common.CurrRequest.ID
-		m.previousParentId = common.CurrRequest.ParentID
+	if m.Requests.Current.Type == "group" {
+		m.previousParentId = m.Requests.Current.ParentID
+		m.parentId = &m.Requests.Current.ID
 	}
 
-	if common.CurrRequest.Type == "request" {
-		m.parentId = common.CurrRequest.ParentID
-
-		m.detail.Request = common.CurrRequest
-		m.detail.Preview = fmt.Sprintf("%s - %s", common.CurrRequest.Method, common.CurrRequest.Endpoint)
+	if m.Requests.Current.Type == "request" {
+		m.parentId = m.Requests.Current.ParentID
 
 		repositories.NewDefault().Update(&repositories.Default{
-			RequestId: common.CurrRequest.ID,
+			RequestId: m.Requests.Current.ID,
 		})
 	}
 
@@ -173,22 +170,28 @@ func (m Model) OpenRequest() Model {
 }
 
 func (m Model) BackRequest() Model {
+	index := m.List.Index()
+	m.Requests.Current = m.Requests.List[index]
+
 	if m.parentId == nil {
 		return m
 	}
 
-	if len(common.ListOfRequests) == 0 {
+	if len(m.Requests.List) == 0 {
 		m.parentId = m.previousParentId
 		return m
 	}
 
-	group, _ := repositories.NewRequest().FindOne(*m.parentId)
-	common.CurrRequest = *group
-
-	m.parentId = common.CurrRequest.ParentID
+	if m.Requests.Current.ParentID != nil {
+		request, _ := repositories.NewRequest().FindOne(*m.Requests.Current.ParentID)
+		m.parentId = request.ParentID
+		m.previousParentId = request.ParentID
+	} else {
+		m.previousParentId = nil
+	}
 
 	repositories.NewDefault().Update(&repositories.Default{
-		RequestId: common.CurrRequest.ID,
+		RequestId: m.Requests.Current.ID,
 	})
 
 	return m

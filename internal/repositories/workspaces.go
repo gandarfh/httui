@@ -1,7 +1,6 @@
 package repositories
 
 import (
-	"github.com/gandarfh/httui/external/database"
 	"gorm.io/gorm"
 )
 
@@ -16,8 +15,7 @@ type WorkspacesRepo struct {
 }
 
 func NewWorkspace() *WorkspacesRepo {
-	db := database.Client
-	db.AutoMigrate(&Workspace{})
+	db := Database
 
 	return &WorkspacesRepo{db}
 }

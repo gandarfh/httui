@@ -2,14 +2,13 @@ package requests
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/gandarfh/httui/internal/repositories"
 	"github.com/gandarfh/httui/pkg/client"
-	"github.com/gandarfh/httui/pkg/common"
 	"github.com/gandarfh/httui/pkg/utils"
 	"gorm.io/datatypes"
 	"moul.io/http2curl"
@@ -23,13 +22,13 @@ type Result struct {
 
 func (m Model) Exec() tea.Cmd {
 	return func() tea.Msg {
-		request := common.CurrRequest
+		request := m.Requests.Current
 
-		url := utils.ReplaceByOperator(request.Endpoint)
+		url := utils.ReplaceByOperator(request.Endpoint, m.Workspace.ID)
 		res := client.Request(url, strings.ToUpper(request.Method))
 
 		rawbody, _ := request.Body.MarshalJSON()
-		bodystring := utils.ReplaceByOperator(string(rawbody))
+		bodystring := utils.ReplaceByOperator(string(rawbody), m.Workspace.ID)
 
 		var body any
 		if err := json.Unmarshal([]byte(bodystring), &body); err != nil {
@@ -43,7 +42,7 @@ func (m Model) Exec() tea.Cmd {
 		}
 
 		headers := utils.GetAllParentsHeaders(request.ParentID, request.Headers.Data())
-		headers = utils.ProcessParamsOperators(headers)
+		headers = utils.ProcessParamsOperators(headers, m.Workspace.ID)
 
 		for _, item := range headers {
 			for k, v := range item {
@@ -52,7 +51,7 @@ func (m Model) Exec() tea.Cmd {
 		}
 
 		params := utils.GetAllParentsParams(request.ParentID, request.QueryParams.Data())
-		params = utils.ProcessParamsOperators(params)
+		params = utils.ProcessParamsOperators(params, m.Workspace.ID)
 
 		for _, item := range params {
 			for k, v := range item {
@@ -69,7 +68,7 @@ func (m Model) Exec() tea.Cmd {
 		}
 
 		var response interface{}
-		readbody, _ := ioutil.ReadAll(data.Body)
+		readbody, _ := io.ReadAll(data.Body)
 		json.Unmarshal(readbody, &response)
 
 		result := repositories.Response{

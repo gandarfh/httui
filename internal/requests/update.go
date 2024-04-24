@@ -2,10 +2,11 @@ package requests
 
 import (
 	"fmt"
-	"log"
 
+	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/gandarfh/httui/internal/repositories"
 	"github.com/gandarfh/httui/pkg/common"
 	"github.com/gandarfh/httui/pkg/terminal"
 )
@@ -16,8 +17,18 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmds []tea.Cmd
 	)
 
-	log.Printf("[%T]: %v\n", msg, msg)
 	switch msg := msg.(type) {
+	case RequestsData:
+		m.Requests = msg
+		m.List.SetItems(m.RequestOfList())
+
+	case repositories.Workspace:
+		m.Workspace = msg
+		m.List.Title = fmt.Sprintf("[%s]", msg.Name)
+
+	case repositories.Default:
+		m.Configs = msg
+
 	case Result:
 		if msg.Err != nil {
 			term := terminal.NewPreview(&msg.Err)
@@ -37,25 +48,18 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			cmds = append(cmds, cmd)
 		}
 
-	case common.Tab:
-		common.CurrTab = msg
-
 	case common.Environment:
-		m.List.Title = fmt.Sprintf("[%s]", msg.Name)
+		m.Workspace = msg.Workspace
+		m.List.Title = fmt.Sprintf("[%s]", msg.Workspace.Name)
 
-	case common.List:
-		common.ListOfRequests = msg.Requests
-
-		m.List.SetItems(m.RequestOfList())
-		m.List, cmd = m.List.Update(msg)
+		cmd = m.Detail.SetWorkspace(repositories.Workspace(m.Workspace))
 		cmds = append(cmds, cmd)
 
 	case spinner.TickMsg:
 		if m.loading.Value {
 			m.spinner, cmd = m.spinner.Update(msg)
-			m.List.Title = fmt.Sprintf("[%s]", common.CurrWorkspace.Name) + m.spinner.View()
-
-			return m, cmd
+			m.List.Title = fmt.Sprintf("[%s]", m.Workspace.Name) + m.spinner.View()
+			cmds = append(cmds, cmd)
 		}
 
 	case common.Loading:
@@ -66,7 +70,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case terminal.Finish:
-		m.List.Title = fmt.Sprintf("[%s]", common.CurrWorkspace.Name)
+		m.List.Title = fmt.Sprintf("[%s]", m.Workspace.Name)
 		m, cmd = m.TerminalActions(msg)
 
 		cmds = append(cmds, cmd)
@@ -81,12 +85,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.WindowSizeMsg:
 		m.Height = msg.Height
-		m.Width = msg.Width + 1
+		m.Width = msg.Width
 
-		m.List.SetHeight(m.Height/2 - 2)
+		m.List.SetHeight(m.Height / 2)
 		m.List.SetWidth(m.Width / 5)
-		m.detail.Height = ((m.Height) - 9)
-		m.detail.Width = m.Width - m.List.Width() + 1
+
+		m.Detail.Width = m.Width - m.List.Width() - 2
+		m.Detail.Height = m.Height - 9
 	}
 
 	if m.command_active {
@@ -96,11 +101,22 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, cmd
 	}
 
-	m.detail, cmd = m.detail.Update(msg)
-	cmds = append(cmds, cmd)
-
 	m.List, cmd = m.List.Update(msg)
 	cmds = append(cmds, cmd)
 
+	m.Detail, cmd = m.Detail.Update(msg)
+	cmds = append(cmds, cmd)
+
 	return m, tea.Batch(cmds...)
+}
+
+func (m Model) RequestOfList() []list.Item {
+	list := []list.Item{}
+	w := m.List.Width() - 2
+
+	for _, i := range m.Requests.List {
+		list = append(list, RequestItem{i.Name, i.Type, w})
+	}
+
+	return list
 }

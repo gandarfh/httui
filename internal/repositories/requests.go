@@ -1,7 +1,6 @@
 package repositories
 
 import (
-	"github.com/gandarfh/httui/external/database"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
@@ -19,7 +18,6 @@ type Request struct {
 	ParentID         *uint                                      `json:"parent_id"`
 	ExternalId       string                                     `json:"external_id"`
 	ExternalParentId string                                     `json:"external_parent_id"`
-	Responses        []Response                                 `json:"responses" gorm:"foreignKey:RequestId;constraint:Onupdate:CASCADE;"`
 }
 
 type RequestsRepo struct {
@@ -27,8 +25,7 @@ type RequestsRepo struct {
 }
 
 func NewRequest() *RequestsRepo {
-	db := database.Client
-	db.AutoMigrate(&Request{})
+	db := Database
 
 	return &RequestsRepo{db}
 }
@@ -63,9 +60,11 @@ func (repo *RequestsRepo) FindOne(id uint) (*Request, error) {
 
 func (repo *RequestsRepo) List(parentId *uint, filter string) ([]Request, error) {
 	requests := []Request{}
-	query := repo.Sql.Model(&requests).
-		Preload("Requests").
-		Where("name LIKE ?", "%"+filter+"%")
+	query := repo.Sql.Model(&requests)
+
+	if filter != "" {
+		query.Where("name LIKE ?", "%"+filter+"%")
+	}
 
 	if filter == "" {
 		if parentId == nil {

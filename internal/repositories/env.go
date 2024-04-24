@@ -1,7 +1,6 @@
 package repositories
 
 import (
-	"github.com/gandarfh/httui/external/database"
 	"gorm.io/gorm"
 )
 
@@ -17,8 +16,7 @@ type EnvsRepo struct {
 }
 
 func NewEnvs() *EnvsRepo {
-	db := database.Client
-	db.AutoMigrate(&Env{})
+	db := Database
 
 	return &EnvsRepo{db}
 }

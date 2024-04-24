@@ -1,4 +1,4 @@
-package database
+package repositories
 
 import (
 	"log"
@@ -11,11 +11,13 @@ import (
 )
 
 var newLogger = logger.New(
-	log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
-	logger.Config{},
+	log.Default(),
+	logger.Config{
+		// LogLevel: logger.Error,
+	},
 )
 
-var Client *gorm.DB
+var Database *gorm.DB
 
 func SqliteConnection() error {
 	home, _ := os.UserHomeDir()
@@ -34,6 +36,11 @@ func SqliteConnection() error {
 		return err
 	}
 
-	Client = db
+	db.AutoMigrate(&Request{}, &Response{})
+	db.AutoMigrate(&Workspace{})
+	db.AutoMigrate(&Env{})
+	db.AutoMigrate(&Default{})
+
+	Database = db
 	return nil
 }

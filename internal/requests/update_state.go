@@ -1,11 +1,9 @@
 package requests
 
 import (
-	"fmt"
-
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/gandarfh/httui/internal/repositories"
 	"github.com/gandarfh/httui/pkg/common"
+	"github.com/gandarfh/httui/pkg/terminal"
 )
 
 func (m Model) StateActions(msg common.State) (Model, tea.Cmd) {
@@ -13,26 +11,13 @@ func (m Model) StateActions(msg common.State) (Model, tea.Cmd) {
 
 	switch msg {
 	case common.Start_state:
-		conf, _ := repositories.NewDefault().First()
-
-		request, _ := repositories.NewRequest().FindOne(conf.RequestId)
-		common.CurrRequest = *request
-
-		m.parentId = common.CurrRequest.ParentID
-
-		workspace, _ := repositories.NewWorkspace().FindOne(conf.WorkspaceId)
-		common.CurrWorkspace = workspace
-
 		return m, common.SetState(common.Loaded_state)
 
+	case common.Exit_state:
+		return m, tea.Sequence(terminal.ClearScreen())
+
 	case common.Loaded_state:
-		m.List.SetItems(m.RequestOfList())
-
-		m.detail.Request = common.CurrRequest
-		m.detail.Preview = fmt.Sprintf("%s - %s", common.CurrRequest.Method, common.CurrRequest.Endpoint)
-		m.List.Title = fmt.Sprintf("[%s]", common.CurrWorkspace.Name)
-
-		m.parentId = common.CurrRequest.ParentID
+		return m, tea.Sequence(tea.ClearScreen, tea.EnterAltScreen)
 	}
 
 	return m, nil

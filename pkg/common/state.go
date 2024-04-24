@@ -6,7 +6,7 @@ type State int
 
 const (
 	Start_state State = iota
-	Error_state
+	Exit_state
 	Loaded_state
 )
 

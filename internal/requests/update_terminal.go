@@ -3,7 +3,6 @@ package requests
 import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/gandarfh/httui/internal/repositories"
-	"github.com/gandarfh/httui/pkg/common"
 	"github.com/gandarfh/httui/pkg/terminal"
 	"gorm.io/gorm"
 )
@@ -12,7 +11,9 @@ func (m Model) TerminalActions(msg terminal.Finish) (Model, tea.Cmd) {
 	switch msg.Category {
 	case "Create":
 		request := repositories.Request{}
-		msg.Preview.Execute(&request)
+		if err := msg.Preview.Execute(&request); err != nil {
+			return m, nil
+		}
 
 		if request.Name == "" {
 			return m, nil
@@ -20,19 +21,21 @@ func (m Model) TerminalActions(msg terminal.Finish) (Model, tea.Cmd) {
 
 		repositories.NewRequest().Create(&request)
 
-		common.CurrRequest = request
-		m.parentId = common.CurrRequest.ParentID
+		m.Requests.Current = request
+		m.parentId = m.Requests.Current.ParentID
 
-		return m, tea.Batch(common.ListRequests(common.CurrRequest.ParentID))
+		return m, tea.Batch(LoadRequestsByParentId(m.parentId))
 
 	case "Edit":
-		if common.CurrRequest.Type == "group" {
+		if m.Requests.Current.Type == "group" {
 			var group = struct {
 				Group    repositories.Request
 				Requests []repositories.Request
 			}{}
 
-			msg.Preview.Execute(&group)
+			if err := msg.Preview.Execute(&group); err != nil {
+				return m, nil
+			}
 
 			for _, request := range group.Requests {
 				if request.ID == 0 {
@@ -45,25 +48,31 @@ func (m Model) TerminalActions(msg terminal.Finish) (Model, tea.Cmd) {
 			repositories.NewRequest().Update(&group.Group)
 			m.parentId = group.Group.ParentID
 
-			return m, tea.Batch(common.ListRequests(common.CurrRequest.ParentID))
+			return m, tea.Batch(LoadRequestsByParentId(m.parentId))
 		}
 
 		request := repositories.Request{}
-		msg.Preview.Execute(&request)
-		request.ID = common.CurrRequest.ID
+
+		if err := msg.Preview.Execute(&request); err != nil {
+			return m, nil
+		}
+
+		request.ID = m.Requests.Current.ID
 
 		repositories.NewRequest().Update(&request)
-		m.parentId = common.CurrRequest.ParentID
+		m.parentId = m.Requests.Current.ParentID
 
-		return m, tea.Batch(common.ListRequests(common.CurrRequest.ParentID))
+		return m, tea.Batch(LoadRequestsByParentId(m.parentId))
 
 	case "Envs":
 		data := []map[string]any{}
-		msg.Preview.Execute(&data)
+		if err := msg.Preview.Execute(&data); err != nil {
+			return m, nil
+		}
 
 		for _, item := range data {
 			env := repositories.Env{
-				WorkspaceId: common.CurrWorkspace.ID,
+				WorkspaceId: m.Workspace.ID,
 				Key:         item["key"].(string),
 				Value:       item["value"].(string),
 			}
