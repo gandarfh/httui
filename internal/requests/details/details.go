@@ -90,7 +90,6 @@ func (m Model) View() string {
 
 }
 
-// replaceStringsInJSON processa um JSON substituindo strings usando uma função fornecida.
 func replaceStringsInJSON(input string, replaceFunc func(string) string) (string, error) {
 	var data interface{}
 	err := json.Unmarshal([]byte(input), &data)
@@ -160,8 +159,8 @@ func DataToString(data interface{}, size int, workspaceId uint) string {
 		return ""
 	}
 
-	dataWithEnvValues := utils.ReplaceByOperator(string(indentedJSON), workspaceId)
-	// dataWithEnvValues := string(indentedJSON)
+	// dataWithEnvValues := utils.ReplaceByOperator(string(indentedJSON), workspaceId)
+	dataWithEnvValues := string(indentedJSON)
 
 	summariseProperties := func(s string) string {
 		// s = utils.ReplaceByOperator(s, workspaceId)

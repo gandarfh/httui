@@ -8,11 +8,7 @@ import (
 )
 
 func (m Model) Preview() string {
-
-	Preview := utils.ReplaceByOperator(
-		utils.Truncate(fmt.Sprintf("%s - %s", m.Request.Method, m.Request.Endpoint), 100),
-		m.Workspace.ID,
-	)
+	preview := utils.Truncate(fmt.Sprintf("%s - %s", m.Request.Method, m.Request.Endpoint), 100)
 
 	text := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Render(
 		lipgloss.Place(
@@ -20,7 +16,7 @@ func (m Model) Preview() string {
 			1,
 			lipgloss.Left,
 			lipgloss.Top,
-			lipgloss.NewStyle().Bold(true).Render(fmt.Sprint(" Preview: ", Preview)),
+			lipgloss.NewStyle().Bold(true).Render(fmt.Sprint(" Preview: ", preview)),
 		))
 
 	return text

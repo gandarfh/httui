@@ -106,11 +106,11 @@ func New() tea.Model {
 
 func (m Model) Init() tea.Cmd {
 	return tea.Sequence(
-		m.command_bar.Init(),
-		m.Detail.Init(),
 		LoadDefault,
 		LoadWorspace,
 		LoadRequests,
+		m.command_bar.Init(),
+		m.Detail.Init(),
 		common.SetState(common.Start_state),
 	)
 }
@@ -127,7 +127,7 @@ func (m Model) View() string {
 	)
 
 	if m.state != common.Loaded_state {
-		return "Starting..."
+		return ""
 	}
 
 	footer := ""

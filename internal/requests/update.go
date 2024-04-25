@@ -11,6 +11,8 @@ import (
 	"github.com/gandarfh/httui/pkg/terminal"
 )
 
+type UpdateRequestDefault repositories.Request
+
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var (
 		cmd  tea.Cmd
@@ -20,7 +22,18 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case RequestsData:
 		m.Requests = msg
-		m.List.SetItems(m.RequestOfList())
+
+		cmds = append(cmds, m.List.SetItems(m.RequestOfList()))
+
+		index := m.List.Index()
+
+		if len(m.Requests.List) <= index {
+			index = 0
+		}
+
+		m.Requests.Current = m.Requests.List[index]
+		cmds = append(cmds, m.Detail.SetRequest(m.Requests.Current))
+		cmds = append(cmds, func() tea.Msg { return UpdateRequestDefault(m.Requests.Current) })
 
 	case repositories.Workspace:
 		m.Workspace = msg
@@ -28,6 +41,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case repositories.Default:
 		m.Configs = msg
+
+	case UpdateRequestDefault:
+		if m.Requests.Current.ID == msg.ID {
+			repositories.NewDefault().Update(&repositories.Default{
+				RequestId: m.Requests.Current.ID,
+			})
+		}
 
 	case Result:
 		if msg.Err != nil {

@@ -7,7 +7,6 @@ import (
 
 type Response struct {
 	RequestId  uint                                    `json:"request_id"`
-	ExternalId string                                  `json:"external_id"`
 	Method     string                                  `json:"method"`
 	Endpoint   string                                  `json:"endpoint"`
 	Url        string                                  `json:"url"`

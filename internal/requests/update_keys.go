@@ -1,6 +1,8 @@
 package requests
 
 import (
+	"time"
+
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/gandarfh/httui/internal/repositories"
@@ -15,14 +17,17 @@ func (m Model) KeyActions(msg tea.KeyMsg) (Model, tea.Cmd) {
 
 	case key.Matches(msg, m.keys.Detail):
 		m = m.ShowRequestDetails(msg.String())
-		return m, m.Detail.SetRequest(m.Requests.Current)
+		return m, tea.Batch(
+			m.Detail.SetRequest(m.Requests.Current),
+			tea.Tick(time.Second, func(_ time.Time) tea.Msg {
+				return UpdateRequestDefault(m.Requests.Current)
+			}),
+		)
 
 	case key.Matches(msg, m.keys.OpenGroup):
 		m = m.OpenRequest()
-		m = m.ShowRequestDetails(msg.String())
 		return m, tea.Batch(
 			LoadRequestsByParentId(m.parentId),
-			m.Detail.SetRequest(m.Requests.Current),
 		)
 
 	case key.Matches(msg, m.keys.CloseGroup):
@@ -153,6 +158,10 @@ func (m Model) OpenRequest() Model {
 	index := m.List.Index()
 	m.Requests.Current = m.Requests.List[index]
 
+	repositories.NewDefault().Update(&repositories.Default{
+		RequestId: m.Requests.Current.ID,
+	})
+
 	if m.Requests.Current.Type == "group" {
 		m.previousParentId = m.Requests.Current.ParentID
 		m.parentId = &m.Requests.Current.ID
@@ -160,10 +169,6 @@ func (m Model) OpenRequest() Model {
 
 	if m.Requests.Current.Type == "request" {
 		m.parentId = m.Requests.Current.ParentID
-
-		repositories.NewDefault().Update(&repositories.Default{
-			RequestId: m.Requests.Current.ID,
-		})
 	}
 
 	return m
@@ -172,6 +177,10 @@ func (m Model) OpenRequest() Model {
 func (m Model) BackRequest() Model {
 	index := m.List.Index()
 	m.Requests.Current = m.Requests.List[index]
+
+	repositories.NewDefault().Update(&repositories.Default{
+		RequestId: m.Requests.Current.ID,
+	})
 
 	if m.parentId == nil {
 		return m
@@ -189,10 +198,6 @@ func (m Model) BackRequest() Model {
 	} else {
 		m.previousParentId = nil
 	}
-
-	repositories.NewDefault().Update(&repositories.Default{
-		RequestId: m.Requests.Current.ID,
-	})
 
 	return m
 }

@@ -6,18 +6,16 @@ import (
 )
 
 type Request struct {
-	gorm.Model                                                  // `json:"-"`
-	Type             string                                     `json:"type"` // group | request
-	Name             string                                     `json:"name"`
-	Description      string                                     `json:"description"`
-	Method           string                                     `json:"method"`
-	Endpoint         string                                     `json:"endpoint"`
-	QueryParams      datatypes.JSONType[[]map[string]string]    `json:"query_params"`
-	Headers          datatypes.JSONType[[]map[string]string]    `json:"headers"`
-	Body             datatypes.JSONType[map[string]interface{}] `json:"body"`
-	ParentID         *uint                                      `json:"parent_id"`
-	ExternalId       string                                     `json:"external_id"`
-	ExternalParentId string                                     `json:"external_parent_id"`
+	gorm.Model                                             // `json:"-"`
+	Type        string                                     `json:"type"` // group | request
+	Name        string                                     `json:"name"`
+	Description string                                     `json:"description"`
+	Method      string                                     `json:"method"`
+	Endpoint    string                                     `json:"endpoint"`
+	QueryParams datatypes.JSONType[[]map[string]string]    `json:"query_params"`
+	Headers     datatypes.JSONType[[]map[string]string]    `json:"headers"`
+	Body        datatypes.JSONType[map[string]interface{}] `json:"body"`
+	ParentID    *uint                                      `json:"parent_id"`
 }
 
 type RequestsRepo struct {
