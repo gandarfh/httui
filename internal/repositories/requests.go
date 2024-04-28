@@ -37,9 +37,19 @@ func (repo *RequestsRepo) Create(value *Request) error {
 }
 
 func (repo *RequestsRepo) Update(value *Request) error {
-	if err := repo.Sql.Model(&Request{}).
-		Where("id = ?", value.ID).
-		Updates(value).Error; err != nil {
+	updateMap := map[string]interface{}{
+		"Type":        value.Type,
+		"Name":        value.Name,
+		"Description": value.Description,
+		"Method":      value.Method,
+		"Endpoint":    value.Endpoint,
+		"QueryParams": value.QueryParams,
+		"Headers":     value.Headers,
+		"Body":        value.Body,
+		"ParentID":    value.ParentID,
+	}
+
+	if err := repo.Sql.Model(&Request{}).Where("id = ?", value.ID).Updates(updateMap).Error; err != nil {
 		return err
 	}
 

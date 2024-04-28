@@ -60,7 +60,7 @@ func (m Model) TerminalActions(msg terminal.Finish) (Model, tea.Cmd) {
 		request.ID = m.Requests.Current.ID
 
 		repositories.NewRequest().Update(&request)
-		m.parentId = m.Requests.Current.ParentID
+		m.parentId = request.ParentID
 
 		return m, tea.Batch(LoadRequestsByParentId(m.parentId))
 
