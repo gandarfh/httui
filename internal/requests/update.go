@@ -25,15 +25,17 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		cmds = append(cmds, m.List.SetItems(m.RequestOfList()))
 
-		index := m.List.Index()
+		if len(m.Requests.List) > 0 {
+			index := m.List.Index()
 
-		if len(m.Requests.List) <= index {
-			index = 0
+			if len(m.Requests.List) <= index {
+				index = 0
+			}
+
+			m.Requests.Current = m.Requests.List[index]
+			cmds = append(cmds, m.Detail.SetRequest(m.Requests.Current))
+			cmds = append(cmds, func() tea.Msg { return UpdateRequestDefault(m.Requests.Current) })
 		}
-
-		m.Requests.Current = m.Requests.List[index]
-		cmds = append(cmds, m.Detail.SetRequest(m.Requests.Current))
-		cmds = append(cmds, func() tea.Msg { return UpdateRequestDefault(m.Requests.Current) })
 
 	case repositories.Workspace:
 		m.Workspace = msg
