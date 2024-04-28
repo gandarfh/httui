@@ -50,6 +50,10 @@ func (m Model) KeyActions(msg tea.KeyMsg) (Model, tea.Cmd) {
 		)
 
 	case key.Matches(msg, m.keys.Exec):
+		if len(m.Requests.List) == 0 {
+			return m, nil
+		}
+
 		index := m.List.Index()
 		m.Requests.Current = m.Requests.List[index]
 		m = m.OpenRequest()
@@ -61,6 +65,10 @@ func (m Model) KeyActions(msg tea.KeyMsg) (Model, tea.Cmd) {
 		return m, tea.Batch(common.SetLoading(true, "Loading..."), m.Exec())
 
 	case key.Matches(msg, m.keys.Delete):
+		if len(m.Requests.List) == 0 {
+			return m, nil
+		}
+
 		index := m.List.Index()
 		m.Requests.Current = m.Requests.List[index]
 
@@ -69,19 +77,17 @@ func (m Model) KeyActions(msg tea.KeyMsg) (Model, tea.Cmd) {
 		)
 
 	case key.Matches(msg, m.keys.Create):
-		parentId := m.Requests.Current.ParentID
-
-		if m.Requests.Current.Type == "group" {
-			parentId = &m.Requests.Current.ID
-		}
-
 		term := terminal.NewPreview(&repositories.Request{
-			ParentID: parentId,
+			ParentID: m.parentId,
 		})
 
 		return m, tea.Batch(term.OpenVim("Create"))
 
 	case key.Matches(msg, m.keys.Edit):
+		if len(m.Requests.List) == 0 {
+			return m, nil
+		}
+
 		index := m.List.Index()
 		m.Requests.Current = m.Requests.List[index]
 		m = m.OpenRequest()
@@ -175,12 +181,14 @@ func (m Model) OpenRequest() Model {
 }
 
 func (m Model) BackRequest() Model {
-	index := m.List.Index()
-	m.Requests.Current = m.Requests.List[index]
+	if len(m.Requests.List) > 0 {
+		index := m.List.Index()
+		m.Requests.Current = m.Requests.List[index]
 
-	repositories.NewDefault().Update(&repositories.Default{
-		RequestId: m.Requests.Current.ID,
-	})
+		repositories.NewDefault().Update(&repositories.Default{
+			RequestId: m.Requests.Current.ID,
+		})
+	}
 
 	if m.parentId == nil {
 		return m
