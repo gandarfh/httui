@@ -8,20 +8,23 @@ import (
 )
 
 func (m Model) Body() string {
+	bodyWidth := m.Width / 3
+	maxTextValueSize := bodyWidth / 3
 
-	bodyrenderer, _ := glamour.NewTermRenderer(
+	renderTerm, _ := glamour.NewTermRenderer(
 		glamour.WithStyles(styleConfig),
-		glamour.WithWordWrap(m.Width-m.Width/3-2),
+		glamour.WithWordWrap(bodyWidth),
 	)
 
 	rawbody := m.Request.Body.Data()
-	body, _ := bodyrenderer.Render("```json\n" + DataToString(rawbody, 20, m.Workspace.ID) + "\n```")
+	jsonString := DataToString(rawbody, maxTextValueSize, m.Height-m.Height/4)
+	bodyJson, _ := renderTerm.Render("```json\n" + jsonString + "\n  ```")
 
-	body_box := lipgloss.JoinVertical(
+	content := lipgloss.JoinVertical(
 		lipgloss.Left,
 		lipgloss.NewStyle().Bold(true).Render(fmt.Sprint(" Bodys:")),
-		body,
+		bodyJson,
 	)
 
-	return body_box
+	return content
 }

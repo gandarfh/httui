@@ -1,13 +1,12 @@
 package details
 
 import (
-	"encoding/json"
-
+	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/glamour"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/gandarfh/httui/internal/repositories"
-	"github.com/gandarfh/httui/pkg/utils"
+	"github.com/gandarfh/httui/pkg/common"
 )
 
 var (
@@ -19,6 +18,9 @@ var (
 type Model struct {
 	Width     int
 	Height    int
+	bodyVP    viewport.Model
+	headerVP  viewport.Model
+	paramsVP  viewport.Model
 	Request   repositories.Request
 	Workspace repositories.Workspace
 }
@@ -27,15 +29,30 @@ func New() Model {
 	return Model{}
 }
 
-func (m Model) SetWorkspace(w repositories.Workspace) tea.Cmd {
+func (m *Model) SetWorkspace(w repositories.Workspace) tea.Cmd {
 	return func() tea.Msg {
 		return w
 	}
 }
 
-func (m Model) SetRequest(r repositories.Request) tea.Cmd {
+func (m *Model) SetRequest(r repositories.Request) tea.Cmd {
 	return func() tea.Msg {
 		return r
+	}
+}
+
+type Width int
+type Height int
+
+func (m *Model) SetWidth(w int) tea.Cmd {
+	return func() tea.Msg {
+		return Width(w)
+	}
+}
+
+func (m *Model) SetHeight(h int) tea.Cmd {
+	return func() tea.Msg {
+		return Height(h)
 	}
 }
 
@@ -45,11 +62,18 @@ func (m Model) Init() tea.Cmd {
 
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	var (
-		// cmd  tea.Cmd
+		cmd  tea.Cmd
 		cmds []tea.Cmd
 	)
 
 	switch msg := msg.(type) {
+	case common.State:
+		if msg == common.Start_state {
+			m.bodyVP = viewport.New(m.Width-m.Width/3-4, m.Height)
+			m.headerVP = viewport.New(m.Width/3-2, m.Height/2-2)
+			m.paramsVP = viewport.New(m.Width/3-2, m.Height/2-2)
+		}
+
 	case repositories.Request:
 		m.Request = msg
 
@@ -57,26 +81,39 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		m.Workspace = msg
 	}
 
+	m.bodyVP, cmd = m.bodyVP.Update(msg)
+	cmds = append(cmds, cmd)
+
+	m.headerVP, cmd = m.headerVP.Update(msg)
+	cmds = append(cmds, cmd)
+
+	m.paramsVP, cmd = m.paramsVP.Update(msg)
+	cmds = append(cmds, cmd)
+
 	return m, tea.Batch(cmds...)
 }
 
 func (m Model) View() string {
-	params_box := lipgloss.
+	m.bodyVP.SetContent(m.Body())
+	m.headerVP.SetContent(m.Headers())
+	m.paramsVP.SetContent(m.Params())
+
+	paramsContent := lipgloss.
 		NewStyle().
 		Height(m.Height).
 		Width(m.Width / 3).
 		Render(lipgloss.JoinVertical(
 			lipgloss.Left,
-			m.Params(),
-			lipgloss.NewStyle().Width(m.Width/3).Border(lipgloss.NormalBorder(), true, false, false, false).String(),
-			m.Headers(),
+			m.paramsVP.View(),
+			lipgloss.NewStyle().Width(m.Width/3).Border(lipgloss.NormalBorder(), false).BorderBottom(true).String(),
+			m.headerVP.View(),
 		))
 
 	content_row := lipgloss.NewStyle().Width(m.Width).Height(m.Height).Border(lipgloss.RoundedBorder()).Render(lipgloss.JoinHorizontal(
 		lipgloss.Left,
-		m.Body(),
-		lipgloss.NewStyle().Height(m.Height).Width(1).Border(lipgloss.NormalBorder(), false, true, false, false).String(),
-		params_box,
+		m.bodyVP.View(),
+		lipgloss.NewStyle().Height(m.Height).Width(3).Border(lipgloss.NormalBorder(), false).BorderRight(true).String(),
+		paramsContent,
 	))
 
 	container := lipgloss.NewStyle().Padding(0, 1).Render(lipgloss.JoinVertical(
@@ -87,90 +124,4 @@ func (m Model) View() string {
 	))
 
 	return container
-
-}
-
-func replaceStringsInJSON(input string, replaceFunc func(string) string) (string, error) {
-	var data interface{}
-	err := json.Unmarshal([]byte(input), &data)
-	if err != nil {
-		return "", err
-	}
-
-	data = modifyData(data, replaceFunc)
-
-	result, err := json.MarshalIndent(data, "", "  ")
-	if err != nil {
-		return "", err
-	}
-
-	return string(result), nil
-}
-
-func modifyData(value interface{}, replaceFunc func(string) string) interface{} {
-	switch v := value.(type) {
-	case map[string]interface{}:
-		if len(v) > 7 {
-			v = limitMapSize(v, 7)
-		}
-		return processMap(v, replaceFunc)
-	case []interface{}:
-		if len(v) > 3 {
-			v = v[:3]
-		}
-		return processSlice(v, replaceFunc)
-	case string:
-		return replaceFunc(v)
-	default:
-		return v
-	}
-}
-
-func limitMapSize(m map[string]interface{}, max int) map[string]interface{} {
-	newMap := make(map[string]interface{})
-	count := 0
-	for key, value := range m {
-		if count >= max {
-			break
-		}
-		newMap[key] = value
-		count++
-	}
-	return newMap
-}
-
-func processMap(m map[string]interface{}, replaceFunc func(string) string) map[string]interface{} {
-	for key, val := range m {
-		m[key] = modifyData(val, replaceFunc)
-	}
-	return m
-}
-
-func processSlice(s []interface{}, replaceFunc func(string) string) []interface{} {
-	for i, val := range s {
-		s[i] = modifyData(val, replaceFunc)
-	}
-	return s
-}
-
-func DataToString(data interface{}, size int, workspaceId uint) string {
-	indentedJSON, err := json.MarshalIndent(data, "", "  ")
-	if err != nil {
-		return ""
-	}
-
-	// dataWithEnvValues := utils.ReplaceByOperator(string(indentedJSON), workspaceId)
-	dataWithEnvValues := string(indentedJSON)
-
-	summariseProperties := func(s string) string {
-		// s = utils.ReplaceByOperator(s, workspaceId)
-		return utils.Truncate(s, size)
-	}
-
-	value, _ := replaceStringsInJSON(
-		dataWithEnvValues,
-		summariseProperties,
-	)
-
-	return value
 }

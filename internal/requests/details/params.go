@@ -9,15 +9,20 @@ import (
 )
 
 func (m Model) Params() string {
+	paramsWidth := m.Width/3 - 2
+	maxTextValueSize := paramsWidth / 4
+
 	paramrenderer, _ := glamour.NewTermRenderer(
 		glamour.WithStyles(styleConfig),
-		glamour.WithWordWrap(m.Width/3-10),
+		glamour.WithWordWrap(paramsWidth),
 	)
 
 	rawparams := utils.GetAllParentsParams(m.Request.ParentID, m.Request.QueryParams.Data())
-	query, _ := paramrenderer.Render("```json\n" + DataToString(rawparams, 10, m.Workspace.ID) + "\n  ```")
+	jsonString := DataToString(rawparams, maxTextValueSize, m.Height/3-2)
 
-	query_box := lipgloss.NewStyle().Height(m.Height / 2).Render(lipgloss.JoinVertical(
+	query, _ := paramrenderer.Render("```json\n" + jsonString + "\n  ```")
+
+	query_box := lipgloss.NewStyle().Height(m.Height/2 - 2).Render(lipgloss.JoinVertical(
 		lipgloss.Left,
 		lipgloss.NewStyle().Bold(true).Render(fmt.Sprint(" Params:")),
 		query,

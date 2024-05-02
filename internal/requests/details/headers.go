@@ -9,19 +9,24 @@ import (
 )
 
 func (m Model) Headers() string {
+	headerWidth := m.Width/3 - 2
+	maxTextValueSize := headerWidth / 4
+
 	paramrenderer, _ := glamour.NewTermRenderer(
 		glamour.WithStyles(styleConfig),
-		glamour.WithWordWrap(m.Width/3-10),
+		glamour.WithWordWrap(headerWidth),
 	)
 
 	rawheader := utils.GetAllParentsHeaders(m.Request.ParentID, m.Request.Headers.Data())
-	header, _ := paramrenderer.Render("```json\n" + DataToString(rawheader, 10, m.Workspace.ID) + "\n  ```")
+	jsonString := DataToString(rawheader, maxTextValueSize, m.Height/3-2)
 
-	header_box := lipgloss.JoinVertical(
+	header, _ := paramrenderer.Render("```json\n" + jsonString + "\n  ```")
+
+	header_box := lipgloss.NewStyle().PaddingTop(1).Height(m.Height/2 - 2).Render(lipgloss.JoinVertical(
 		lipgloss.Left,
 		lipgloss.NewStyle().Bold(true).Render(fmt.Sprint(" Headers:")),
 		header,
-	)
+	))
 
 	return header_box
 }
