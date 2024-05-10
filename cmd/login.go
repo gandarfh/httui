@@ -8,7 +8,7 @@ import (
 func loginCmd() *cobra.Command {
 	init := &cobra.Command{
 		Use:     "login",
-		Short:   "Login in httui plataform.",
+		Short:   "Login in httui platform.",
 		Long:    "Login to sync your httui account in with your terminal.",
 		Example: "httui login",
 		Aliases: []string{"login"},

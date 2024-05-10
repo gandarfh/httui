@@ -1,6 +1,9 @@
 package cmd
 
 import (
+	"log"
+
+	"github.com/gandarfh/httui/internal/config"
 	"github.com/gandarfh/httui/internal/tui"
 	"github.com/spf13/cobra"
 )
@@ -23,5 +26,10 @@ func Execute() error {
 }
 
 func init() {
+	err := config.ParseConfig()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	rootCmd.AddCommand(loginCmd())
 }

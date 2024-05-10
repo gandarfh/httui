@@ -5,7 +5,8 @@ import (
 )
 
 type KeyMap struct {
-	Quit key.Binding
+	Quit     key.Binding
+	OpenPage key.Binding
 }
 
 func (k KeyMap) ShortHelp() []key.Binding {
@@ -19,5 +20,9 @@ func (k KeyMap) FullHelp() [][]key.Binding {
 var keys = KeyMap{
 	Quit: key.NewBinding(
 		key.WithKeys("ctrl+c", "q"),
+	),
+
+	OpenPage: key.NewBinding(
+		key.WithKeys("enter"),
 	),
 }
