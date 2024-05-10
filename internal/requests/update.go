@@ -6,12 +6,12 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/gandarfh/httui/internal/repositories"
+	"github.com/gandarfh/httui/internal/repositories/offline"
 	"github.com/gandarfh/httui/pkg/common"
 	"github.com/gandarfh/httui/pkg/terminal"
 )
 
-type UpdateRequestDefault repositories.Request
+type UpdateRequestDefault offline.Request
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var (
@@ -37,16 +37,16 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			cmds = append(cmds, func() tea.Msg { return UpdateRequestDefault(m.Requests.Current) })
 		}
 
-	case repositories.Workspace:
+	case offline.Workspace:
 		m.Workspace = msg
 		m.List.Title = fmt.Sprintf("[%s]", msg.Name)
 
-	case repositories.Default:
+	case offline.Default:
 		m.Configs = msg
 
 	case UpdateRequestDefault:
 		if m.Requests.Current.ID == msg.ID {
-			repositories.NewDefault().Update(&repositories.Default{
+			offline.NewDefault().Update(&offline.Default{
 				RequestId: m.Requests.Current.ID,
 			})
 		}
@@ -74,7 +74,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.Workspace = msg.Workspace
 		m.List.Title = fmt.Sprintf("[%s]", msg.Workspace.Name)
 
-		cmd = m.Detail.SetWorkspace(repositories.Workspace(m.Workspace))
+		cmd = m.Detail.SetWorkspace(offline.Workspace(m.Workspace))
 		cmds = append(cmds, cmd)
 
 	case spinner.TickMsg:

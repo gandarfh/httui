@@ -1,4 +1,4 @@
-package repositories
+package offline
 
 import (
 	"gorm.io/datatypes"

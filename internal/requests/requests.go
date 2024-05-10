@@ -7,32 +7,32 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/gandarfh/httui/internal/command"
-	"github.com/gandarfh/httui/internal/repositories"
+	"github.com/gandarfh/httui/internal/repositories/offline"
 	"github.com/gandarfh/httui/internal/requests/details"
 	"github.com/gandarfh/httui/pkg/common"
 	"github.com/gandarfh/httui/pkg/styles"
 )
 
 func LoadDefault() tea.Msg {
-	config, _ := repositories.NewDefault().First()
+	config, _ := offline.NewDefault().First()
 	return *config
 }
 
 func LoadWorspace() tea.Msg {
-	config, _ := repositories.NewDefault().First()
-	workspace, _ := repositories.NewWorkspace().FindOne(config.WorkspaceId)
+	config, _ := offline.NewDefault().First()
+	workspace, _ := offline.NewWorkspace().FindOne(config.WorkspaceId)
 	return workspace
 }
 
 type RequestsData struct {
-	List    []repositories.Request
-	Current repositories.Request
+	List    []offline.Request
+	Current offline.Request
 }
 
 func LoadRequests() tea.Msg {
-	config, _ := repositories.NewDefault().First()
-	request, _ := repositories.NewRequest().FindOne(config.RequestId)
-	requests, _ := repositories.NewRequest().List(request.ParentID, "")
+	config, _ := offline.NewDefault().First()
+	request, _ := offline.NewRequest().FindOne(config.RequestId)
+	requests, _ := offline.NewRequest().List(request.ParentID, "")
 
 	return RequestsData{
 		Current: *request,
@@ -42,7 +42,7 @@ func LoadRequests() tea.Msg {
 
 func LoadRequestsByParentId(parentId *uint) tea.Cmd {
 	return func() tea.Msg {
-		requests, _ := repositories.NewRequest().List(parentId, "")
+		requests, _ := offline.NewRequest().List(parentId, "")
 		return RequestsData{
 			List: requests,
 		}
@@ -51,7 +51,7 @@ func LoadRequestsByParentId(parentId *uint) tea.Cmd {
 
 func LoadRequestsByFilter(filter string) tea.Cmd {
 	return func() tea.Msg {
-		requests, _ := repositories.NewRequest().List(nil, filter)
+		requests, _ := offline.NewRequest().List(nil, filter)
 		return RequestsData{
 			List: requests,
 		}
@@ -75,8 +75,8 @@ type Model struct {
 	Width            int
 	Height           int
 	Requests         RequestsData
-	Configs          repositories.Default
-	Workspace        repositories.Workspace
+	Configs          offline.Default
+	Workspace        offline.Workspace
 }
 
 var (

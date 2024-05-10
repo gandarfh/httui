@@ -2,7 +2,7 @@ package requests
 
 import (
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/gandarfh/httui/internal/repositories"
+	"github.com/gandarfh/httui/internal/repositories/offline"
 	"github.com/gandarfh/httui/pkg/terminal"
 	"gorm.io/gorm"
 )
@@ -10,7 +10,7 @@ import (
 func (m Model) TerminalActions(msg terminal.Finish) (Model, tea.Cmd) {
 	switch msg.Category {
 	case "Create":
-		request := repositories.Request{}
+		request := offline.Request{}
 		if err := msg.Preview.Execute(&request); err != nil {
 			return m, nil
 		}
@@ -19,7 +19,7 @@ func (m Model) TerminalActions(msg terminal.Finish) (Model, tea.Cmd) {
 			return m, nil
 		}
 
-		repositories.NewRequest().Create(&request)
+		offline.NewRequest().Create(&request)
 
 		m.Requests.Current = request
 		m.parentId = m.Requests.Current.ParentID
@@ -29,8 +29,8 @@ func (m Model) TerminalActions(msg terminal.Finish) (Model, tea.Cmd) {
 	case "Edit":
 		if m.Requests.Current.Type == "group" {
 			var group = struct {
-				Group    repositories.Request
-				Requests []repositories.Request
+				Group    offline.Request
+				Requests []offline.Request
 			}{}
 
 			if err := msg.Preview.Execute(&group); err != nil {
@@ -39,19 +39,19 @@ func (m Model) TerminalActions(msg terminal.Finish) (Model, tea.Cmd) {
 
 			for _, request := range group.Requests {
 				if request.ID == 0 {
-					repositories.NewRequest().Create(&request)
+					offline.NewRequest().Create(&request)
 				}
 
-				repositories.NewRequest().Update(&request)
+				offline.NewRequest().Update(&request)
 			}
 
-			repositories.NewRequest().Update(&group.Group)
+			offline.NewRequest().Update(&group.Group)
 			m.parentId = group.Group.ParentID
 
 			return m, tea.Batch(LoadRequestsByParentId(m.parentId))
 		}
 
-		request := repositories.Request{}
+		request := offline.Request{}
 
 		if err := msg.Preview.Execute(&request); err != nil {
 			return m, nil
@@ -59,7 +59,7 @@ func (m Model) TerminalActions(msg terminal.Finish) (Model, tea.Cmd) {
 
 		request.ID = m.Requests.Current.ID
 
-		repositories.NewRequest().Update(&request)
+		offline.NewRequest().Update(&request)
 		m.parentId = request.ParentID
 
 		return m, tea.Batch(LoadRequestsByParentId(m.parentId))
@@ -71,7 +71,7 @@ func (m Model) TerminalActions(msg terminal.Finish) (Model, tea.Cmd) {
 		}
 
 		for _, item := range data {
-			env := repositories.Env{
+			env := offline.Env{
 				WorkspaceId: m.Workspace.ID,
 				Key:         item["key"].(string),
 				Value:       item["value"].(string),
@@ -81,9 +81,9 @@ func (m Model) TerminalActions(msg terminal.Finish) (Model, tea.Cmd) {
 				env.Model = gorm.Model{
 					ID: uint(item["id"].(float64)),
 				}
-				repositories.NewEnvs().Update(&env)
+				offline.NewEnvs().Update(&env)
 			} else {
-				repositories.NewEnvs().Create(&env)
+				offline.NewEnvs().Create(&env)
 			}
 		}
 	}

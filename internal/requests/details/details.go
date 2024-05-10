@@ -5,7 +5,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/glamour"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/gandarfh/httui/internal/repositories"
+	"github.com/gandarfh/httui/internal/repositories/offline"
 	"github.com/gandarfh/httui/pkg/common"
 )
 
@@ -21,21 +21,21 @@ type Model struct {
 	bodyVP    viewport.Model
 	headerVP  viewport.Model
 	paramsVP  viewport.Model
-	Request   repositories.Request
-	Workspace repositories.Workspace
+	Request   offline.Request
+	Workspace offline.Workspace
 }
 
 func New() Model {
 	return Model{}
 }
 
-func (m *Model) SetWorkspace(w repositories.Workspace) tea.Cmd {
+func (m *Model) SetWorkspace(w offline.Workspace) tea.Cmd {
 	return func() tea.Msg {
 		return w
 	}
 }
 
-func (m *Model) SetRequest(r repositories.Request) tea.Cmd {
+func (m *Model) SetRequest(r offline.Request) tea.Cmd {
 	return func() tea.Msg {
 		return r
 	}
@@ -74,10 +74,10 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			m.paramsVP = viewport.New(m.Width/3-2, m.Height/2-2)
 		}
 
-	case repositories.Request:
+	case offline.Request:
 		m.Request = msg
 
-	case repositories.Workspace:
+	case offline.Workspace:
 		m.Workspace = msg
 	}
 

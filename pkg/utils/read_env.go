@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/gandarfh/httui/internal/repositories"
+	"github.com/gandarfh/httui/internal/repositories/offline"
 )
 
 var re_env = regexp.MustCompile(`{{ _.\w* }}`)
@@ -15,8 +15,8 @@ var re_response_fields = regexp.MustCompile(`'\w+(\.\w+)*'`)
 
 // {% response 'field' '1' %}
 
-func ReadEnv(key string, workspaceId uint) (repositories.Env, error) {
-	repo := repositories.NewEnvs()
+func ReadEnv(key string, workspaceId uint) (offline.Env, error) {
+	repo := offline.NewEnvs()
 
 	key = strings.Replace(key, "{{ _.", "", 1)
 	key = strings.Replace(key, " }}", "", 1)
@@ -52,7 +52,7 @@ func ReadResponse(key string) (string, error) {
 
 	fields := strings.Split(infos[0], ".")
 
-	repo := repositories.NewResponse()
+	repo := offline.NewResponse()
 	response, err := repo.FindOne(reqId)
 
 	data := map[string]interface{}{}

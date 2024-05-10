@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/gandarfh/httui/internal/repositories"
+	"github.com/gandarfh/httui/internal/repositories/offline"
 	"github.com/gandarfh/httui/pkg/client"
 	"github.com/gandarfh/httui/pkg/utils"
 	"gorm.io/datatypes"
@@ -71,7 +71,7 @@ func (m Model) Exec() tea.Cmd {
 		readbody, _ := io.ReadAll(data.Body)
 		json.Unmarshal(readbody, &response)
 
-		result := repositories.Response{
+		result := offline.Response{
 			RequestId: request.ID,
 			Url:       url,
 			Method:    request.Method,
@@ -83,7 +83,7 @@ func (m Model) Exec() tea.Cmd {
 			Curl:      Curl(data.Request),
 		}
 
-		repositories.NewResponse().Create(&result)
+		offline.NewResponse().Create(&result)
 
 		return Result{
 			Response: result,

@@ -5,18 +5,19 @@ import (
 	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/gandarfh/httui/internal/config"
 	"github.com/gandarfh/httui/internal/login"
-	"github.com/gandarfh/httui/internal/repositories"
+	"github.com/gandarfh/httui/internal/repositories/offline"
 	"github.com/gandarfh/httui/internal/requests"
 )
 
 func init() {
-	if err := repositories.SqliteConnection(); err != nil {
+	if err := offline.SqliteConnection(); err != nil {
 		fmt.Println("Error running program:", err)
 		os.Exit(1)
 	}
 
-	if false {
+	if config.Config.Settings.Logging {
 		f, err := tea.LogToFile("debug.log", "debug")
 		if err != nil {
 			fmt.Println("fatal:", err)

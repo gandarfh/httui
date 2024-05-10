@@ -5,7 +5,7 @@ import (
 
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/gandarfh/httui/internal/repositories"
+	"github.com/gandarfh/httui/internal/repositories/offline"
 	"github.com/gandarfh/httui/pkg/common"
 	"github.com/gandarfh/httui/pkg/terminal"
 )
@@ -77,7 +77,7 @@ func (m Model) KeyActions(msg tea.KeyMsg) (Model, tea.Cmd) {
 		)
 
 	case key.Matches(msg, m.keys.Create):
-		term := terminal.NewPreview(&repositories.Request{
+		term := terminal.NewPreview(&offline.Request{
 			ParentID: m.parentId,
 		})
 
@@ -93,11 +93,11 @@ func (m Model) KeyActions(msg tea.KeyMsg) (Model, tea.Cmd) {
 		m = m.OpenRequest()
 
 		if m.Requests.Current.Type == "group" {
-			requests, _ := repositories.NewRequest().List(&m.Requests.Current.ID, "")
+			requests, _ := offline.NewRequest().List(&m.Requests.Current.ID, "")
 
 			group := struct {
-				Group    repositories.Request
-				Requests []repositories.Request
+				Group    offline.Request
+				Requests []offline.Request
 			}{
 				Group:    m.Requests.Current,
 				Requests: requests,
@@ -113,7 +113,7 @@ func (m Model) KeyActions(msg tea.KeyMsg) (Model, tea.Cmd) {
 		return m, tea.Batch(term.OpenVim("Edit"))
 
 	case key.Matches(msg, m.keys.Envs):
-		envs, _ := repositories.NewEnvs().List(m.Workspace.ID)
+		envs, _ := offline.NewEnvs().List(m.Workspace.ID)
 
 		data := []map[string]any{}
 		for _, env := range envs {
@@ -164,7 +164,7 @@ func (m Model) OpenRequest() Model {
 	index := m.List.Index()
 	m.Requests.Current = m.Requests.List[index]
 
-	repositories.NewDefault().Update(&repositories.Default{
+	offline.NewDefault().Update(&offline.Default{
 		RequestId: m.Requests.Current.ID,
 	})
 
@@ -185,7 +185,7 @@ func (m Model) BackRequest() Model {
 		index := m.List.Index()
 		m.Requests.Current = m.Requests.List[index]
 
-		repositories.NewDefault().Update(&repositories.Default{
+		offline.NewDefault().Update(&offline.Default{
 			RequestId: m.Requests.Current.ID,
 		})
 	}
@@ -200,7 +200,7 @@ func (m Model) BackRequest() Model {
 	}
 
 	if m.Requests.Current.ParentID != nil {
-		request, _ := repositories.NewRequest().FindOne(*m.Requests.Current.ParentID)
+		request, _ := offline.NewRequest().FindOne(*m.Requests.Current.ParentID)
 		m.parentId = request.ParentID
 		m.previousParentId = request.ParentID
 	} else {
