@@ -5,8 +5,7 @@ import (
 )
 
 type Env struct {
-	gorm.Model
-	WorkspaceId uint   `json:"workspaceId"`
+	WorkspaceId string `json:"workspaceId"`
 	Key         string `json:"key"`
 	Value       string `json:"value"`
 }
@@ -32,14 +31,14 @@ func (repo *EnvsRepo) Update(value *Env) error {
 		Save(value).Error
 }
 
-func (repo *EnvsRepo) Delete(id uint) error {
+func (repo *EnvsRepo) Delete(id string) error {
 	db := repo.Sql.Model(&Env{})
 	db.Where("id IS ?", id).Delete(&Env{})
 
 	return db.Error
 }
 
-func (repo *EnvsRepo) Find(id uint) (Env, error) {
+func (repo *EnvsRepo) Find(id string) (Env, error) {
 	value := Env{}
 	db := repo.Sql.Model(&Env{})
 	db.First(&value, id)
@@ -47,7 +46,7 @@ func (repo *EnvsRepo) Find(id uint) (Env, error) {
 	return value, db.Error
 }
 
-func (repo *EnvsRepo) FindByKey(key string, workspaceId uint) (Env, error) {
+func (repo *EnvsRepo) FindByKey(key string, workspaceId string) (Env, error) {
 	value := Env{Key: key}
 	db := repo.Sql.Model(&Env{})
 	db.Where("key = ?", key).
@@ -57,7 +56,7 @@ func (repo *EnvsRepo) FindByKey(key string, workspaceId uint) (Env, error) {
 	return value, db.Error
 }
 
-func (repo *EnvsRepo) List(workspaceId uint) ([]Env, error) {
+func (repo *EnvsRepo) List(workspaceId string) ([]Env, error) {
 	envs := []Env{}
 	db := repo.Sql.Where("workspace_id = ?", workspaceId).Find(&envs)
 

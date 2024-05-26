@@ -8,7 +8,6 @@ import (
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/gandarfh/httui/pkg/client"
 )
 
 type DeviceStatus string
@@ -46,12 +45,12 @@ func (d Device) Create() tea.Msg {
 		"ipaddress": GetPublicIP(),
 		"platform":  runtime.GOOS,
 	}
-	data, _ := json.Marshal(body)
-	api, _ := client.Post("http://localhost:5000/devices").Body(data).Exec()
 
-	var response DeviceResponse
-	readbody, _ := io.ReadAll(api.Body)
-	json.Unmarshal(readbody, &response)
+	data, _ := json.Marshal(body)
+
+	client, _ := HttuiApiDatasource.Body(data).Post("/devices")
+	response := DeviceResponse{}
+	client.Decode(&response)
 
 	return response
 }

@@ -4,7 +4,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/gandarfh/httui/internal/repositories/offline"
 	"github.com/gandarfh/httui/pkg/terminal"
-	"gorm.io/gorm"
+	"gorm.io/datatypes"
 )
 
 func (m Model) TerminalActions(msg terminal.Finish) (Model, tea.Cmd) {
@@ -65,27 +65,13 @@ func (m Model) TerminalActions(msg terminal.Finish) (Model, tea.Cmd) {
 		return m, tea.Batch(LoadRequestsByParentId(m.parentId))
 
 	case "Envs":
-		data := []map[string]any{}
+		data := map[string]string{}
 		if err := msg.Preview.Execute(&data); err != nil {
 			return m, nil
 		}
 
-		for _, item := range data {
-			env := offline.Env{
-				WorkspaceId: m.Workspace.ID,
-				Key:         item["key"].(string),
-				Value:       item["value"].(string),
-			}
-
-			if item["id"] != nil {
-				env.Model = gorm.Model{
-					ID: uint(item["id"].(float64)),
-				}
-				offline.NewEnvs().Update(&env)
-			} else {
-				offline.NewEnvs().Create(&env)
-			}
-		}
+		m.Workspace.Environments = datatypes.NewJSONType(data)
+		offline.NewWorkspace().Update(&m.Workspace)
 	}
 
 	defer msg.Preview.Close()

@@ -1,6 +1,8 @@
 package offline
 
 import (
+	"time"
+
 	"gorm.io/gorm"
 )
 
@@ -10,8 +12,10 @@ type DefaultsRepo struct {
 
 type Default struct {
 	gorm.Model
-	WorkspaceId uint `json:"workspaceId"`
-	RequestId   uint `json:"requestId"`
+	LastRequestSync   time.Time `json:"lastRequestSync"`
+	LastWorkspaceSync time.Time `json:"lastWorkspaceSync"`
+	WorkspaceId       uint      `json:"workspaceId"`
+	RequestId         uint      `json:"requestId"`
 }
 
 func NewDefault() *DefaultsRepo {

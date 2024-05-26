@@ -1,22 +1,23 @@
 package offline
 
 import (
+	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
 type Response struct {
-	RequestId  uint                                    `json:"request_id"`
-	Method     string                                  `json:"method"`
-	Endpoint   string                                  `json:"endpoint"`
-	Url        string                                  `json:"url"`
-	Status     string                                  `json:"status"`
-	Params     datatypes.JSONType[[]map[string]string] `json:"query_params"`
-	Headers    datatypes.JSONType[[]map[string]string] `json:"headers"`
-	Response   datatypes.JSONType[interface{}]         `json:"response"`
-	Body       datatypes.JSONType[interface{}]         `json:"body"`
-	Curl       string                                  `json:"curl"`
-	gorm.Model `json:"-"`
+	ID          string                          `gorm:"primaryKey" json:"id"`
+	Status      string                          `json:"status"`
+	WorkspaceId uint                            `json:"workspaceId"`
+	RequestId   uint                            `json:"requestId"`
+	Response    datatypes.JSONType[interface{}] `json:"response"`
+	Request     datatypes.JSONType[Request]     `json:"request,omitempty"`
+	CreatedAt   time.Time                       `json:"createdAt,omitempty"`
+	UpdatedAt   time.Time                       `json:"updatedAt,omitempty"`
+	DeletedAt   gorm.DeletedAt                  `gorm:"index" json:"deletedAt,omitempty"`
 }
 
 type ResponsesRepo struct {
@@ -30,13 +31,15 @@ func NewResponse() *ResponsesRepo {
 }
 
 func (repo *ResponsesRepo) Create(value *Response) error {
+	value.ID = primitive.NewObjectID().Hex()
 	return repo.Sql.Create(value).Error
 }
 
-func (repo *ResponsesRepo) FindOne(requestId string) (*Response, error) {
+func (repo *ResponsesRepo) FindOne(requestId, workspace_id uint) (*Response, error) {
 	request := Response{}
 	err := repo.Sql.Model(&request).
 		Where("request_id = ?", requestId).
+		Where("workspace_id = ?", workspace_id).
 		Order("created_at DESC").
 		First(&request).Error
 

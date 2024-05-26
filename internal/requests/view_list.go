@@ -68,7 +68,6 @@ func (d RequestDelegate) Render(w io.Writer, m list.Model, index int, listItem l
 	}
 
 	str := fmt.Sprintf("%s %s", prefix, utils.Truncate(i.title, i.width-10))
-	// str := fmt.Sprintf("%s %s", prefix, i.title)
 
 	if index == m.Index() {
 		fmt.Fprint(

@@ -9,6 +9,8 @@ import (
 	"github.com/gandarfh/httui/internal/repositories/offline"
 	"github.com/gandarfh/httui/pkg/common"
 	"github.com/gandarfh/httui/pkg/terminal"
+	"github.com/gandarfh/httui/pkg/utils"
+	"gorm.io/gorm"
 )
 
 type UpdateRequestDefault offline.Request
@@ -20,10 +22,48 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	)
 
 	switch msg := msg.(type) {
+	case common.Sync:
+		switch msg.Action {
+		case "request":
+			request := offline.Request{}
+			if err := utils.Convert(msg.Data, &request); err != nil {
+				return m, nil
+			}
+
+			sync := true
+			request.Sync = &sync
+
+			if offline.NewRequest().Sql.Model(&request).Session(&gorm.Session{FullSaveAssociations: true}).Where("external_id = ?", request.ExternalId).Updates(&request).RowsAffected == 0 {
+				offline.NewRequest().Sql.Model(&request).Create(&request)
+			}
+
+			return m, LoadRequestsByParentId(m.parentId)
+
+		case "workspace":
+			workspace := offline.Workspace{}
+			if err := utils.Convert(msg.Data, &workspace); err != nil {
+				return m, nil
+			}
+
+			sync := true
+			workspace.Sync = &sync
+
+			if offline.NewWorkspace().Sql.Model(&workspace).Session(&gorm.Session{FullSaveAssociations: true}).Where("external_id = ?", workspace.ExternalId).Updates(&workspace).RowsAffected == 0 {
+				offline.NewWorkspace().Sql.Model(&workspace).Create(&workspace)
+			}
+		}
+
 	case RequestsData:
 		m.Requests = msg
 
-		cmds = append(cmds, m.List.SetItems(m.RequestOfList()))
+		list := []list.Item{}
+		w := m.List.Width() - 2
+
+		for _, i := range m.Requests.List {
+			list = append(list, RequestItem{i.Name, string(i.Type), w})
+		}
+
+		cmds = append(cmds, m.List.SetItems(list))
 
 		if len(m.Requests.List) > 0 {
 			index := m.List.Index()
@@ -71,8 +111,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case common.Environment:
-		m.Workspace = msg.Workspace
-		m.List.Title = fmt.Sprintf("[%s]", msg.Workspace.Name)
+		if msg.Reset {
+			m.List.Title = fmt.Sprintf("[%s]", m.Workspace.Name)
+			return m, nil
+		} else {
+			m.Workspace = msg.Workspace
+			m.List.Title = fmt.Sprintf("[%s]", msg.Workspace.Name)
+		}
 
 		cmd = m.Detail.SetWorkspace(offline.Workspace(m.Workspace))
 		cmds = append(cmds, cmd)
@@ -80,7 +125,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case spinner.TickMsg:
 		if m.loading.Value {
 			m.spinner, cmd = m.spinner.Update(msg)
-			m.List.Title = fmt.Sprintf("[%s]", m.Workspace.Name) + m.spinner.View()
+			m.List.Title = fmt.Sprintf("[%s]", m.Workspace.Name) + m.spinner.View() + m.loading.Msg
 			cmds = append(cmds, cmd)
 		}
 
@@ -130,15 +175,4 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	cmds = append(cmds, cmd)
 
 	return m, tea.Batch(cmds...)
-}
-
-func (m Model) RequestOfList() []list.Item {
-	list := []list.Item{}
-	w := m.List.Width() - 2
-
-	for _, i := range m.Requests.List {
-		list = append(list, RequestItem{i.Name, i.Type, w})
-	}
-
-	return list
 }

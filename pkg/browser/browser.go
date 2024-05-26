@@ -1,7 +1,6 @@
 package browser
 
 import (
-	"log"
 	"os/exec"
 	"runtime"
 
@@ -10,8 +9,6 @@ import (
 
 func OpenPage(url string) tea.Cmd {
 	var cmd *exec.Cmd
-
-	log.Printf("xdg-open %s;\n", url)
 
 	switch runtime.GOOS {
 	case "linux":

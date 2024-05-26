@@ -113,15 +113,8 @@ func (m Model) KeyActions(msg tea.KeyMsg) (Model, tea.Cmd) {
 		return m, tea.Batch(term.OpenVim("Edit"))
 
 	case key.Matches(msg, m.keys.Envs):
-		envs, _ := offline.NewEnvs().List(m.Workspace.ID)
-
-		data := []map[string]any{}
-		for _, env := range envs {
-			data = append(data, map[string]any{"id": env.ID, "key": env.Key, "value": env.Value})
-		}
-
+		data := m.Workspace.Environments.Data()
 		term := terminal.NewPreview(&data)
-
 		return m, tea.Batch(term.OpenVim("Envs"))
 	}
 

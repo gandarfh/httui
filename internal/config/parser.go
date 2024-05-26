@@ -10,18 +10,39 @@ import (
 // ConfigParser is the parser for the config file.
 type ConfigParser struct{}
 
-// getDefaultConfig returns the default config for the application.
-func (parser ConfigParser) getDefaultConfig() config {
+// GetDefaultConfig returns the default config for the application.
+func (parser ConfigParser) GetDefaultConfig() config {
 	return config{
 		Settings: SettingsConfig{
-			Logging: false,
+			Local:    true,
+			Token:    "",
+			DeviceID: "",
+			Logging:  true, // TODO
+			AutoSync: AutoSync{
+				BeforeOpen: Sync{
+					Remote:  true,
+					Locally: true,
+				},
+				BeforeCreate: Sync{
+					Remote:  true,
+					Locally: true,
+				},
+				BeforeUpdate: Sync{
+					Remote:  true,
+					Locally: true,
+				},
+				BeforeDelete: Sync{
+					Remote:  true,
+					Locally: true,
+				},
+			},
 		},
 	}
 }
 
 // getDefaultConfigYamlContents returns the default config file contents.
 func (parser ConfigParser) getDefaultConfigYamlContents() string {
-	defaultConfig := parser.getDefaultConfig()
+	defaultConfig := parser.GetDefaultConfig()
 	yaml, _ := yaml.Marshal(defaultConfig)
 
 	return string(yaml)
@@ -82,7 +103,7 @@ func (parser ConfigParser) getConfigFileOrCreateIfMissing() (*string, error) {
 
 // readConfigFile reads the config file and returns the config.
 func (parser ConfigParser) readConfigFile(path string) (config, error) {
-	config := parser.getDefaultConfig()
+	config := parser.GetDefaultConfig()
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return config, configError{parser: parser, configDir: path, err: err}

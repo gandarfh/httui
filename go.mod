@@ -9,6 +9,8 @@ require (
 	github.com/charmbracelet/lipgloss v0.10.0
 	github.com/google/uuid v1.4.0
 	github.com/spf13/cobra v1.8.0
+	go.mongodb.org/mongo-driver v1.15.0
+	github.com/eclipse/paho.mqtt.golang v1.4.3
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/datatypes v1.2.0
 	gorm.io/driver/sqlite v1.4.3
@@ -26,6 +28,7 @@ require (
 	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
 	github.com/gorilla/css v1.0.0 // indirect
+	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect

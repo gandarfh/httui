@@ -1,13 +1,68 @@
 package offline
 
 import (
+	"database/sql/driver"
+	"fmt"
+	"strings"
+	"time"
+
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
+type Time time.Time
+
+func (t *Time) Scan(value interface{}) error {
+	switch v := value.(type) {
+	case []byte:
+		return t.UnmarshalText(string(v))
+	case string:
+		return t.UnmarshalText(v)
+	case time.Time:
+		*t = Time(v)
+	case nil:
+		*t = Time{}
+	default:
+		return fmt.Errorf("cannot sql.Scan() MyTime from: %#v", v)
+	}
+	return nil
+}
+
+func (t Time) Value() (driver.Value, error) {
+	return driver.Value(time.Time(t).Format(time.RFC3339)), nil
+}
+
+func (t *Time) UnmarshalText(value string) error {
+	dd, err := time.Parse(time.RFC3339, value)
+	if err != nil {
+		return err
+	}
+	*t = Time(dd)
+	return nil
+}
+
+func (Time) GormDataType() string {
+	return "TIME"
+}
+
 type Workspace struct {
 	gorm.Model
-	Name string `gorm:"unique" json:"name"`
-	Envs []Env  `json:"envs" gorm:"foreignKey:WorkspaceId;constraint:Onupdate:CASCADE;"`
+	ExternalId   string                                `json:"_id"`
+	Name         string                                `gorm:"unique" json:"name"`
+	Sync         *bool                                 `json:"sync"`
+	Environments datatypes.JSONType[map[string]string] `json:"environments"`
+}
+
+func (w Workspace) GetID() string {
+	return fmt.Sprint(w.ID)
+}
+
+func (w Workspace) GetExternalID() string {
+	return w.ExternalId
+}
+
+func (w Workspace) GetUpdatedAt() time.Time {
+	return w.UpdatedAt
 }
 
 type WorkspacesRepo struct {
@@ -21,11 +76,20 @@ func NewWorkspace() *WorkspacesRepo {
 }
 
 func (repo *WorkspacesRepo) Create(value *Workspace) error {
+	sync := false
+	value.Sync = &sync
+	value.Name = strings.Trim(value.Name, " ")
+
+	if value.Name == "" {
+		return nil
+	}
 	db := repo.Sql.Create(value)
 	return db.Error
 }
 
 func (repo *WorkspacesRepo) Update(value *Workspace) error {
+	sync := false
+	value.Sync = &sync
 	if err := repo.Sql.
 		Session(&gorm.Session{FullSaveAssociations: true}).
 		Where("id = ?", value.ID).
@@ -34,21 +98,33 @@ func (repo *WorkspacesRepo) Update(value *Workspace) error {
 	}
 
 	return nil
-
 }
 
 func (repo *WorkspacesRepo) FindOne(id uint) (Workspace, error) {
 	workspace := Workspace{}
 
-	if err := repo.Sql.Model(&workspace).
-		Where("id IS ?", id).First(&workspace).Error; err != nil {
-		return workspace, err
+	db := repo.Sql.Model(&workspace).
+		Where("id IS ?", id).First(&workspace)
+
+	if db.Error != nil {
+		repo.Sql.Model(&workspace).First(&workspace)
 	}
 
 	return workspace, nil
 }
 
 func (repo *WorkspacesRepo) List() ([]Workspace, error) {
+	workspaces := []Workspace{}
+
+	if err := repo.Sql.Model(&workspaces).
+		Find(&workspaces).Error; err != nil {
+		return workspaces, err
+	}
+
+	return workspaces, nil
+}
+
+func (repo *WorkspacesRepo) ListForSync() ([]Workspace, error) {
 	workspaces := []Workspace{}
 
 	if err := repo.Sql.Model(&workspaces).

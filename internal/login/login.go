@@ -12,14 +12,17 @@ import (
 )
 
 type Model struct {
-	Width  int
-	Height int
-	keys   KeyMap
-	url    string
-	Tokens *services.Tokens
+	Width   int
+	Height  int
+	keys    KeyMap
+	url     string
+	success bool
 }
 
 func New() Model {
+	defaultConfig := config.ConfigParser{}
+	config.Config = defaultConfig.GetDefaultConfig()
+
 	return Model{
 		keys: keys,
 	}
@@ -44,17 +47,19 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case services.ValidateDeviceResponse:
 		if msg.Tokens != nil {
+			m.success = true
 			config.Config.Settings.Token = msg.Tokens.Access
 			config.UpdateConfig(config.Config)
-			return m, nil
+			return m, tea.Quit
 		}
-
-		return m, services.PollingValidate(m.Tokens.Access)
+		return m, services.PollingValidate(config.Config.Settings.DeviceID, config.Config.Settings.Token)
 
 	case services.DeviceResponse:
 		m.url = msg.Url
-		m.Tokens = msg.Tokens
-		return m, services.PollingValidate(m.Tokens.Access)
+		config.Config.Settings.DeviceID = msg.ID
+		config.Config.Settings.Token = msg.Tokens.Access
+
+		return m, services.PollingValidate(config.Config.Settings.DeviceID, config.Config.Settings.Token)
 
 	case tea.KeyMsg:
 		switch {
@@ -74,7 +79,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m Model) View() string {
 	if m.url == "" {
-		return fmt.Sprintf("loading...")
+		return "loading..."
 	}
+
+	if m.success {
+		return "Device connected with success!"
+	}
+
 	return fmt.Sprintf("Press Enter to open the browser or visit %s", m.url)
 }

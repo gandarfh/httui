@@ -32,4 +32,5 @@ func init() {
 	}
 
 	rootCmd.AddCommand(loginCmd())
+	rootCmd.AddCommand(testCmd())
 }

@@ -1,21 +1,57 @@
 package offline
 
 import (
+	"fmt"
+	"strings"
+	"time"
+
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
+type RequestType string
+
+const (
+	REQUEST RequestType = "request"
+	GROUP   RequestType = "group"
+)
+
+type MethodType string
+
+const (
+	GET    MethodType = "get"
+	POST   MethodType = "post"
+	PATCH  MethodType = "patch"
+	PUT    MethodType = "put"
+	DELETE MethodType = "delete"
+)
+
 type Request struct {
-	gorm.Model                                             // `json:"-"`
-	Type        string                                     `json:"type"` // group | request
-	Name        string                                     `json:"name"`
-	Description string                                     `json:"description"`
-	Method      string                                     `json:"method"`
-	Endpoint    string                                     `json:"endpoint"`
-	QueryParams datatypes.JSONType[[]map[string]string]    `json:"query_params"`
-	Headers     datatypes.JSONType[[]map[string]string]    `json:"headers"`
-	Body        datatypes.JSONType[map[string]interface{}] `json:"body"`
-	ParentID    *uint                                      `json:"parent_id"`
+	gorm.Model
+	ExternalId     string                                  `json:"_id,omitempty"`
+	Sync           *bool                                   `json:"sync,omitempty"`
+	OrganizationID string                                  `gorm:"index;" json:"organizationId,omitempty"`
+	ParentID       *uint                                   `gorm:"index;" json:"parentId,omitempty"`
+	Type           RequestType                             `json:"type"`
+	Name           string                                  `json:"name"`
+	Description    *string                                 `json:"description"`
+	Method         MethodType                              `json:"method,omitempty"`
+	Endpoint       string                                  `json:"endpoint"`
+	QueryParams    datatypes.JSONType[[]map[string]string] `json:"queryParams"`
+	Headers        datatypes.JSONType[[]map[string]string] `json:"headers"`
+	Body           datatypes.JSONType[map[string]any]      `json:"body"`
+}
+
+func (r Request) GetID() string {
+	return fmt.Sprint(r.ID)
+}
+
+func (r Request) GetExternalID() string {
+	return r.ExternalId
+}
+
+func (r Request) GetUpdatedAt() time.Time {
+	return r.UpdatedAt
 }
 
 type RequestsRepo struct {
@@ -29,6 +65,11 @@ func NewRequest() *RequestsRepo {
 }
 
 func (repo *RequestsRepo) Create(value *Request) error {
+	sync := false
+	value.Sync = &sync
+
+	value.Method = MethodType(strings.ToLower(string(value.Method)))
+
 	if err := repo.Sql.Create(value).Error; err != nil {
 		return err
 	}
@@ -37,19 +78,24 @@ func (repo *RequestsRepo) Create(value *Request) error {
 }
 
 func (repo *RequestsRepo) Update(value *Request) error {
-	updateMap := map[string]interface{}{
-		"Type":        value.Type,
-		"Name":        value.Name,
-		"Description": value.Description,
-		"Method":      value.Method,
-		"Endpoint":    value.Endpoint,
-		"QueryParams": value.QueryParams,
-		"Headers":     value.Headers,
-		"Body":        value.Body,
-		"ParentID":    value.ParentID,
+	sync := false
+	value.Sync = &sync
+
+	if err := repo.Sql.
+		Session(&gorm.Session{FullSaveAssociations: true}).
+		Where("id = ?", value.ID).
+		Updates(value).Error; err != nil {
+		return err
 	}
 
-	if err := repo.Sql.Model(&Request{}).Where("id = ?", value.ID).Updates(updateMap).Error; err != nil {
+	return nil
+}
+
+func (repo *RequestsRepo) Upsert(value *Request) error {
+	if err := repo.Sql.
+		Session(&gorm.Session{FullSaveAssociations: true}).
+		Where("id = ?", value.ID).
+		Updates(value).Error; err != nil {
 		return err
 	}
 
@@ -83,6 +129,18 @@ func (repo *RequestsRepo) List(parentId *uint, filter string) ([]Request, error)
 	}
 
 	if err := query.Find(&requests).Error; err != nil {
+		return requests, err
+	}
+
+	return requests, nil
+}
+
+func (repo *RequestsRepo) ListForSync() ([]Request, error) {
+	requests := []Request{}
+
+	if err := repo.Sql.Model(&requests).
+		Where("sync = ?", 0).
+		Find(&requests).Error; err != nil {
 		return requests, err
 	}
 

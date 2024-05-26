@@ -7,6 +7,7 @@ import (
 
 type Environment struct {
 	Workspace offline.Workspace
+	Reset     bool
 }
 
 func SetWorkspace(workspaceId uint) tea.Cmd {
@@ -16,6 +17,14 @@ func SetWorkspace(workspaceId uint) tea.Cmd {
 
 		return Environment{
 			Workspace: workspace,
+		}
+	}
+}
+
+func ResetWorkspace() tea.Cmd {
+	return func() tea.Msg {
+		return Environment{
+			Reset: true,
 		}
 	}
 }

@@ -2,6 +2,7 @@ package details
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/gandarfh/httui/pkg/utils"
@@ -9,7 +10,7 @@ import (
 
 func (m Model) Preview() string {
 	maxPreviewTextSize := m.Width - m.Width/3
-	preview := utils.Truncate(fmt.Sprintf("%s - %s", m.Request.Method, m.Request.Endpoint), maxPreviewTextSize)
+	preview := utils.Truncate(fmt.Sprintf("%s - %s", strings.ToUpper(string(m.Request.Method)), string(m.Request.Endpoint)), maxPreviewTextSize)
 
 	text := lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Render(
 		lipgloss.Place(
