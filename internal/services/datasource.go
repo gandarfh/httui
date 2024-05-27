@@ -15,6 +15,8 @@ func DatasourceStart() {
 		HttuiApiDatasource = client.New().URL("https://api.httui.com")
 	}
 
-	HttuiApiDatasource = HttuiApiDatasource.
-		Header("Authorization", "Bearer "+config.Config.Settings.Token)
+	if config.Config.Settings.Token != "" {
+		HttuiApiDatasource = HttuiApiDatasource.
+			Header("Authorization", "Bearer "+config.Config.Settings.Token)
+	}
 }

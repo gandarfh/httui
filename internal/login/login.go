@@ -12,11 +12,13 @@ import (
 )
 
 type Model struct {
-	Width   int
-	Height  int
-	keys    KeyMap
-	url     string
-	success bool
+	Width       int
+	Height      int
+	keys        KeyMap
+	url         string
+	success     bool
+	accessToken string
+	deviceID    string
 }
 
 func New() Model {
@@ -52,14 +54,16 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			config.UpdateConfig(config.Config)
 			return m, tea.Quit
 		}
-		return m, services.PollingValidate(config.Config.Settings.DeviceID, config.Config.Settings.Token)
+
+		return m, services.PollingValidate(m.deviceID, m.accessToken)
 
 	case services.DeviceResponse:
 		m.url = msg.Url
 		config.Config.Settings.DeviceID = msg.ID
-		config.Config.Settings.Token = msg.Tokens.Access
+		m.deviceID = msg.ID
+		m.accessToken = msg.Tokens.Access
 
-		return m, services.PollingValidate(config.Config.Settings.DeviceID, config.Config.Settings.Token)
+		return m, services.PollingValidate(msg.ID, msg.Tokens.Access)
 
 	case tea.KeyMsg:
 		switch {
