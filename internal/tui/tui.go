@@ -11,7 +11,6 @@ import (
 	"github.com/gandarfh/httui/internal/repositories/sync"
 	"github.com/gandarfh/httui/internal/requests"
 	"github.com/gandarfh/httui/internal/services"
-	"github.com/gandarfh/httui/pkg/mqtt"
 )
 
 func init() {
@@ -23,7 +22,7 @@ func init() {
 }
 
 var program tea.Program
-var mqttCmd = mqtt.Connect(&program)
+var mqttCmd = sync.MQTTConnect(&program)
 var syncRequestsCmd = sync.SyncRequests(&program)
 var syncWorkspacesCmd = sync.SyncWorkspaces(&program)
 

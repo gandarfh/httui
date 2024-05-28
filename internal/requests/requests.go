@@ -114,8 +114,8 @@ func (m Model) Init() tea.Cmd {
 	return tea.Batch(
 		m.syncRequestsCmd,
 		m.syncWorkspacesCmd,
+		m.mqttStart,
 		tea.Sequence(
-			m.mqttStart,
 			LoadDefault,
 			LoadWorspace,
 			LoadRequests,

@@ -25,6 +25,7 @@ type Params struct {
 type Client struct {
 	method  string
 	body    io.Reader
+	auth    *Header
 	url     []string
 	params  []*Params
 	headers []*Header
@@ -46,6 +47,15 @@ func (c Client) URL(url string) Client {
 	}
 
 	c.url = append(c.url, url)
+
+	return c
+}
+
+func (c Client) Auth(key string, value string) Client {
+	c.auth = &Header{
+		Key:   key,
+		Value: value,
+	}
 
 	return c
 }
@@ -89,6 +99,10 @@ func (c Client) Do() (*Response, error) {
 
 	request.Header.Add("accept", "application/json")
 	request.Header.Add("Content-Type", "application/json; charset=utf-8")
+
+	if c.auth != nil {
+		request.Header.Add(c.auth.Key, c.auth.Value)
+	}
 
 	for _, item := range c.headers {
 		request.Header.Add(item.Key, item.Value)

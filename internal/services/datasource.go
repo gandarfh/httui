@@ -17,6 +17,6 @@ func DatasourceStart() {
 
 	if config.Config.Settings.Token != "" {
 		HttuiApiDatasource = HttuiApiDatasource.
-			Header("Authorization", "Bearer "+config.Config.Settings.Token)
+			Auth("Authorization", "Bearer "+config.Config.Settings.Token)
 	}
 }

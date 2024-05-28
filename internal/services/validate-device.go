@@ -40,7 +40,7 @@ func PollingValidate(deviceId, accessToken string) tea.Cmd {
 		var response = ValidateDeviceResponse{}
 
 		client, err := HttuiApiDatasource.
-			Header("Authorization", fmt.Sprint("Bearer ", accessToken)).
+			Auth("Authorization", fmt.Sprint("Bearer ", accessToken)).
 			Post("/auth/validate/device/" + deviceId)
 		if err != nil {
 			return ValidateDeviceResponse{}
