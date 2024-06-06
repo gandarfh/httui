@@ -21,10 +21,13 @@ func init() {
 
 }
 
-var program tea.Program
-var mqttCmd = sync.MQTTConnect(&program)
-var syncRequestsCmd = sync.SyncRequests(&program)
-var syncWorkspacesCmd = sync.SyncWorkspaces(&program)
+var (
+	program           tea.Program
+	mqttCmd           = sync.MQTTConnect(&program)
+	syncRequestsCmd   = sync.SyncRequests(&program)
+	syncWorkspacesCmd = sync.SyncWorkspaces(&program)
+	syncResponsesCmd  = sync.SyncResponses(&program)
+)
 
 func App() {
 	if config.Config.Settings.Logging {
@@ -38,7 +41,12 @@ func App() {
 
 	services.DatasourceStart()
 
-	m := requests.New(mqttCmd, syncRequestsCmd, syncWorkspacesCmd)
+	m := requests.New(
+		mqttCmd,
+		syncRequestsCmd,
+		syncWorkspacesCmd,
+		syncResponsesCmd,
+	)
 
 	program = *tea.NewProgram(m, tea.WithAltScreen())
 

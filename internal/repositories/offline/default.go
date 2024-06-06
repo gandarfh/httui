@@ -12,6 +12,7 @@ type DefaultsRepo struct {
 
 type Default struct {
 	gorm.Model
+	LastResponseSync  time.Time `json:"lastResponseSync"`
 	LastRequestSync   time.Time `json:"lastRequestSync"`
 	LastWorkspaceSync time.Time `json:"lastWorkspaceSync"`
 	WorkspaceId       uint      `json:"workspaceId"`

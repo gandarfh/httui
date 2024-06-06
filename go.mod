@@ -7,10 +7,9 @@ require (
 	github.com/charmbracelet/bubbletea v0.25.0
 	github.com/charmbracelet/glamour v0.6.0
 	github.com/charmbracelet/lipgloss v0.10.0
+	github.com/eclipse/paho.mqtt.golang v1.4.3
 	github.com/google/uuid v1.4.0
 	github.com/spf13/cobra v1.8.0
-	go.mongodb.org/mongo-driver v1.15.0
-	github.com/eclipse/paho.mqtt.golang v1.4.3
 	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/datatypes v1.2.0
 	gorm.io/driver/sqlite v1.4.3
@@ -52,6 +51,7 @@ require (
 	github.com/stretchr/testify v1.9.0 // indirect
 	github.com/yuin/goldmark v1.5.2 // indirect
 	github.com/yuin/goldmark-emoji v1.0.1 // indirect
+	golang.org/x/crypto v0.17.0 // indirect
 	golang.org/x/net v0.19.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
 	golang.org/x/sys v0.19.0 // indirect

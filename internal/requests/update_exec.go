@@ -72,10 +72,12 @@ func (m Model) Exec() tea.Cmd {
 		json.Unmarshal(readbody, &response)
 
 		result := offline.Response{
-			WorkspaceId: m.Workspace.ID,
-			Status:      data.Status,
-			Request:     datatypes.NewJSONType(request),
-			Response:    datatypes.NewJSONType(response),
+			WorkspaceId:       m.Workspace.ID,
+			Status:            data.Status,
+			RequestId:         request.ID,
+			RequestExternalId: request.ExternalId,
+			Request:           datatypes.NewJSONType(request),
+			Response:          datatypes.NewJSONType(response),
 		}
 
 		offline.NewResponse().Create(&result)

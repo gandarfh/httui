@@ -251,3 +251,23 @@ debug 2024/05/26 16:39:48 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
 debug 2024/05/26 17:11:03 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
 debug 2024/05/26 17:13:35 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
 debug 2024/05/26 17:13:49 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/29 15:59:50 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/29 16:00:01 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/29 16:00:43 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/29 16:04:28 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/29 16:04:51 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/29 19:15:58 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/29 19:20:43 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/29 19:25:18 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/29 19:44:58 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/29 19:48:49 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/29 19:50:13 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/30 20:14:15 OrganizationShow: Get "http://localhost:5000/organizations": EOF
+debug 2024/05/30 20:14:15 failed to get organization value: Get "http://localhost:5000/organizations": EOF
+debug 2024/05/30 20:27:23 OrganizationShow: Get "http://localhost:5000/organizations": EOF
+debug 2024/05/30 20:27:23 failed to get organization value: Get "http://localhost:5000/organizations": EOF
+debug 2024/05/30 20:29:26 OrganizationShow: Get "http://localhost:5000/organizations": dial tcp [::1]:5000: connect: connection refused
+debug 2024/05/30 20:29:26 failed to get organization value: Get "http://localhost:5000/organizations": dial tcp [::1]:5000: connect: connection refused
+debug 2024/05/30 20:29:31 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/30 20:29:45 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/06/02 06:35:48 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5

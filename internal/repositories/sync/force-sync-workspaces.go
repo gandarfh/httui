@@ -32,7 +32,9 @@ func SyncWorkspaces(program *tea.Program) tea.Cmd {
 
 		locally, _ := offline.NewWorkspace().ListForSync()
 
-		httuiClient := services.HttuiApiDatasource
+		httuiClient := services.HttuiApiDatasource.
+			Params("history", "false")
+
 		if !d.LastWorkspaceSync.IsZero() {
 			httuiClient = httuiClient.Params("lastUpdate", d.LastWorkspaceSync.Format(time.RFC3339))
 		}

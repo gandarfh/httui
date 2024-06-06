@@ -75,3 +75,31 @@ func (r *Request) AfterDelete(tx *gorm.DB) (err error) {
 
 	return nil
 }
+
+func (r *Response) AfterSave(tx *gorm.DB) (err error) {
+	if config.Config.Settings.AutoSync.BeforeCreate.Remote {
+		if r.Sync == nil || !*r.Sync {
+			go func() {
+				body, _ := json.Marshal(r)
+				res, err := services.HttuiApiDatasource.Body(body).Post("responses")
+				if err != nil {
+					log.Println("Error to Sync response", err.Error())
+					return
+				}
+
+				if res.StatusCode < 300 {
+					res.Decode(r)
+					sync := true
+					r.Sync = &sync
+
+					NewResponse().Sql.
+						Session(&gorm.Session{FullSaveAssociations: true}).
+						Where("id = ?", r.ID).
+						Updates(r)
+				}
+			}()
+		}
+	}
+
+	return nil
+}

@@ -59,62 +59,57 @@ func LoadRequestsByFilter(filter string) tea.Cmd {
 }
 
 type Model struct {
-	Detail            details.Model
-	title             string
-	filter            string
-	parentId          *uint
-	previousParentId  *uint
-	command_active    bool
-	keys              KeyMap
-	help              help.Model
-	List              list.Model
-	spinner           spinner.Model
-	command_bar       common.Component
-	loading           common.Loading
-	state             common.State
-	Width             int
-	Height            int
-	Requests          RequestsData
-	Configs           offline.Default
-	Workspace         offline.Workspace
-	mqttStart         tea.Cmd
-	syncRequestsCmd   tea.Cmd
-	syncWorkspacesCmd tea.Cmd
+	Detail           details.Model
+	title            string
+	filter           string
+	parentId         *uint
+	previousParentId *uint
+	command_active   bool
+	keys             KeyMap
+	help             help.Model
+	List             list.Model
+	spinner          spinner.Model
+	command_bar      common.Component
+	loading          common.Loading
+	state            common.State
+	Width            int
+	Height           int
+	Requests         RequestsData
+	Configs          offline.Default
+	Workspace        offline.Workspace
+	workers          []tea.Cmd
 }
 
 var (
 	divider = lipgloss.NewStyle().MarginLeft(1).Border(lipgloss.NormalBorder(), false, true, false, false)
 )
 
-func New(mqttStart, syncRequestsCmd, syncWorkspacesCmd tea.Cmd) tea.Model {
+func New(workers ...tea.Cmd) tea.Model {
 	s := spinner.New()
 	s.Spinner = spinner.Points
 	s.Style = lipgloss.NewStyle().MarginLeft(2).Foreground(styles.DefaultTheme.PrimaryText)
 
 	m := Model{
-		Width:             0,
-		Height:            0,
-		state:             common.Start_state,
-		List:              NewRequestList(),
-		Detail:            details.New(),
-		help:              help.New(),
-		keys:              keys,
-		spinner:           s,
-		command_bar:       command.New(),
-		command_active:    false,
-		mqttStart:         mqttStart,
-		syncRequestsCmd:   syncRequestsCmd,
-		syncWorkspacesCmd: syncWorkspacesCmd,
+		Width:          0,
+		Height:         0,
+		state:          common.Start_state,
+		List:           NewRequestList(),
+		Detail:         details.New(),
+		help:           help.New(),
+		keys:           keys,
+		spinner:        s,
+		command_bar:    command.New(),
+		command_active: false,
+		workers:        workers,
 	}
 
 	return m
 }
 
 func (m Model) Init() tea.Cmd {
-	return tea.Batch(
-		m.syncRequestsCmd,
-		m.syncWorkspacesCmd,
-		m.mqttStart,
+	cmds := m.workers
+
+	cmds = append(cmds,
 		tea.Sequence(
 			LoadDefault,
 			LoadWorspace,
@@ -122,7 +117,10 @@ func (m Model) Init() tea.Cmd {
 			m.command_bar.Init(),
 			m.Detail.Init(),
 			common.SetState(common.Start_state),
-		))
+		),
+	)
+
+	return tea.Batch(cmds...)
 }
 
 var (
