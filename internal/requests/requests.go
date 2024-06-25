@@ -25,8 +25,9 @@ func LoadWorspace() tea.Msg {
 }
 
 type RequestsData struct {
-	List    []offline.Request
-	Current offline.Request
+	List     []offline.Request
+	Current  offline.Request
+	ParentID *uint
 }
 
 func LoadRequests() tea.Msg {
@@ -35,8 +36,9 @@ func LoadRequests() tea.Msg {
 	requests, _ := offline.NewRequest().List(request.ParentID, "")
 
 	return RequestsData{
-		Current: *request,
-		List:    requests,
+		Current:  *request,
+		List:     requests,
+		ParentID: request.ParentID,
 	}
 }
 
@@ -44,7 +46,8 @@ func LoadRequestsByParentId(parentId *uint) tea.Cmd {
 	return func() tea.Msg {
 		requests, _ := offline.NewRequest().List(parentId, "")
 		return RequestsData{
-			List: requests,
+			List:     requests,
+			ParentID: parentId,
 		}
 	}
 }
@@ -53,7 +56,8 @@ func LoadRequestsByFilter(filter string) tea.Cmd {
 	return func() tea.Msg {
 		requests, _ := offline.NewRequest().List(nil, filter)
 		return RequestsData{
-			List: requests,
+			List:     requests,
+			ParentID: nil,
 		}
 	}
 }

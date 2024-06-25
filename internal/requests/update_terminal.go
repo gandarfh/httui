@@ -1,6 +1,8 @@
 package requests
 
 import (
+	"reflect"
+
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/gandarfh/httui/internal/repositories/offline"
 	"github.com/gandarfh/httui/pkg/terminal"
@@ -17,6 +19,10 @@ func (m Model) TerminalActions(msg terminal.Finish) (Model, tea.Cmd) {
 
 		if request.Name == "" {
 			return m, nil
+		}
+
+		if request.Type == "" {
+			request.Type = offline.REQUEST
 		}
 
 		offline.NewRequest().Create(&request)
@@ -42,13 +48,21 @@ func (m Model) TerminalActions(msg terminal.Finish) (Model, tea.Cmd) {
 					offline.NewRequest().Create(&request)
 				}
 
-				offline.NewRequest().Update(&request)
+				equal := reflect.DeepEqual(request, m.Requests.Current)
+				if !equal {
+					offline.NewRequest().Update(&request)
+				}
 			}
 
-			offline.NewRequest().Update(&group.Group)
-			m.parentId = group.Group.ParentID
+			equal := reflect.DeepEqual(group.Group, m.Requests.Current)
+			if !equal {
+				offline.NewRequest().Update(&group.Group)
+				m.parentId = group.Group.ParentID
 
-			return m, tea.Batch(LoadRequestsByParentId(m.parentId))
+				return m, tea.Batch(LoadRequestsByParentId(m.parentId))
+			}
+
+			return m, nil
 		}
 
 		request := offline.Request{}
