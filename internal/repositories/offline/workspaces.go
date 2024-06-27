@@ -128,7 +128,7 @@ func (repo *WorkspacesRepo) ListForSync() ([]Workspace, error) {
 	workspaces := []Workspace{}
 
 	if err := repo.Sql.Model(&workspaces).
-		Where("sync = ?", 0).
+		Where("sync = ?", 0).Or("sync IS NULL").
 		Find(&workspaces).Error; err != nil {
 		return workspaces, err
 	}

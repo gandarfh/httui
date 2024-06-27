@@ -6,6 +6,7 @@ import (
 
 	"github.com/gandarfh/httui/internal/config"
 	"github.com/gandarfh/httui/internal/services"
+	"github.com/gandarfh/httui/pkg/convert"
 	"gorm.io/gorm"
 )
 
@@ -41,7 +42,17 @@ func (r *Request) AfterSave(tx *gorm.DB) (err error) {
 	if config.Config.Settings.AutoSync.BeforeCreate.Remote {
 		if r.Sync == nil || !*r.Sync {
 			go func() {
-				body, _ := json.Marshal(r)
+				var parentId *string
+				if r.ParentID != nil {
+					parentRequest, _ := NewRequest().FindOne(*r.ParentID)
+					parentId = &parentRequest.ExternalId
+				}
+
+				payload := map[string]any{}
+				convert.ToSource(r, &payload)
+				payload["parentId"] = parentId
+
+				body, _ := json.Marshal(payload)
 				res, err := services.HttuiApiDatasource.Body(body).Post("requests")
 				if err != nil {
 					log.Println("Error to Sync request", err.Error())

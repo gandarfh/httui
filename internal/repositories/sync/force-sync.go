@@ -1,6 +1,8 @@
 package sync
 
 import (
+	"log"
+
 	"github.com/gandarfh/httui/internal/config"
 	"github.com/gandarfh/httui/internal/repositories/offline"
 )
@@ -8,6 +10,8 @@ import (
 func SyncDatabases[T offline.Entity](locally []T, remotes []T, UpsertLocal, UpsertRemote func(data T, exists bool) (T, error)) error {
 	localIndex := BuildIndex(locally)
 	remoteIndex := BuildIndex(remotes)
+
+	log.Println("localIndex", len(localIndex))
 
 	if config.Config.Settings.AutoSync.BeforeOpen.Locally {
 		for _, remote := range remotes {
@@ -29,6 +33,7 @@ func SyncDatabases[T offline.Entity](locally []T, remotes []T, UpsertLocal, Upse
 			if !exists || local.GetUpdatedAt().After(remote.GetUpdatedAt()) {
 				_, err := UpsertRemote(local, exists)
 				if err != nil {
+          log.Println(err.Error())
 					return err
 				}
 			}
@@ -41,7 +46,13 @@ func SyncDatabases[T offline.Entity](locally []T, remotes []T, UpsertLocal, Upse
 func BuildIndex[T offline.Entity](data []T) map[string]T {
 	index := make(map[string]T)
 	for i := range data {
-		index[data[i].GetExternalID()] = data[i]
+		key := data[i].GetExternalID()
+
+		if key == "" {
+			key = data[i].GetID()
+		}
+
+		index[key] = data[i]
 	}
 	return index
 }

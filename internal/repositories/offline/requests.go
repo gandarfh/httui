@@ -1,6 +1,7 @@
 package offline
 
 import (
+	"encoding/binary"
 	"fmt"
 	"strings"
 	"time"
@@ -139,7 +140,7 @@ func (repo *RequestsRepo) ListForSync() ([]Request, error) {
 	requests := []Request{}
 
 	if err := repo.Sql.Model(&requests).
-		Where("sync = ?", 0).
+		Where("sync = ?", 0).Or("sync IS NULL").
 		Find(&requests).Error; err != nil {
 		return requests, err
 	}
@@ -154,4 +155,10 @@ func (repo *RequestsRepo) Delete(id uint) error {
 		return err
 	}
 	return nil
+}
+
+func main() {
+	var mySlice = []byte("667cbc333a10023835f9cc1b")
+	data, _ := binary.Varint(mySlice)
+	fmt.Println(data)
 }
