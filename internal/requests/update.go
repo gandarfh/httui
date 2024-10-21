@@ -3,12 +3,12 @@ package requests
 import (
 	"fmt"
 
-	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/gandarfh/httui/internal/repositories/offline"
 	"github.com/gandarfh/httui/pkg/common"
 	"github.com/gandarfh/httui/pkg/terminal"
+	"github.com/gandarfh/httui/pkg/tree/v2"
 	"github.com/gandarfh/httui/pkg/utils"
 	"gorm.io/gorm"
 )
@@ -57,23 +57,15 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.Requests = msg
 		m.parentId = msg.ParentID
 
-		list := []list.Item{}
-		w := m.List.Width() - 2
+		m.List.SetCursorAndPage(msg.Cursor, msg.Page)
 
-		for _, i := range m.Requests.List {
-			list = append(list, RequestItem{i.Name, string(i.Type), w})
-		}
+		nodes := buildTree(m.Requests.List, nil)
+		nodes = tree.MergeNodes(nodes, msg.RequestTree)
+		nodes = tree.MergeNodes(nodes, m.List.Nodes())
 
-		cmds = append(cmds, m.List.SetItems(list))
+		m.List.SetNodes(nodes)
 
 		if len(m.Requests.List) > 0 {
-			index := m.List.Index()
-
-			if len(m.Requests.List) <= index {
-				index = 0
-			}
-
-			m.Requests.Current = m.Requests.List[index]
 			cmds = append(cmds, m.Detail.SetRequest(m.Requests.Current))
 			cmds = append(cmds, func() tea.Msg { return UpdateRequestDefault(m.Requests.Current) })
 		}
@@ -87,7 +79,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case UpdateRequestDefault:
 		if m.Requests.Current.ID == msg.ID {
-			offline.NewDefault().Update(&offline.Default{
+			offline.NewDefault().Update(offline.Default{
 				RequestId: m.Requests.Current.ID,
 			})
 		}
@@ -176,4 +168,24 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	cmds = append(cmds, cmd)
 
 	return m, tea.Batch(cmds...)
+}
+
+func buildTree(requests []offline.Request, parentID *uint) []tree.Node[offline.Request] {
+	var nodes []tree.Node[offline.Request]
+	for _, req := range requests {
+		if (req.ParentID == nil && parentID == nil) || (req.ParentID != nil && parentID != nil && *req.ParentID == *parentID) {
+
+			children := buildTree(requests, &req.ID)
+			node := tree.Node[offline.Request]{
+				Value:    req.Name,
+				Data:     req,
+				Children: children,
+				Expanded: false,
+			}
+
+			nodes = append(nodes, node)
+		}
+	}
+
+	return nodes
 }

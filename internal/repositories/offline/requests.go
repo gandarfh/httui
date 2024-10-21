@@ -1,7 +1,6 @@
 package offline
 
 import (
-	"encoding/binary"
 	"fmt"
 	"strings"
 	"time"
@@ -114,19 +113,73 @@ func (repo *RequestsRepo) FindOne(id uint) (*Request, error) {
 }
 
 func (repo *RequestsRepo) List(parentId *uint, filter string) ([]Request, error) {
-	requests := []Request{}
+	var requests []Request
 	query := repo.Sql.Model(&requests)
 
 	if filter != "" {
 		query.Where("name LIKE ?", "%"+filter+"%")
+
+		if err := query.Find(&requests).Error; err != nil {
+			return nil, err
+		}
+
+		if len(requests) == 0 {
+			return requests, nil
+		}
+
+		relatedRequestsMap := make(map[uint]Request)
+
+		for _, req := range requests {
+			relatedRequestsMap[req.ID] = req
+		}
+
+		addRelatedRequests := func(req Request) {
+			if req.ParentID != nil {
+				var parent Request
+				if err := repo.Sql.Where("id = ?", req.ParentID).First(&parent).Error; err == nil {
+					relatedRequestsMap[parent.ID] = parent
+				}
+			}
+
+			if req.Type == "group" {
+				var children []Request
+				if err := repo.Sql.Where("parent_id = ?", req.ID).Find(&children).Error; err == nil {
+					for _, child := range children {
+						relatedRequestsMap[child.ID] = child
+					}
+				}
+			}
+		}
+
+		for _, req := range requests {
+			if req.Type == "request" || req.Type == "group" {
+				addRelatedRequests(req)
+			}
+		}
+
+		finalRequests := make([]Request, 0, len(relatedRequestsMap))
+		for _, req := range relatedRequestsMap {
+			finalRequests = append(finalRequests, req)
+		}
+
+		return finalRequests, nil
 	}
 
-	if filter == "" {
-		if parentId == nil {
-			query = query.Where("parent_id IS NULL")
-		} else {
-			query = query.Where("parent_id = ?", *parentId)
-		}
+	if err := query.Find(&requests).Error; err != nil {
+		return nil, err
+	}
+
+	return requests, nil
+}
+
+func (repo *RequestsRepo) ListByparent(parentId *uint) ([]Request, error) {
+	requests := []Request{}
+	query := repo.Sql.Model(&requests)
+
+	if parentId == nil {
+		query = query.Where("parent_id IS NULL")
+	} else {
+		query = query.Where("parent_id = ?", *parentId)
 	}
 
 	if err := query.Find(&requests).Error; err != nil {
@@ -155,10 +208,4 @@ func (repo *RequestsRepo) Delete(id uint) error {
 		return err
 	}
 	return nil
-}
-
-func main() {
-	var mySlice = []byte("667cbc333a10023835f9cc1b")
-	data, _ := binary.Varint(mySlice)
-	fmt.Println(data)
 }

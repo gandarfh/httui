@@ -76,14 +76,9 @@ func (parser ConfigParser) createConfigFileIfMissing(configFilePath string) erro
 
 // getConfigFileOrCreateIfMissing returns the config file path or creates the config file if it doesn't exist.
 func (parser ConfigParser) getConfigFileOrCreateIfMissing() (*string, error) {
-	var err error
-	configDir := os.Getenv("XDG_CONFIG_HOME")
-
-	if configDir == "" {
-		configDir, err = os.UserConfigDir()
-		if err != nil {
-			return nil, configError{parser: parser, configDir: configDir, err: err}
-		}
+	configDir, err := os.UserHomeDir()
+	if err != nil {
+		return nil, configError{parser: parser, configDir: configDir, err: err}
 	}
 
 	prsConfigDir := filepath.Join(configDir, AppDir)

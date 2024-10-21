@@ -1,8 +1,9 @@
 package requests
 
 import (
+	"log"
+
 	"github.com/charmbracelet/bubbles/help"
-	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -11,6 +12,7 @@ import (
 	"github.com/gandarfh/httui/internal/requests/details"
 	"github.com/gandarfh/httui/pkg/common"
 	"github.com/gandarfh/httui/pkg/styles"
+	"github.com/gandarfh/httui/pkg/tree/v2"
 )
 
 func LoadDefault() tea.Msg {
@@ -21,13 +23,18 @@ func LoadDefault() tea.Msg {
 func LoadWorspace() tea.Msg {
 	config, _ := offline.NewDefault().First()
 	workspace, _ := offline.NewWorkspace().FindOne(config.WorkspaceId)
+	log.Println(workspace.ID, workspace.Name)
+
 	return workspace
 }
 
 type RequestsData struct {
-	List     []offline.Request
-	Current  offline.Request
-	ParentID *uint
+	List        []offline.Request
+	Current     offline.Request
+	RequestTree []tree.Node[offline.Request]
+	ParentID    *uint
+	Cursor      int
+	Page        int
 }
 
 func LoadRequests() tea.Msg {
@@ -36,28 +43,45 @@ func LoadRequests() tea.Msg {
 	requests, _ := offline.NewRequest().List(request.ParentID, "")
 
 	return RequestsData{
-		Current:  *request,
-		List:     requests,
-		ParentID: request.ParentID,
+		RequestTree: config.RequestTree.Data(),
+		Cursor:      *config.Cursor,
+		Page:        *config.Page,
+		Current:     *request,
+		List:        requests,
+		ParentID:    request.ParentID,
 	}
 }
 
 func LoadRequestsByParentId(parentId *uint) tea.Cmd {
 	return func() tea.Msg {
+		config, _ := offline.NewDefault().First()
+		request, _ := offline.NewRequest().FindOne(config.RequestId)
 		requests, _ := offline.NewRequest().List(parentId, "")
+
 		return RequestsData{
-			List:     requests,
-			ParentID: parentId,
+			List:        requests,
+			ParentID:    parentId,
+			RequestTree: config.RequestTree.Data(),
+			Cursor:      *config.Cursor,
+			Page:        *config.Page,
+			Current:     *request,
 		}
 	}
 }
 
 func LoadRequestsByFilter(filter string) tea.Cmd {
 	return func() tea.Msg {
+		config, _ := offline.NewDefault().First()
+		request, _ := offline.NewRequest().FindOne(config.RequestId)
 		requests, _ := offline.NewRequest().List(nil, filter)
+
 		return RequestsData{
-			List:     requests,
-			ParentID: nil,
+			RequestTree: config.RequestTree.Data(),
+			List:        requests,
+			Current:     *request,
+			ParentID:    nil,
+			Cursor:      0,
+			Page:        0,
 		}
 	}
 }
@@ -71,7 +95,7 @@ type Model struct {
 	command_active   bool
 	keys             KeyMap
 	help             help.Model
-	List             list.Model
+	List             tree.Model[offline.Request]
 	spinner          spinner.Model
 	command_bar      common.Component
 	loading          common.Loading
@@ -97,7 +121,7 @@ func New(workers ...tea.Cmd) tea.Model {
 		Width:          0,
 		Height:         0,
 		state:          common.Start_state,
-		List:           NewRequestList(),
+		List:           tree.New([]tree.Node[offline.Request]{}, 0, 0),
 		Detail:         details.New(),
 		help:           help.New(),
 		keys:           keys,
@@ -132,9 +156,15 @@ var (
 )
 
 func (m Model) View() string {
+	list := lipgloss.NewStyle().
+		Border(lipgloss.RoundedBorder()).
+		Height(m.Height - 3).
+		Width(m.List.Width() - 4).
+		Render(m.List.View())
+
 	requestsPage := lipgloss.JoinHorizontal(
 		lipgloss.Left,
-		lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Height(m.Height-3).Width(m.List.Width()-4).Render(m.List.View()),
+		list,
 		m.Detail.View(),
 	)
 

@@ -9,7 +9,6 @@ type KeyMap struct {
 	SetWorkspace    key.Binding
 	CreateWorkspace key.Binding
 	OpenGroup       key.Binding
-	CloseGroup      key.Binding
 	Delete          key.Binding
 	Create          key.Binding
 	Edit            key.Binding
@@ -25,7 +24,6 @@ func (k KeyMap) ShortHelp() []key.Binding {
 		k.SetWorkspace,
 		k.CreateWorkspace,
 		k.OpenGroup,
-		k.CloseGroup,
 		k.Delete,
 		k.Create,
 		k.Edit,
@@ -60,10 +58,6 @@ var keys = KeyMap{
 	OpenGroup: key.NewBinding(
 		key.WithKeys("o", "esc", "enter", "l"),
 		key.WithHelp("o/l/enter", "Open"),
-	),
-	CloseGroup: key.NewBinding(
-		key.WithKeys("O", "h"),
-		key.WithHelp("O/h", "Close"),
 	),
 	Edit: key.NewBinding(
 		key.WithKeys("R"),

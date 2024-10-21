@@ -1,9 +1,8 @@
-package utils
+package truncate
 
-func Truncate(text string, maxLen int) string {
+func String(text string, maxLen int) string {
 	if len(text) > maxLen {
 		return text[:maxLen] + "..."
 	}
-
 	return text
 }

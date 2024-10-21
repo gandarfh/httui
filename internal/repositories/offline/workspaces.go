@@ -140,3 +140,28 @@ func (repo *WorkspacesRepo) Delete(id uint) error {
 	db := repo.Sql.Model(&Workspace{}).Where("id IS ?", id).Delete(&Workspace{})
 	return db.Error
 }
+
+func (repo *WorkspacesRepo) Environments(workspaceId uint) (map[string]string, error) {
+	mergedEnvironments := make(map[string]string)
+
+	var workspaces []Workspace
+	if err := repo.Sql.Find(&workspaces).Error; err != nil {
+		return nil, err
+	}
+
+	for _, workspace := range workspaces {
+		if workspace.Environments.Data() != nil {
+			for key, value := range workspace.Environments.Data() {
+				if workspace.ID == workspaceId {
+					mergedEnvironments[key] = value
+				} else {
+					if _, exists := mergedEnvironments[key]; !exists {
+						mergedEnvironments[key] = ""
+					}
+				}
+			}
+		}
+	}
+
+	return mergedEnvironments, nil
+}

@@ -125,7 +125,7 @@ func SyncRequests(program *tea.Program) tea.Cmd {
 				Where("id = ?", r.ID).
 				Updates(&r)
 
-			offline.NewDefault().Update(&offline.Default{LastRequestSync: r.UpdatedAt.Add(1 * time.Minute)})
+			offline.NewDefault().Update(offline.Default{LastRequestSync: r.UpdatedAt.Add(1 * time.Minute)})
 
 			return r, nil
 		}

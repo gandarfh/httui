@@ -3,6 +3,8 @@ package offline
 import (
 	"time"
 
+	"github.com/gandarfh/httui/pkg/tree/v2"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
@@ -12,11 +14,14 @@ type DefaultsRepo struct {
 
 type Default struct {
 	gorm.Model
-	LastResponseSync  time.Time `json:"lastResponseSync"`
-	LastRequestSync   time.Time `json:"lastRequestSync"`
-	LastWorkspaceSync time.Time `json:"lastWorkspaceSync"`
-	WorkspaceId       uint      `json:"workspaceId"`
-	RequestId         uint      `json:"requestId"`
+	LastResponseSync  time.Time                                `json:"lastResponseSync"`
+	LastRequestSync   time.Time                                `json:"lastRequestSync"`
+	LastWorkspaceSync time.Time                                `json:"lastWorkspaceSync"`
+	WorkspaceId       uint                                     `json:"workspaceId"`
+	RequestId         uint                                     `json:"requestId"`
+	Cursor            *int                                     `json:"cursor"`
+	Page              *int                                     `json:"page"`
+	RequestTree       datatypes.JSONType[[]tree.Node[Request]] `json:"requestTree"`
 }
 
 func NewDefault() *DefaultsRepo {
@@ -30,7 +35,7 @@ func NewDefault() *DefaultsRepo {
 	return &DefaultsRepo{Database}
 }
 
-func (repo *DefaultsRepo) Update(value *Default) error {
+func (repo *DefaultsRepo) Update(value Default) error {
 	db := repo.Sql.Model(&Default{}).Where("id IS ?", 1).Updates(value)
 	return db.Error
 }

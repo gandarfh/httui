@@ -19,6 +19,7 @@ func (m Model) CommandsActions(msg common.CommandClose) (Model, tea.Cmd) {
 
 	case "FILTER":
 		m.filter = msg.Value
+		m.List.CursorTop()
 		return m, tea.Batch(LoadRequestsByFilter(m.filter))
 
 	case "CREATE_WORKSPACE":
@@ -30,7 +31,7 @@ func (m Model) CommandsActions(msg common.CommandClose) (Model, tea.Cmd) {
 		offline.NewWorkspace().Create(&workspace)
 		m.Workspace = workspace
 
-		offline.NewDefault().Update(&offline.Default{
+		offline.NewDefault().Update(offline.Default{
 			WorkspaceId: workspace.ID,
 		})
 
@@ -45,7 +46,7 @@ func (m Model) CommandsActions(msg common.CommandClose) (Model, tea.Cmd) {
 		offline.NewWorkspace().Sql.Model(&workspace).Where("name LIKE ?", "%"+msg.Value+"%").First(&workspace)
 		m.Workspace = workspace
 
-		offline.NewDefault().Update(&offline.Default{
+		offline.NewDefault().Update(offline.Default{
 			WorkspaceId: workspace.ID,
 		})
 

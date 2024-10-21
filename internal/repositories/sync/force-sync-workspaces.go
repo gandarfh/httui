@@ -81,7 +81,7 @@ func SyncWorkspaces(program *tea.Program) tea.Cmd {
 				Where("id = ?", w.ID).
 				Updates(&w)
 
-			offline.NewDefault().Update(&offline.Default{LastWorkspaceSync: w.UpdatedAt.Add(1 * time.Minute)})
+			offline.NewDefault().Update(offline.Default{LastWorkspaceSync: w.UpdatedAt.Add(1 * time.Minute)})
 
 			return w, nil
 		}
