@@ -1,12 +1,21 @@
 package details
 
 import (
+	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/glamour"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/gandarfh/httui/internal/repositories/offline"
 	"github.com/gandarfh/httui/pkg/common"
+)
+
+type section uint
+
+const (
+	CursorTree   section = 0
+	CursorName    section = 1
+	CursorPreview section = 2
 )
 
 var (
@@ -16,17 +25,34 @@ var (
 )
 
 type Model struct {
-	Width     int
-	Height    int
-	bodyVP    viewport.Model
-	headerVP  viewport.Model
-	paramsVP  viewport.Model
-	Request   offline.Request
-	Workspace offline.Workspace
+	Width        int
+	Height       int
+	Cursor       section
+	InputName    textinput.Model
+	InputPreview textinput.Model
+	bodyVP       viewport.Model
+	headerVP     viewport.Model
+	paramsVP     viewport.Model
+	Request      offline.Request
+	Workspace    offline.Workspace
 }
 
 func New() Model {
-	return Model{}
+	tn := textinput.New()
+	tn.Prompt = ""
+	tn.CharLimit = 156
+	tn.Blur()
+
+	tp := textinput.New()
+	tp.Prompt = ""
+	tp.CharLimit = 156
+	tp.Blur()
+
+	return Model{
+		Cursor:       CursorTree,
+		InputName:    tn,
+		InputPreview: tp,
+	}
 }
 
 func (m *Model) SetWorkspace(w offline.Workspace) tea.Cmd {
@@ -41,23 +67,72 @@ func (m *Model) SetRequest(r offline.Request) tea.Cmd {
 	}
 }
 
-type Width int
-type Height int
-
-func (m *Model) SetWidth(w int) tea.Cmd {
-	return func() tea.Msg {
-		return Width(w)
+func (m *Model) Next() tea.Cmd {
+	switch m.Cursor {
+	case CursorName:
+		m.InputName.Blur()
+	case CursorPreview:
+		m.InputPreview.Blur()
 	}
+
+	m.Cursor++
+
+	if m.Cursor > 2 {
+		m.Cursor = 0
+	}
+
+	m.CompleteInputValue()
+
+	switch m.Cursor {
+	case CursorName:
+		return m.InputName.Focus()
+	case CursorPreview:
+		return m.InputPreview.Focus()
+	}
+
+	return nil
 }
 
-func (m *Model) SetHeight(h int) tea.Cmd {
-	return func() tea.Msg {
-		return Height(h)
+func (m *Model) Prev() tea.Cmd {
+	switch m.Cursor {
+	case CursorName:
+		m.InputName.Blur()
+	case CursorPreview:
+		m.InputPreview.Blur()
+	}
+
+	m.Cursor--
+
+	if m.Cursor < 0 {
+		m.Cursor = CursorPreview
+	}
+
+	m.CompleteInputValue()
+
+	switch m.Cursor {
+	case CursorName:
+		return m.InputName.Focus()
+	case CursorPreview:
+		return m.InputPreview.Focus()
+	}
+
+	return nil
+}
+
+func (m *Model) CompleteInputValue() {
+	switch m.Cursor {
+	case CursorName:
+		m.InputName.SetValue(m.Request.Name)
+	case CursorPreview:
+		m.InputPreview.SetValue(m.Request.Endpoint)
+	default:
+		m.InputName.SetValue("")
+		m.InputPreview.SetValue("")
 	}
 }
 
 func (m Model) Init() tea.Cmd {
-	return nil
+	return textinput.Blink
 }
 
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
@@ -88,6 +163,12 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	cmds = append(cmds, cmd)
 
 	m.paramsVP, cmd = m.paramsVP.Update(msg)
+	cmds = append(cmds, cmd)
+
+	m.InputName, cmd = m.InputName.Update(msg)
+	cmds = append(cmds, cmd)
+
+	m.InputPreview, cmd = m.InputPreview.Update(msg)
 	cmds = append(cmds, cmd)
 
 	return m, tea.Batch(cmds...)

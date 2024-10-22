@@ -152,6 +152,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		m.Detail.Width = m.Width - m.List.Width() - 2
 		m.Detail.Height = m.Height - 9
+
+		m.Detail.InputPreview.CharLimit = m.Detail.Width - m.Detail.Width/6
+		m.Detail.InputName.CharLimit = m.Detail.Width / 2
 	}
 
 	if m.command_active {

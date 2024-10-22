@@ -70,6 +70,16 @@ func (m *Model[T]) SetNodes(nodes []Node[T]) {
 	m.updatePagination()
 }
 
+func (m *Model[T]) EnableKeyMap(v bool) {
+	m.KeyMap.PrevPage.SetEnabled(v)
+	m.KeyMap.NextPage.SetEnabled(v)
+	m.KeyMap.Bottom.SetEnabled(v)
+	m.KeyMap.Top.SetEnabled(v)
+	m.KeyMap.Down.SetEnabled(v)
+	m.KeyMap.Up.SetEnabled(v)
+	m.KeyMap.ToggleExpand.SetEnabled(v)
+}
+
 func (m *Model[T]) NumberOfNodes() int {
 	count := 0
 

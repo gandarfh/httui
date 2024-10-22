@@ -10,7 +10,7 @@ https://github.com/gandarfh/httui/assets/57275106/d6865bd4-036d-4a2c-916d-7f8908
 
 ## 1. Variables in Multiple Environments
 
-**httui** allows you to define variables in different environments, making it easy to parameterize your requests. This is especially useful when you need to switch between development, testing, and production environments.
+**httui** allows you to define variables in different environments, making it easy to parameterize your requests. This is especially useful when you need to switch between development, testing and production environments.
 
 ## 2. Easy Environment Creation and Switching
 

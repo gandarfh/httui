@@ -6,6 +6,7 @@ import (
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/gandarfh/httui/internal/repositories/offline"
+	"github.com/gandarfh/httui/internal/requests/details"
 	"github.com/gandarfh/httui/pkg/common"
 	"github.com/gandarfh/httui/pkg/terminal"
 	"github.com/gandarfh/httui/pkg/topointer"
@@ -115,6 +116,45 @@ func (m Model) KeyActions(msg tea.KeyMsg) (Model, tea.Cmd) {
 		envs, _ := offline.NewWorkspace().Environments(m.Workspace.ID)
 		term := terminal.NewPreview(&envs)
 		return m, tea.Batch(term.OpenVim("Envs"))
+
+	case key.Matches(msg, m.keys.Next):
+		cursor := m.Detail.Cursor + 1
+		if m.Detail.Cursor == details.CursorPreview {
+			cursor = details.CursorTree
+		}
+
+		m.keys.DisableKeysForInputs(cursor == details.CursorTree)
+		m.List.EnableKeyMap(cursor == details.CursorTree)
+		return m, m.Detail.Next()
+
+	case key.Matches(msg, m.keys.Save):
+		switch m.Detail.Cursor {
+		case details.CursorName:
+			name := m.Detail.InputName.Value()
+			if name != "" {
+				m.Requests.Current.Name = name
+				offline.NewRequest().Update(&m.Requests.Current)
+				m.Detail.InputName.Blur()
+				m.Detail.Cursor = details.CursorTree
+				m.keys.DisableKeysForInputs(true)
+				m.List.EnableKeyMap(true)
+
+				return m, tea.Batch(LoadRequestsByParentId(m.parentId))
+			}
+
+		case details.CursorPreview:
+			endpoint := m.Detail.InputPreview.Value()
+			if endpoint != "" {
+				m.Requests.Current.Endpoint = endpoint
+				offline.NewRequest().Update(&m.Requests.Current)
+				m.Detail.InputPreview.Blur()
+				m.Detail.Cursor = details.CursorTree
+				m.keys.DisableKeysForInputs(true)
+				m.List.EnableKeyMap(true)
+
+				return m, tea.Batch(LoadRequestsByParentId(m.parentId))
+			}
+		}
 	}
 
 	return m, nil
