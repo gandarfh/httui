@@ -17,7 +17,6 @@ func (parser ConfigParser) GetDefaultConfig() config {
 			Local:    true,
 			Token:    "",
 			DeviceID: "",
-			Logging:  true, // TODO
 			AutoSync: AutoSync{
 				BeforeOpen: Sync{
 					Remote:  true,

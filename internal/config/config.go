@@ -14,7 +14,6 @@ type AutoSync struct {
 
 // SettingsConfig struct represents the config for the settings.
 type SettingsConfig struct {
-	Logging  bool     `yaml:"logging"`
 	Local    bool     `yaml:"local"`
 	Token    string   `yaml:"token"`
 	DeviceID string   `yaml:"deviceId"`

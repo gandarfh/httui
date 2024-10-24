@@ -3,6 +3,7 @@ package tui
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/gandarfh/httui/internal/config"
@@ -30,14 +31,15 @@ var (
 )
 
 func App() {
-	if config.Config.Settings.Logging {
-		f, err := tea.LogToFile("debug.log", "debug")
-		if err != nil {
-			fmt.Println("fatal:", err)
-			os.Exit(1)
-		}
-		defer f.Close()
+	configDir, _ := os.UserHomeDir()
+	path := filepath.Join(configDir, config.AppDir, "debug.log")
+
+	f, err := tea.LogToFile(path, "debug")
+	if err != nil {
+		fmt.Println("fatal:", err)
+		os.Exit(1)
 	}
+	defer f.Close()
 
 	services.DatasourceStart()
 
@@ -57,14 +59,15 @@ func App() {
 }
 
 func Login() {
-	if config.Config.Settings.Logging {
-		f, err := tea.LogToFile("debug.log", "debug")
-		if err != nil {
-			fmt.Println("fatal:", err)
-			os.Exit(1)
-		}
-		defer f.Close()
+	configDir, _ := os.UserHomeDir()
+	path := filepath.Join(configDir, config.AppDir, "debug.log")
+
+	f, err := tea.LogToFile(path, "debug")
+	if err != nil {
+		fmt.Println("fatal:", err)
+		os.Exit(1)
 	}
+	defer f.Close()
 
 	services.DatasourceStart()
 

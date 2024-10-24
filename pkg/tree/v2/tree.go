@@ -1,7 +1,6 @@
 package tree
 
 import (
-	"log"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/key"
@@ -98,7 +97,6 @@ func (m *Model[T]) NumberOfNodes() int {
 }
 
 func (m *Model[T]) Index() int {
-	log.Println(m.Paginator.Page*m.Paginator.PerPage, m.cursor)
 	return m.Paginator.Page*m.Paginator.PerPage + m.cursor
 }
 
@@ -139,7 +137,6 @@ func (m *Model[T]) GetNodeByIndex(index int) *Node[T] {
 }
 
 func (m *Model[T]) ToggleExpand() {
-	log.Println("ToggleExpand")
 	count := 0
 	var toggleExpandNode func([]Node[T]) bool
 
@@ -196,7 +193,6 @@ func (m *Model[T]) CursorTop() {
 }
 
 func (m *Model[T]) CursorBottom() {
-	log.Println(m.NumberOfNodes())
 	m.Paginator.Page = m.Paginator.TotalPages - 1
 	m.cursor = m.Paginator.ItemsOnPage(m.NumberOfNodes()) - 1
 }
