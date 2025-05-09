@@ -5,9 +5,12 @@ import (
 
 	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/gandarfh/httui/internal/repositories"
+	"github.com/gandarfh/httui/internal/repositories/offline"
+	"github.com/gandarfh/httui/internal/requests/details"
 	"github.com/gandarfh/httui/pkg/common"
 	"github.com/gandarfh/httui/pkg/terminal"
+	"github.com/gandarfh/httui/pkg/topointer"
+	"gorm.io/datatypes"
 )
 
 func (m Model) KeyActions(msg tea.KeyMsg) (Model, tea.Cmd) {
@@ -17,6 +20,7 @@ func (m Model) KeyActions(msg tea.KeyMsg) (Model, tea.Cmd) {
 
 	case key.Matches(msg, m.keys.Detail):
 		m = m.ShowRequestDetails(msg.String())
+
 		return m, tea.Batch(
 			m.Detail.SetRequest(m.Requests.Current),
 			tea.Tick(time.Second, func(_ time.Time) tea.Msg {
@@ -26,13 +30,6 @@ func (m Model) KeyActions(msg tea.KeyMsg) (Model, tea.Cmd) {
 
 	case key.Matches(msg, m.keys.OpenGroup):
 		m = m.OpenRequest()
-		return m, tea.Batch(
-			LoadRequestsByParentId(m.parentId),
-		)
-
-	case key.Matches(msg, m.keys.CloseGroup):
-		m = m.BackRequest()
-		return m, tea.Batch(LoadRequestsByParentId(m.previousParentId))
 
 	case key.Matches(msg, m.keys.Filter):
 		return m, tea.Batch(
@@ -54,31 +51,35 @@ func (m Model) KeyActions(msg tea.KeyMsg) (Model, tea.Cmd) {
 			return m, nil
 		}
 
-		index := m.List.Index()
-		m.Requests.Current = m.Requests.List[index]
+		m.Requests.Current = m.List.CurrentNode().Data
 		m = m.OpenRequest()
 
 		if m.Requests.Current.Type == "group" {
 			break
 		}
 
-		return m, tea.Batch(common.SetLoading(true, "Loading..."), m.Exec())
+		return m, tea.Batch(common.SetLoading(true), m.Exec())
 
 	case key.Matches(msg, m.keys.Delete):
 		if len(m.Requests.List) == 0 {
 			return m, nil
 		}
 
-		index := m.List.Index()
-		m.Requests.Current = m.Requests.List[index]
+		m.Requests.Current = m.List.CurrentNode().Data
 
 		return m, tea.Batch(
 			common.OpenCommand("DELETE", "Type 'Y' to confirm, or any other key to cancel: "),
 		)
 
 	case key.Matches(msg, m.keys.Create):
-		term := terminal.NewPreview(&repositories.Request{
-			ParentID: m.parentId,
+		parentId := m.Requests.Current.ParentID
+
+		if m.Requests.Current.Type == offline.GROUP {
+			parentId = &m.Requests.Current.ID
+		}
+
+		term := terminal.NewPreview(&offline.Request{
+			ParentID: parentId,
 		})
 
 		return m, tea.Batch(term.OpenVim("Create"))
@@ -88,16 +89,15 @@ func (m Model) KeyActions(msg tea.KeyMsg) (Model, tea.Cmd) {
 			return m, nil
 		}
 
-		index := m.List.Index()
-		m.Requests.Current = m.Requests.List[index]
+		m.Requests.Current = m.List.CurrentNode().Data
 		m = m.OpenRequest()
 
 		if m.Requests.Current.Type == "group" {
-			requests, _ := repositories.NewRequest().List(&m.Requests.Current.ID, "")
+			requests, _ := offline.NewRequest().ListByparent(&m.Requests.Current.ID)
 
 			group := struct {
-				Group    repositories.Request
-				Requests []repositories.Request
+				Group    offline.Request
+				Requests []offline.Request
 			}{
 				Group:    m.Requests.Current,
 				Requests: requests,
@@ -113,41 +113,84 @@ func (m Model) KeyActions(msg tea.KeyMsg) (Model, tea.Cmd) {
 		return m, tea.Batch(term.OpenVim("Edit"))
 
 	case key.Matches(msg, m.keys.Envs):
-		envs, _ := repositories.NewEnvs().List(m.Workspace.ID)
+		envs, _ := offline.NewWorkspace().Environments(m.Workspace.ID)
+		term := terminal.NewPreview(&envs)
+		return m, tea.Batch(term.OpenVim("Envs"))
 
-		data := []map[string]any{}
-		for _, env := range envs {
-			data = append(data, map[string]any{"id": env.ID, "key": env.Key, "value": env.Value})
+	case key.Matches(msg, m.keys.Next):
+		cursor := m.Detail.Cursor + 1
+		if m.Detail.Cursor == details.CursorPreview {
+			cursor = details.CursorTree
 		}
 
-		term := terminal.NewPreview(&data)
+		m.keys.DisableKeysForInputs(cursor == details.CursorTree)
+		m.List.EnableKeyMap(cursor == details.CursorTree)
+		return m, m.Detail.Next()
 
-		return m, tea.Batch(term.OpenVim("Envs"))
+	case key.Matches(msg, m.keys.Save):
+		switch m.Detail.Cursor {
+		case details.CursorName:
+			name := m.Detail.InputName.Value()
+			if name != "" {
+				m.Requests.Current.Name = name
+				offline.NewRequest().Update(&m.Requests.Current)
+				m.Detail.InputName.Blur()
+				m.Detail.Cursor = details.CursorTree
+				m.keys.DisableKeysForInputs(true)
+				m.List.EnableKeyMap(true)
+
+				return m, tea.Batch(LoadRequestsByParentId(m.parentId))
+			}
+
+		case details.CursorPreview:
+			endpoint := m.Detail.InputPreview.Value()
+			if endpoint != "" {
+				m.Requests.Current.Endpoint = endpoint
+				offline.NewRequest().Update(&m.Requests.Current)
+				m.Detail.InputPreview.Blur()
+				m.Detail.Cursor = details.CursorTree
+				m.keys.DisableKeysForInputs(true)
+				m.List.EnableKeyMap(true)
+
+				return m, tea.Batch(LoadRequestsByParentId(m.parentId))
+			}
+		}
 	}
 
 	return m, nil
 }
 
 func (m Model) ShowRequestDetails(direction string) Model {
-	size := len(m.Requests.List)
+	size := m.List.NumberOfNodes()
 	if size == 0 {
 		return m
 	}
 
 	index := m.List.Index()
+	cursor := m.List.Cursor()
 
 	switch direction {
 	case "down", "j":
 		index += 1
+		cursor += 1
 	case "up", "k":
 		index -= 1
+		cursor -= 1
 	}
 
 	if size == index || index < 0 {
 		index = m.List.Index()
+		cursor = m.List.Cursor()
 	}
 
-	m.Requests.Current = m.Requests.List[index]
+	m.Requests.Current = m.List.GetNodeByIndex(index).Data
+
+	d, _ := offline.NewDefault().First()
+	d.RequestTree = datatypes.NewJSONType(m.List.Nodes())
+	d.Cursor = topointer.New(cursor)
+	d.Page = topointer.New(m.List.Paginator.Page)
+	d.RequestId = m.Requests.Current.ID
+	offline.NewDefault().Update(*d)
 
 	if m.Requests.Current.Type == "request" {
 		m.parentId = m.Requests.Current.ParentID
@@ -161,12 +204,9 @@ func (m Model) OpenRequest() Model {
 		return m
 	}
 
-	index := m.List.Index()
-	m.Requests.Current = m.Requests.List[index]
+	m.List.ToggleExpand()
 
-	repositories.NewDefault().Update(&repositories.Default{
-		RequestId: m.Requests.Current.ID,
-	})
+	m.Requests.Current = m.List.CurrentNode().Data
 
 	if m.Requests.Current.Type == "group" {
 		m.previousParentId = m.Requests.Current.ParentID
@@ -177,35 +217,12 @@ func (m Model) OpenRequest() Model {
 		m.parentId = m.Requests.Current.ParentID
 	}
 
-	return m
-}
-
-func (m Model) BackRequest() Model {
-	if len(m.Requests.List) > 0 {
-		index := m.List.Index()
-		m.Requests.Current = m.Requests.List[index]
-
-		repositories.NewDefault().Update(&repositories.Default{
-			RequestId: m.Requests.Current.ID,
-		})
-	}
-
-	if m.parentId == nil {
-		return m
-	}
-
-	if len(m.Requests.List) == 0 {
-		m.parentId = m.previousParentId
-		return m
-	}
-
-	if m.Requests.Current.ParentID != nil {
-		request, _ := repositories.NewRequest().FindOne(*m.Requests.Current.ParentID)
-		m.parentId = request.ParentID
-		m.previousParentId = request.ParentID
-	} else {
-		m.previousParentId = nil
-	}
+	d, _ := offline.NewDefault().First()
+	d.RequestTree = datatypes.NewJSONType(m.List.Nodes())
+	d.Cursor = topointer.New(m.List.Cursor())
+	d.Page = topointer.New(m.List.Paginator.Page)
+	d.RequestId = m.Requests.Current.ID
+	offline.NewDefault().Update(*d)
 
 	return m
 }

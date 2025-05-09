@@ -4,17 +4,30 @@ import (
 	"fmt"
 
 	"github.com/charmbracelet/lipgloss"
+	"github.com/gandarfh/httui/pkg/utils"
 )
 
 func (m Model) Title() string {
-  titleWidth := m.Width-m.Width/3
+	titleWidth := m.Width - m.Width/3
 
-	title := title_style.Width(m.Width).Border(lipgloss.RoundedBorder()).Render(lipgloss.JoinHorizontal(
-		lipgloss.Left,
-		lipgloss.NewStyle().Width(titleWidth).Bold(true).Render(" Name: "+m.Request.Name),
-		lipgloss.NewStyle().Width(titleWidth/4).String(),
-		lipgloss.NewStyle().Width(titleWidth/4).Bold(true).Render(fmt.Sprint(" ID: ", m.Request.ID)),
-	))
+	id := lipgloss.NewStyle().
+		Width(titleWidth / 3).
+		Bold(true).
+		Render(utils.Truncate(fmt.Sprintf(" ID: %d", m.Request.ID), titleWidth/4))
+
+	name := " Name: " + m.Request.Name
+
+	if m.Cursor == CursorName {
+		name = " Name: " + m.InputName.View()
+	}
+
+	title := title_style.Width(m.Width).Border(lipgloss.RoundedBorder()).Render(
+		lipgloss.JoinHorizontal(
+			lipgloss.Left,
+			lipgloss.NewStyle().Width(titleWidth).Bold(true).Render(name),
+			lipgloss.NewStyle().Width(titleWidth/6).String(),
+			id,
+		))
 
 	return title
 }

@@ -2,61 +2,16 @@ package requests
 
 import (
 	"github.com/charmbracelet/bubbles/help"
-	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/gandarfh/httui/internal/command"
-	"github.com/gandarfh/httui/internal/repositories"
+	"github.com/gandarfh/httui/internal/repositories/offline"
 	"github.com/gandarfh/httui/internal/requests/details"
 	"github.com/gandarfh/httui/pkg/common"
 	"github.com/gandarfh/httui/pkg/styles"
+	"github.com/gandarfh/httui/pkg/tree/v2"
 )
-
-func LoadDefault() tea.Msg {
-	config, _ := repositories.NewDefault().First()
-	return *config
-}
-
-func LoadWorspace() tea.Msg {
-	config, _ := repositories.NewDefault().First()
-	workspace, _ := repositories.NewWorkspace().FindOne(config.WorkspaceId)
-	return workspace
-}
-
-type RequestsData struct {
-	List    []repositories.Request
-	Current repositories.Request
-}
-
-func LoadRequests() tea.Msg {
-	config, _ := repositories.NewDefault().First()
-	request, _ := repositories.NewRequest().FindOne(config.RequestId)
-	requests, _ := repositories.NewRequest().List(request.ParentID, "")
-
-	return RequestsData{
-		Current: *request,
-		List:    requests,
-	}
-}
-
-func LoadRequestsByParentId(parentId *uint) tea.Cmd {
-	return func() tea.Msg {
-		requests, _ := repositories.NewRequest().List(parentId, "")
-		return RequestsData{
-			List: requests,
-		}
-	}
-}
-
-func LoadRequestsByFilter(filter string) tea.Cmd {
-	return func() tea.Msg {
-		requests, _ := repositories.NewRequest().List(nil, filter)
-		return RequestsData{
-			List: requests,
-		}
-	}
-}
 
 type Model struct {
 	Detail           details.Model
@@ -67,7 +22,7 @@ type Model struct {
 	command_active   bool
 	keys             KeyMap
 	help             help.Model
-	List             list.Model
+	List             tree.Model[offline.Request]
 	spinner          spinner.Model
 	command_bar      common.Component
 	loading          common.Loading
@@ -75,15 +30,16 @@ type Model struct {
 	Width            int
 	Height           int
 	Requests         RequestsData
-	Configs          repositories.Default
-	Workspace        repositories.Workspace
+	Configs          offline.Default
+	Workspace        offline.Workspace
+	workers          []tea.Cmd
 }
 
 var (
 	divider = lipgloss.NewStyle().MarginLeft(1).Border(lipgloss.NormalBorder(), false, true, false, false)
 )
 
-func New() tea.Model {
+func New(workers ...tea.Cmd) tea.Model {
 	s := spinner.New()
 	s.Spinner = spinner.Points
 	s.Style = lipgloss.NewStyle().MarginLeft(2).Foreground(styles.DefaultTheme.PrimaryText)
@@ -92,27 +48,34 @@ func New() tea.Model {
 		Width:          0,
 		Height:         0,
 		state:          common.Start_state,
-		List:           NewRequestList(),
+		List:           tree.New([]tree.Node[offline.Request]{}, 0, 0),
 		Detail:         details.New(),
 		help:           help.New(),
 		keys:           keys,
 		spinner:        s,
 		command_bar:    command.New(),
 		command_active: false,
+		workers:        workers,
 	}
 
 	return m
 }
 
 func (m Model) Init() tea.Cmd {
-	return tea.Sequence(
-		LoadDefault,
-		LoadWorspace,
-		LoadRequests,
-		m.command_bar.Init(),
-		m.Detail.Init(),
-		common.SetState(common.Start_state),
+	cmds := m.workers
+
+	cmds = append(cmds,
+		tea.Sequence(
+			LoadDefault,
+			LoadWorspace,
+			LoadRequests,
+			m.command_bar.Init(),
+			m.Detail.Init(),
+			common.SetState(common.Start_state),
+		),
 	)
+
+	return tea.Batch(cmds...)
 }
 
 var (
@@ -120,9 +83,15 @@ var (
 )
 
 func (m Model) View() string {
+	list := lipgloss.NewStyle().
+		Border(lipgloss.RoundedBorder()).
+		Height(m.Height - 3).
+		Width(m.List.Width() - 4).
+		Render(m.List.View())
+
 	requestsPage := lipgloss.JoinHorizontal(
 		lipgloss.Left,
-		lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Height(m.Height-3).Width(m.List.Width()-4).Render(m.List.View()),
+		list,
 		m.Detail.View(),
 	)
 

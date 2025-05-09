@@ -9,13 +9,14 @@ type KeyMap struct {
 	SetWorkspace    key.Binding
 	CreateWorkspace key.Binding
 	OpenGroup       key.Binding
-	CloseGroup      key.Binding
 	Delete          key.Binding
 	Create          key.Binding
 	Edit            key.Binding
 	Exec            key.Binding
 	Envs            key.Binding
 	Detail          key.Binding
+	Next            key.Binding
+	Save            key.Binding
 	Quit            key.Binding
 }
 
@@ -25,12 +26,13 @@ func (k KeyMap) ShortHelp() []key.Binding {
 		k.SetWorkspace,
 		k.CreateWorkspace,
 		k.OpenGroup,
-		k.CloseGroup,
 		k.Delete,
 		k.Create,
 		k.Edit,
 		k.Exec,
 		k.Envs,
+		k.Next,
+		k.Save,
 	}
 }
 
@@ -61,10 +63,6 @@ var keys = KeyMap{
 		key.WithKeys("o", "esc", "enter", "l"),
 		key.WithHelp("o/l/enter", "Open"),
 	),
-	CloseGroup: key.NewBinding(
-		key.WithKeys("O", "h"),
-		key.WithHelp("O/h", "Close"),
-	),
 	Edit: key.NewBinding(
 		key.WithKeys("R"),
 		key.WithHelp("R", "Edit Request"),
@@ -85,6 +83,27 @@ var keys = KeyMap{
 		key.WithKeys("ctrl+e"),
 		key.WithHelp("ctrl+e", "Open Envs"),
 	),
+	Next: key.NewBinding(
+		key.WithKeys("tab"),
+		key.WithHelp("tab/shift+tab", "Next or Prev"),
+	),
+	Save: key.NewBinding(
+		key.WithKeys("enter"),
+	),
+}
+
+func (k *KeyMap) DisableKeysForInputs(v bool) {
+	k.Detail.SetEnabled(v)
+	k.Filter.SetEnabled(v)
+	k.SetWorkspace.SetEnabled(v)
+	k.CreateWorkspace.SetEnabled(v)
+	k.OpenGroup.SetEnabled(v)
+	k.Delete.SetEnabled(v)
+	k.Create.SetEnabled(v)
+	k.Edit.SetEnabled(v)
+	k.Exec.SetEnabled(v)
+	k.Envs.SetEnabled(v)
+	k.Quit.SetEnabled(v)
 }
 
 func (m Model) Help() string {

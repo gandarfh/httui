@@ -4,9 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 
-	"github.com/gandarfh/httui/internal/repositories"
+	"github.com/gandarfh/httui/internal/repositories/offline"
 )
 
 var re_env = regexp.MustCompile(`{{ _.\w* }}`)
@@ -15,15 +16,17 @@ var re_response_fields = regexp.MustCompile(`'\w+(\.\w+)*'`)
 
 // {% response 'field' '1' %}
 
-func ReadEnv(key string, workspaceId uint) (repositories.Env, error) {
-	repo := repositories.NewEnvs()
-
+func ReadEnv(key string, envs map[string]string) string {
 	key = strings.Replace(key, "{{ _.", "", 1)
 	key = strings.Replace(key, " }}", "", 1)
 
-	env, err := repo.FindByKey(key, workspaceId)
+	for envkey, value := range envs {
+		if envkey == key {
+			return value
+		}
+	}
 
-	return env, err
+	return key
 }
 
 func getField(payload map[string]interface{}, fields []string) (interface{}, error) {
@@ -44,16 +47,16 @@ func getField(payload map[string]interface{}, fields []string) (interface{}, err
 	return value, nil
 }
 
-func ReadResponse(key string) (string, error) {
+func ReadResponse(key string, workspaceId uint) (string, error) {
 	infos := re_response_fields.FindAllString(key, -1)
 
 	infos[0] = strings.Replace(infos[0], "'", "", -1)
-	reqId := strings.Replace(infos[1], "'", "", -1)
+	reqId, _ := strconv.Atoi(strings.Replace(infos[1], "'", "", -1))
 
 	fields := strings.Split(infos[0], ".")
 
-	repo := repositories.NewResponse()
-	response, err := repo.FindOne(reqId)
+	repo := offline.NewResponse()
+	response, err := repo.FindOne(uint(reqId), workspaceId)
 
 	data := map[string]interface{}{}
 	Convert(response, &data)
@@ -65,20 +68,20 @@ func ReadResponse(key string) (string, error) {
 
 type TransformFunc func(text string) string
 
-func ReplaceByOperator(raw string, workspaceId uint, transforms ...TransformFunc) string {
+func ReplaceByOperator(raw string, workspaceId uint, envs map[string]string) string {
 	listOfEnvs := re_env.FindAllString(raw, -1)
 	listOfResponses := re_response.FindAllString(raw, -1)
 
 	for _, item := range listOfEnvs {
-		if env, err := ReadEnv(item, workspaceId); err != nil {
+		if value := ReadEnv(item, envs); value == "" {
 			raw = strings.ReplaceAll(raw, item, item)
 		} else {
-			raw = strings.ReplaceAll(raw, item, env.Value)
+			raw = strings.ReplaceAll(raw, item, value)
 		}
 	}
 
 	for _, item := range listOfResponses {
-		if data, err := ReadResponse(item); err != nil {
+		if data, err := ReadResponse(item, workspaceId); err != nil {
 			raw = strings.ReplaceAll(raw, item, item)
 		} else {
 			raw = strings.ReplaceAll(raw, item, data)

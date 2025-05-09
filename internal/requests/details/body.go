@@ -16,7 +16,7 @@ func (m Model) Body() string {
 		glamour.WithWordWrap(bodyWidth),
 	)
 
-	rawbody := m.Request.Body.Data()
+	rawbody := m.Request.Body
 	jsonString := DataToString(rawbody, maxTextValueSize, m.Height-m.Height/4)
 	bodyJson, _ := renderTerm.Render("```json\n" + jsonString + "\n  ```")
 

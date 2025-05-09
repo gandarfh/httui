@@ -4,10 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"net/http"
-	"os"
-	"strconv"
 	"time"
 )
 
@@ -78,9 +75,8 @@ func (c *client) Exec() (*http.Response, error) {
 		request.Header.Add(item.key, item.value)
 	}
 
-	SERVER_READ_TIMEOUT, _ := strconv.Atoi(os.Getenv("SERVER_READ_TIMEOUT"))
 	client := http.Client{
-		Timeout: time.Second * time.Duration(SERVER_READ_TIMEOUT),
+		Timeout: time.Second * 30,
 	}
 
 	response, err := client.Do(request)
@@ -98,7 +94,7 @@ func (c *client) Decode(decode any) (*http.Response, error) {
 		return nil, err
 	}
 
-	data, err := ioutil.ReadAll(res.Body)
+	data, err := io.ReadAll(res.Body)
 
 	if err != nil {
 		return nil, err

@@ -3,15 +3,17 @@ package requests
 import (
 	"fmt"
 
-	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/gandarfh/httui/internal/repositories"
+	"github.com/gandarfh/httui/internal/repositories/offline"
 	"github.com/gandarfh/httui/pkg/common"
 	"github.com/gandarfh/httui/pkg/terminal"
+	"github.com/gandarfh/httui/pkg/tree/v2"
+	"github.com/gandarfh/httui/pkg/utils"
+	"gorm.io/gorm"
 )
 
-type UpdateRequestDefault repositories.Request
+type UpdateRequestDefault offline.Request
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var (
@@ -20,33 +22,64 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	)
 
 	switch msg := msg.(type) {
-	case RequestsData:
-		m.Requests = msg
-
-		cmds = append(cmds, m.List.SetItems(m.RequestOfList()))
-
-		if len(m.Requests.List) > 0 {
-			index := m.List.Index()
-
-			if len(m.Requests.List) <= index {
-				index = 0
+	case common.Sync:
+		switch msg.Action {
+		case "request":
+			request := offline.Request{}
+			if err := utils.Convert(msg.Data, &request); err != nil {
+				return m, nil
 			}
 
-			m.Requests.Current = m.Requests.List[index]
+			sync := true
+			request.Sync = &sync
+
+			if offline.NewRequest().Sql.Model(&request).Session(&gorm.Session{FullSaveAssociations: true}).Where("external_id = ?", request.ExternalId).Updates(&request).RowsAffected == 0 {
+				offline.NewRequest().Sql.Model(&request).Create(&request)
+			}
+
+			return m, LoadRequestsByParentId(m.parentId)
+
+		case "workspace":
+			workspace := offline.Workspace{}
+			if err := utils.Convert(msg.Data, &workspace); err != nil {
+				return m, nil
+			}
+
+			sync := true
+			workspace.Sync = &sync
+
+			if offline.NewWorkspace().Sql.Model(&workspace).Session(&gorm.Session{FullSaveAssociations: true}).Where("external_id = ?", workspace.ExternalId).Updates(&workspace).RowsAffected == 0 {
+				offline.NewWorkspace().Sql.Model(&workspace).Create(&workspace)
+			}
+		}
+
+	case RequestsData:
+		m.Requests = msg
+		m.parentId = msg.ParentID
+
+		m.List.SetCursorAndPage(msg.Cursor, msg.Page)
+
+		nodes := buildTree(m.Requests.List, nil)
+		nodes = tree.MergeNodes(nodes, msg.RequestTree)
+		nodes = tree.MergeNodes(nodes, m.List.Nodes())
+
+		m.List.SetNodes(nodes)
+
+		if len(m.Requests.List) > 0 {
 			cmds = append(cmds, m.Detail.SetRequest(m.Requests.Current))
 			cmds = append(cmds, func() tea.Msg { return UpdateRequestDefault(m.Requests.Current) })
 		}
 
-	case repositories.Workspace:
+	case offline.Workspace:
 		m.Workspace = msg
 		m.List.Title = fmt.Sprintf("[%s]", msg.Name)
 
-	case repositories.Default:
+	case offline.Default:
 		m.Configs = msg
 
 	case UpdateRequestDefault:
 		if m.Requests.Current.ID == msg.ID {
-			repositories.NewDefault().Update(&repositories.Default{
+			offline.NewDefault().Update(offline.Default{
 				RequestId: m.Requests.Current.ID,
 			})
 		}
@@ -71,16 +104,21 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case common.Environment:
-		m.Workspace = msg.Workspace
-		m.List.Title = fmt.Sprintf("[%s]", msg.Workspace.Name)
+		if msg.Reset {
+			m.List.Title = fmt.Sprintf("[%s]", m.Workspace.Name)
+			return m, nil
+		} else {
+			m.Workspace = msg.Workspace
+			m.List.Title = fmt.Sprintf("[%s]", msg.Workspace.Name)
+		}
 
-		cmd = m.Detail.SetWorkspace(repositories.Workspace(m.Workspace))
+		cmd = m.Detail.SetWorkspace(offline.Workspace(m.Workspace))
 		cmds = append(cmds, cmd)
 
 	case spinner.TickMsg:
 		if m.loading.Value {
 			m.spinner, cmd = m.spinner.Update(msg)
-			m.List.Title = fmt.Sprintf("[%s]", m.Workspace.Name) + m.spinner.View()
+			m.List.Title = fmt.Sprintf("[%s]", m.Workspace.Name) + m.spinner.View() + m.loading.Msg
 			cmds = append(cmds, cmd)
 		}
 
@@ -114,6 +152,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		m.Detail.Width = m.Width - m.List.Width() - 2
 		m.Detail.Height = m.Height - 9
+
+		m.Detail.InputPreview.CharLimit = m.Detail.Width - m.Detail.Width/6
+		m.Detail.InputName.CharLimit = m.Detail.Width / 2
 	}
 
 	if m.command_active {
@@ -132,13 +173,22 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, tea.Batch(cmds...)
 }
 
-func (m Model) RequestOfList() []list.Item {
-	list := []list.Item{}
-	w := m.List.Width() - 2
+func buildTree(requests []offline.Request, parentID *uint) []tree.Node[offline.Request] {
+	var nodes []tree.Node[offline.Request]
+	for _, req := range requests {
+		if (req.ParentID == nil && parentID == nil) || (req.ParentID != nil && parentID != nil && *req.ParentID == *parentID) {
 
-	for _, i := range m.Requests.List {
-		list = append(list, RequestItem{i.Name, i.Type, w})
+			children := buildTree(requests, &req.ID)
+			node := tree.Node[offline.Request]{
+				Value:    req.Name,
+				Data:     req,
+				Children: children,
+				Expanded: false,
+			}
+
+			nodes = append(nodes, node)
+		}
 	}
 
-	return list
+	return nodes
 }

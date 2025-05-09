@@ -1,0 +1,273 @@
+debug 2024/05/26 05:50:15 organization.Name: Joao Ferreira
+debug 2024/05/26 05:50:16 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 05:50:25 Jaum {"data":{"healthcheck":200},"action":"healthcheck"}
+debug 2024/05/26 05:57:15 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 05:58:25 Action: healthcheck Data: map[action:healthcheck data:map[healthcheck:200 route:healthcheck]]
+debug 2024/05/26 07:40:31 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 07:42:39 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 07:45:39 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 07:47:59 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 07:48:10 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 07:50:46 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 07:50:56 Sync: request map[_id:665314107eea8c771cf95513 createdAt:2024-05-26T10:50:56.106Z description:Gateway principal da housi para gestão de serviços do APP e Site endpoint: headers:[] name:Gandalf API v3 organizationId:6651ee24b41f3afb4ed68bc5 type:group updatedAt:2024-05-26T10:50:56.106Z]
+debug 2024/05/26 08:02:07 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 08:02:14 Sync: request map[_id:665316b57eea8c771cf95514 createdAt:2024-05-26T11:02:13.603Z description:Gateway principal da housi para gestão de serviços do APP e Site endpoint: headers:[] name:Gandalf API v3 organizationId:6651ee24b41f3afb4ed68bc5 type:group updatedAt:2024-05-26T11:02:13.603Z]
+debug 2024/05/26 08:02:26 Sync: request map[_id:665316c17eea8c771cf95515 createdAt:2024-05-26T11:02:25.64Z description:Gateway principal da housi para gestão de serviços do APP e Site endpoint: headers:[] name:Gandalf API v4 organizationId:6651ee24b41f3afb4ed68bc5 type:group updatedAt:2024-05-26T11:02:25.64Z]
+debug 2024/05/26 09:18:05 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 09:18:23 Sync: workspace map[_id:6653288ff803ceeb15c0844a createdAt:2024-05-26T12:18:23.371Z name:Production organizationId:6651ee24b41f3afb4ed68bc5 updatedAt:2024-05-26T12:18:23.371Z]
+debug 2024/05/26 09:18:42 Sync: workspace map[_id:665328a1f803ceeb15c0844b createdAt:2024-05-26T12:18:41.941Z name:Jaum organizationId:6651ee24b41f3afb4ed68bc5 updatedAt:2024-05-26T12:18:41.941Z]
+debug 2024/05/26 09:20:43 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 09:20:49 Sync: workspace map[_id:66532921f803ceeb15c0844c createdAt:2024-05-26T12:20:49.469Z name:Teste organizationId:6651ee24b41f3afb4ed68bc5 updatedAt:2024-05-26T12:20:49.469Z]
+debug 2024/05/26 09:22:10 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 09:23:12 Sync: workspace map[_id:665329aff803ceeb15c0844d createdAt:2024-05-26T12:23:11.82Z name:Jaum organizationId:6651ee24b41f3afb4ed68bc5 updatedAt:2024-05-26T12:23:11.82Z]
+debug 2024/05/26 09:24:36 Sync: workspace map[_id:66532a03f803ceeb15c0844e createdAt:2024-05-26T12:24:35.627Z name:Production organizationId:6651ee24b41f3afb4ed68bc5 updatedAt:2024-05-26T12:24:35.627Z]
+debug 2024/05/26 09:27:51 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 09:27:57 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 09:28:06 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 09:28:33 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 09:28:40 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 09:29:17 Sync: workspace map[_id:66532b1df803ceeb15c08450 createdAt:2024-05-26T12:29:17.465Z name:sandbox organizationId:6651ee24b41f3afb4ed68bc5 updatedAt:2024-05-26T12:29:17.465Z]
+debug 2024/05/26 11:53:56 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 11:54:10 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 11:55:04 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 11:58:20 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 12:02:46 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 12:35:45 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 12:41:10 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 12:42:51 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 12:49:17 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 12:51:20 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 13:17:03 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 13:17:38 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 13:17:56 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 13:18:46 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 13:19:08 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 13:19:17 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 13:19:50 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 13:20:14 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 13:20:53 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 13:21:28 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 13:22:07 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 13:22:57 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 13:23:02 jaum
+debug 2024/05/26 13:24:59 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 13:25:38 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 13:26:17 [{{1 2024-05-26 15:02:51.066 +0000 UTC 2024-05-26 15:02:51.545292284 +0000 UTC {0001-01-01 00:00:00 +0000 UTC false}} 66534f1bf803ceeb15c08454 true 6651ee24b41f3afb4ed68bc5 <nil> group Gandalf API v4 0xc00054a170   {[]} {[]} {map[]}} {{2 2024-05-26 15:03:06.855 +0000 UTC 2024-05-26 15:03:07.333471923 +0000 UTC {0001-01-01 00:00:00 +0000 UTC false}} 66534f2af803ceeb15c08455 true 6651ee24b41f3afb4ed68bc5 <nil> group Gandalf API v5 0xc00054a260   {[]} {[]} {map[]}}]
+debug 2024/05/26 13:26:18 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 13:29:26 []
+debug 2024/05/26 13:29:26 OrganizationShow: Get "http://localhost:5000/organizations": dial tcp [::1]:5000: connect: connection refused
+debug 2024/05/26 13:29:26 failed to get organization value: Get "http://localhost:5000/organizations": dial tcp [::1]:5000: connect: connection refused
+debug 2024/05/26 13:31:30 OrganizationShow: Get "http://localhost:5000/organizations": dial tcp [::1]:5000: connect: connection refused
+debug 2024/05/26 13:31:30 failed to get organization value: Get "http://localhost:5000/organizations": dial tcp [::1]:5000: connect: connection refused
+debug 2024/05/26 13:31:30 []
+debug 2024/05/26 13:33:08 OrganizationShow: Get "http://localhost:5000/organizations": dial tcp [::1]:5000: connect: connection refused
+debug 2024/05/26 13:33:08 failed to get organization value: Get "http://localhost:5000/organizations": dial tcp [::1]:5000: connect: connection refused
+debug 2024/05/26 13:33:08 []
+debug 2024/05/26 13:33:16 Error to Sync request Post "http://localhost:5000/requests": dial tcp [::1]:5000: connect: connection refused
+debug 2024/05/26 13:34:49 [{{3 2024-05-26 16:33:16.255593361 +0000 UTC 2024-05-26 16:33:16.255593361 +0000 UTC {0001-01-01 00:00:00 +0000 UTC false}}  false  <nil> group Jaum Offline <nil>   {[]} {[]} {map[]}}]
+debug 2024/05/26 13:34:49 OrganizationShow: Get "http://localhost:5000/organizations": dial tcp [::1]:5000: connect: connection refused
+debug 2024/05/26 13:34:49 failed to get organization value: Get "http://localhost:5000/organizations": dial tcp [::1]:5000: connect: connection refused
+debug 2024/05/26 13:55:01 [{{3 2024-05-26 16:33:16.255593361 +0000 UTC 2024-05-26 16:33:16.255593361 +0000 UTC {0001-01-01 00:00:00 +0000 UTC false}}  false  <nil> group Jaum Offline <nil>   {[]} {[]} {map[]}}]
+debug 2024/05/26 13:55:02 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 13:55:14 []
+debug 2024/05/26 13:55:14 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 13:55:38 []
+debug 2024/05/26 13:55:38 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 13:57:43 []
+debug 2024/05/26 13:57:44 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 14:29:34 Error to Sync request Post "http://localhost:5000/requests": dial tcp [::1]:5000: connect: connection refused
+debug 2024/05/26 14:30:49 OrganizationShow: Get "http://localhost:5000/organizations": dial tcp [::1]:5000: connect: connection refused
+debug 2024/05/26 14:30:49 failed to get organization value: Get "http://localhost:5000/organizations": dial tcp [::1]:5000: connect: connection refused
+debug 2024/05/26 14:30:49 []
+debug 2024/05/26 14:31:19 OrganizationShow: Get "http://localhost:5000/organizations": dial tcp [::1]:5000: connect: connection refused
+debug 2024/05/26 14:31:19 failed to get organization value: Get "http://localhost:5000/organizations": dial tcp [::1]:5000: connect: connection refused
+debug 2024/05/26 14:31:19 []
+debug 2024/05/26 14:31:34 Error to Sync request Post "http://localhost:5000/requests": dial tcp [::1]:5000: connect: connection refused
+debug 2024/05/26 14:31:40 Error to Sync request Post "http://localhost:5000/requests": dial tcp [::1]:5000: connect: connection refused
+debug 2024/05/26 14:32:40 OrganizationShow: Get "http://localhost:5000/organizations": dial tcp [::1]:5000: connect: connection refused
+debug 2024/05/26 14:32:40 failed to get organization value: Get "http://localhost:5000/organizations": dial tcp [::1]:5000: connect: connection refused
+debug 2024/05/26 14:32:40 []
+debug 2024/05/26 14:32:45 {
+  "ID": 3,
+  "CreatedAt": "2024-05-26T16:55:01.519Z",
+  "UpdatedAt": "2024-05-26T17:31:40.575116739Z",
+  "DeletedAt": null,
+  "_id": "6653696532a43c2a1f93a352",
+  "organizationId": "6651ee24b41f3afb4ed68bc5",
+  "type": "group",
+  "name": "Jaum Offline v2",
+  "description": null,
+  "endpoint": "",
+  "queryParams": null,
+  "headers": null,
+  "body": null
+}
+debug 2024/05/26 14:32:45 Error to Sync request Post "http://localhost:5000/requests": dial tcp [::1]:5000: connect: connection refused
+debug 2024/05/26 14:36:44 OrganizationShow: Get "http://localhost:5000/organizations": dial tcp [::1]:5000: connect: connection refused
+debug 2024/05/26 14:36:44 failed to get organization value: Get "http://localhost:5000/organizations": dial tcp [::1]:5000: connect: connection refused
+debug 2024/05/26 14:36:44 []
+debug 2024/05/26 14:36:50 {
+  "ID": 3,
+  "CreatedAt": "2024-05-26T16:55:01.519Z",
+  "UpdatedAt": "2024-05-26T17:32:45.623326665Z",
+  "DeletedAt": null,
+  "_id": "6653696532a43c2a1f93a352",
+  "sync": true,
+  "organizationId": "6651ee24b41f3afb4ed68bc5",
+  "type": "group",
+  "name": "Jaum Offline v3",
+  "description": null,
+  "endpoint": "",
+  "queryParams": null,
+  "headers": null,
+  "body": null
+}
+debug 2024/05/26 14:36:58 {
+  "ID": 3,
+  "CreatedAt": "2024-05-26T16:55:01.519Z",
+  "UpdatedAt": "2024-05-26T17:36:50.888063722Z",
+  "DeletedAt": null,
+  "_id": "6653696532a43c2a1f93a352",
+  "sync": true,
+  "organizationId": "6651ee24b41f3afb4ed68bc5",
+  "type": "group",
+  "name": "Jaum Offline v3",
+  "description": null,
+  "endpoint": "",
+  "queryParams": null,
+  "headers": null,
+  "body": null
+}
+debug 2024/05/26 14:37:29 OrganizationShow: Get "http://localhost:5000/organizations": dial tcp [::1]:5000: connect: connection refused
+debug 2024/05/26 14:37:29 failed to get organization value: Get "http://localhost:5000/organizations": dial tcp [::1]:5000: connect: connection refused
+debug 2024/05/26 14:37:29 []
+debug 2024/05/26 14:37:37 {
+  "ID": 3,
+  "CreatedAt": "2024-05-26T16:55:01.519Z",
+  "UpdatedAt": "2024-05-26T17:36:58.89905889Z",
+  "DeletedAt": null,
+  "_id": "6653696532a43c2a1f93a352",
+  "sync": false,
+  "organizationId": "6651ee24b41f3afb4ed68bc5",
+  "type": "group",
+  "name": "Jaum Offline v3",
+  "description": null,
+  "endpoint": "",
+  "queryParams": null,
+  "headers": null,
+  "body": null
+}
+debug 2024/05/26 14:37:37 Error to Sync request Post "http://localhost:5000/requests": dial tcp [::1]:5000: connect: connection refused
+debug 2024/05/26 14:37:42 {
+  "ID": 3,
+  "CreatedAt": "2024-05-26T16:55:01.519Z",
+  "UpdatedAt": "2024-05-26T17:37:37.650541619Z",
+  "DeletedAt": null,
+  "_id": "6653696532a43c2a1f93a352",
+  "sync": false,
+  "organizationId": "6651ee24b41f3afb4ed68bc5",
+  "type": "group",
+  "name": "Jaum Offline v3",
+  "description": null,
+  "endpoint": "",
+  "queryParams": null,
+  "headers": null,
+  "body": null
+}
+debug 2024/05/26 14:37:42 Error to Sync request Post "http://localhost:5000/requests": dial tcp [::1]:5000: connect: connection refused
+debug 2024/05/26 15:23:34 OrganizationShow: Get "http://localhost:5000/organizations": dial tcp [::1]:5000: connect: connection refused
+debug 2024/05/26 15:23:34 failed to get organization value: Get "http://localhost:5000/organizations": dial tcp [::1]:5000: connect: connection refused
+debug 2024/05/26 15:23:34 [{{3 2024-05-26 16:55:01.519 +0000 UTC 2024-05-26 17:37:42.050565338 +0000 UTC {0001-01-01 00:00:00 +0000 UTC false}} 6653696532a43c2a1f93a352 0xc000214190 6651ee24b41f3afb4ed68bc5 <nil> group Jaum Offline v3 <nil>   {[]} {[]} {map[]}}]
+debug 2024/05/26 15:23:54 OrganizationShow: Get "http://localhost:5000/organizations": dial tcp [::1]:5000: connect: connection refused
+debug 2024/05/26 15:23:54 failed to get organization value: Get "http://localhost:5000/organizations": dial tcp [::1]:5000: connect: connection refused
+debug 2024/05/26 15:23:58 [{{3 2024-05-26 16:55:01.519 +0000 UTC 2024-05-26 17:37:42.050565338 +0000 UTC {0001-01-01 00:00:00 +0000 UTC false}} 6653696532a43c2a1f93a352 0xc0004461e0 6651ee24b41f3afb4ed68bc5 <nil> group Jaum Offline v3 <nil>   {[]} {[]} {map[]}}]
+debug 2024/05/26 15:26:56 [{{3 2024-05-26 16:55:01.519 +0000 UTC 2024-05-26 17:37:42.050565338 +0000 UTC {0001-01-01 00:00:00 +0000 UTC false}} 6653696532a43c2a1f93a352 0xc000356040 6651ee24b41f3afb4ed68bc5 <nil> group Jaum Offline v3 <nil>   {[]} {[]} {map[]}}]
+debug 2024/05/26 15:26:57 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 15:27:01 {
+  "ID": 3,
+  "CreatedAt": "2024-05-26T16:55:01.519Z",
+  "UpdatedAt": "2024-05-26T18:26:57.05717934Z",
+  "DeletedAt": null,
+  "_id": "6653696532a43c2a1f93a352",
+  "sync": false,
+  "organizationId": "6651ee24b41f3afb4ed68bc5",
+  "type": "group",
+  "name": "Jaum Offline v3",
+  "description": null,
+  "endpoint": "",
+  "queryParams": null,
+  "headers": null,
+  "body": null
+}
+debug 2024/05/26 15:40:37 {
+  "ID": 3,
+  "CreatedAt": "2024-05-26T16:55:01.519Z",
+  "UpdatedAt": "2024-05-26T18:27:01.940340923Z",
+  "DeletedAt": null,
+  "_id": "6653696532a43c2a1f93a352",
+  "sync": false,
+  "organizationId": "6651ee24b41f3afb4ed68bc5",
+  "type": "group",
+  "name": "Jaum Offline v5",
+  "description": null,
+  "endpoint": "",
+  "queryParams": null,
+  "headers": null,
+  "body": null
+}
+debug 2024/05/26 15:40:55 {
+  "ID": 3,
+  "CreatedAt": "2024-05-26T16:55:01.519Z",
+  "UpdatedAt": "2024-05-26T18:40:37.74818982Z",
+  "DeletedAt": null,
+  "_id": "6653696532a43c2a1f93a352",
+  "sync": false,
+  "organizationId": "6651ee24b41f3afb4ed68bc5",
+  "type": "group",
+  "name": "Jaums Offline v5",
+  "description": null,
+  "endpoint": "",
+  "queryParams": null,
+  "headers": null,
+  "body": null
+}
+debug 2024/05/26 15:41:04 {
+  "ID": 3,
+  "CreatedAt": "2024-05-26T16:55:01.519Z",
+  "UpdatedAt": "2024-05-26T18:40:55.599337258Z",
+  "DeletedAt": null,
+  "_id": "6653696532a43c2a1f93a352",
+  "sync": false,
+  "organizationId": "6651ee24b41f3afb4ed68bc5",
+  "type": "group",
+  "name": "Jaum Offline",
+  "description": null,
+  "endpoint": "",
+  "queryParams": null,
+  "headers": null,
+  "body": null
+}
+debug 2024/05/26 16:39:48 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 17:11:03 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 17:13:35 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/26 17:13:49 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/29 15:59:50 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/29 16:00:01 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/29 16:00:43 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/29 16:04:28 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/29 16:04:51 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/29 19:15:58 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/29 19:20:43 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/29 19:25:18 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/29 19:44:58 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/29 19:48:49 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/29 19:50:13 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/30 20:14:15 OrganizationShow: Get "http://localhost:5000/organizations": EOF
+debug 2024/05/30 20:14:15 failed to get organization value: Get "http://localhost:5000/organizations": EOF
+debug 2024/05/30 20:27:23 OrganizationShow: Get "http://localhost:5000/organizations": EOF
+debug 2024/05/30 20:27:23 failed to get organization value: Get "http://localhost:5000/organizations": EOF
+debug 2024/05/30 20:29:26 OrganizationShow: Get "http://localhost:5000/organizations": dial tcp [::1]:5000: connect: connection refused
+debug 2024/05/30 20:29:26 failed to get organization value: Get "http://localhost:5000/organizations": dial tcp [::1]:5000: connect: connection refused
+debug 2024/05/30 20:29:31 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/05/30 20:29:45 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5
+debug 2024/06/02 06:35:48 MQTT Connected! topics/6651ee24b41f3afb4ed68bc5

@@ -1,10 +1,10 @@
 package utils
 
-import "github.com/gandarfh/httui/internal/repositories"
+import "github.com/gandarfh/httui/internal/repositories/offline"
 
 func GetAllParentsHeaders(parentId *uint, headers []map[string]string) []map[string]string {
 	if parentId != nil {
-		parent, _ := repositories.NewRequest().FindOne(*parentId)
+		parent, _ := offline.NewRequest().FindOne(*parentId)
 		parentHeaders := GetAllParentsHeaders(parent.ParentID, parent.Headers.Data())
 
 		headers = append(headers, parentHeaders...)
@@ -15,7 +15,7 @@ func GetAllParentsHeaders(parentId *uint, headers []map[string]string) []map[str
 
 func GetAllParentsParams(parentId *uint, params []map[string]string) []map[string]string {
 	if parentId != nil {
-		parent, _ := repositories.NewRequest().FindOne(*parentId)
+		parent, _ := offline.NewRequest().FindOne(*parentId)
 		parentParams := GetAllParentsParams(parent.ParentID, parent.QueryParams.Data())
 
 		params = append(params, parentParams...)

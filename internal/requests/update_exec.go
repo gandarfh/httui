@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/gandarfh/httui/internal/repositories"
+	"github.com/gandarfh/httui/internal/repositories/offline"
 	"github.com/gandarfh/httui/pkg/client"
 	"github.com/gandarfh/httui/pkg/utils"
 	"gorm.io/datatypes"
@@ -24,11 +24,11 @@ func (m Model) Exec() tea.Cmd {
 	return func() tea.Msg {
 		request := m.Requests.Current
 
-		url := utils.ReplaceByOperator(request.Endpoint, m.Workspace.ID)
-		res := client.Request(url, strings.ToUpper(request.Method))
+		url := utils.ReplaceByOperator(request.Endpoint, m.Workspace.ID, m.Workspace.Environments.Data())
+		res := client.Request(url, strings.ToUpper(string(request.Method)))
 
 		rawbody, _ := request.Body.MarshalJSON()
-		bodystring := utils.ReplaceByOperator(string(rawbody), m.Workspace.ID)
+		bodystring := utils.ReplaceByOperator(string(rawbody), m.Workspace.ID, m.Workspace.Environments.Data())
 
 		var body any
 		if err := json.Unmarshal([]byte(bodystring), &body); err != nil {
@@ -42,7 +42,7 @@ func (m Model) Exec() tea.Cmd {
 		}
 
 		headers := utils.GetAllParentsHeaders(request.ParentID, request.Headers.Data())
-		headers = utils.ProcessParamsOperators(headers, m.Workspace.ID)
+		headers = utils.ProcessParamsOperators(headers, m.Workspace.ID, m.Workspace.Environments.Data())
 
 		for _, item := range headers {
 			for k, v := range item {
@@ -51,7 +51,7 @@ func (m Model) Exec() tea.Cmd {
 		}
 
 		params := utils.GetAllParentsParams(request.ParentID, request.QueryParams.Data())
-		params = utils.ProcessParamsOperators(params, m.Workspace.ID)
+		params = utils.ProcessParamsOperators(params, m.Workspace.ID, m.Workspace.Environments.Data())
 
 		for _, item := range params {
 			for k, v := range item {
@@ -71,19 +71,16 @@ func (m Model) Exec() tea.Cmd {
 		readbody, _ := io.ReadAll(data.Body)
 		json.Unmarshal(readbody, &response)
 
-		result := repositories.Response{
-			RequestId: request.ID,
-			Url:       url,
-			Method:    request.Method,
-			Status:    data.Status,
-			Params:    datatypes.NewJSONType(params),
-			Headers:   datatypes.NewJSONType(headers),
-			Response:  datatypes.NewJSONType(response),
-			Body:      datatypes.NewJSONType(body),
-			Curl:      Curl(data.Request),
+		result := offline.Response{
+			WorkspaceId:       m.Workspace.ID,
+			Status:            data.Status,
+			RequestId:         request.ID,
+			RequestExternalId: request.ExternalId,
+			Request:           datatypes.NewJSONType(request),
+			Response:          datatypes.NewJSONType(response),
 		}
 
-		repositories.NewResponse().Create(&result)
+		offline.NewResponse().Create(&result)
 
 		return Result{
 			Response: result,
