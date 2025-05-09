@@ -7,8 +7,6 @@ import (
 )
 
 type Model struct {
-	width     int
-	height    int
 	textInput textinput.Model
 }
 

@@ -35,10 +35,21 @@ func LoadRequests() tea.Msg {
 	request, _ := offline.NewRequest().FindOne(config.RequestId)
 	requests, _ := offline.NewRequest().List(request.ParentID, "")
 
+	cursor := 0
+	page := 0
+
+	if config.Cursor != nil {
+		cursor = *config.Cursor
+	}
+
+	if config.Page != nil {
+		page = *config.Page
+	}
+
 	return RequestsData{
 		RequestTree: config.RequestTree.Data(),
-		Cursor:      *config.Cursor,
-		Page:        *config.Page,
+		Cursor:      cursor,
+		Page:        page,
 		Current:     *request,
 		List:        requests,
 		ParentID:    request.ParentID,

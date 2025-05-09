@@ -28,7 +28,7 @@ var Database *gorm.DB
 
 func SqliteConnection() error {
 	home, _ := os.UserHomeDir()
-	db, err := gorm.Open(sqlite.Open(filepath.Join(home, "httui.v2.db")), &gorm.Config{
+	db, err := gorm.Open(sqlite.Open(filepath.Join(home, "httui.v3.db")), &gorm.Config{
 		Logger: newLogger,
 		NowFunc: func() time.Time {
 			return time.Now().UTC()

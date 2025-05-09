@@ -31,6 +31,5 @@ func init() {
 		log.Fatal(err)
 	}
 
-	rootCmd.AddCommand(loginCmd())
 	rootCmd.AddCommand(testCmd())
 }

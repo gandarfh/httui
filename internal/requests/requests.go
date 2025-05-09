@@ -15,7 +15,6 @@ import (
 
 type Model struct {
 	Detail           details.Model
-	title            string
 	filter           string
 	parentId         *uint
 	previousParentId *uint
