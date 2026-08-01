@@ -171,7 +171,7 @@ jobs:
           # vitest --changed needs history to diff against the PR base.
           fetch-depth: 0
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: 20
           cache: npm
@@ -277,7 +277,7 @@ jobs:
                 "httui-desktop/src-tauri/binaries/httui-$triple" \
                 "httui-desktop/src-tauri/binaries/httui-lsp-$triple"
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         if: steps.detect.outputs.has_fe == '1'
         with:
           node-version: 20
